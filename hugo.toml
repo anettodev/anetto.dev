@@ -1,3 +1,81 @@
-baseURL = 'https://example.org/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
+
+
+baseURL = "https://anetto.dev/"
+
+title = "anetto.dev"
+theme = "hugo-coder"
+languageCode = "en"
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = true
+
+paginate = 20
+canonifyURLs = true
+
+enableEmoji = true
+
+dateFormat = "2006-01-02"
+colorScheme = "dark"
+hideColorSchemeToggle = true
+
+customSCSS = ["scss/custom.scss"]
+
+[[menu.main]]
+name = "About"
+weight = 1
+url = "about/"
+
+[params.goatCounter]
+code = "anettodev"
+
+[params.utterances]
+repo = "anettodev/anetto.dev"
+issueTerm = "pathname"
+theme = "dark"
+
+[markup.highlight]
+style = "github-dark"
+tabWidth = 4
+
+[params]
+author = "Antonio Netto"
+avatarURL = "images/me.jpeg"
+images = ["images/an-cover.png"]
+description = "ANetto.dev personal website"
+keywords = "developer,desenvolvedor,engineer,software,staff,iOS,swift,objective-c,obj-c,c++,C#,python,go,rust"
+info = "Sr. Staff Software Engineer"
+company = "Inter"
+companyURL = "https://inter.co/"
+
+[[params.social]]
+name = "LinkedIn"
+icon = "fa-brands fa-linkedin fa-2x"
+weight = 1
+url = "https://www.linkedin.com/in/anettodev/"
+
+[[params.social]]
+name = "Github"
+icon = "fa-brands fa-github fa-2x"
+weight = 2
+url = "https://github.com/anettodev/"
+
+[[params.social]]
+name = "Twitter"
+icon = "fa-brands fa-x-twitter fa-2x"
+weight = 3
+url = "https://twitter.com/anettodev/"
+
+[[params.social]]
+name = "Twitter"
+icon = "fa-brands fa-mastodon fa-2x"
+weight = 4
+url = "https://me.dm/@anettodev"
+
+[[params.social]]
+name = "Medium"
+icon = "fa-brands fa-medium fa-2x"
+weight = 5
+url = "https://medium.com/@anettodev"
+
+[module]
+[module.hugoVersion]
+min = "0.77.0"
