@@ -1,6 +1,6 @@
 
 
-baseURL = "https://anetto.dev/"
+baseURL = "https://anettodev.github.io/"
 
 title = "anetto.dev"
 theme = "hugo-coder"
