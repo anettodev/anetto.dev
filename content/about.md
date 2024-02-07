@@ -1,34 +1,43 @@
 +++
 date = 2024-02-06
-title = "About me"
+title = "👤 About me"
 slug = "about"
 +++
 
-Hello! My name is Antonio. I am a proud father of twins, an computer scientist, and a 🇧🇷brazilian software developer.
+Hello! My name is Antonio. I am a proud father of twins, an computer scientist, and a software developer.
+
+Originally hailing from Recife-PE, Brazil 🇧🇷, I currently reside in Belo Horizonte-MG, Brazil 🇧🇷. 
+
+As a Brazilian, **Portuguese** (pt-br) is my mother tongue, however, I am also highly proficient in **English** (en-us), and I possess a good command of Latin American and Caribbean **Spanish** (es-419).
 
 {{< figure src="../../images/theboys.jpeg" alt="me and my boys" caption="me and my boys 👶🏻 ❤️ 👶🏻" width="50%" class="avatar" >}}
 
-### Profile 
+### 🧑‍💻 Profile 
 
 With over 15 years of experience in software development, I started my career in 2007, primarily concentrating on web development, handling tasks on both the back-end and front-end using PHP and JS.
 
-Nonetheless, from 2011 onward, my professional trajectory pivoted toward iOS mobile development (commencing with iOS 4.3). I am proficient in both Objective-C and Swift programming languages.
+Nonetheless, from 2011 onward, my professional trajectory pivoted toward  iOS mobile development (commencing with iOS 4.3). I am proficient in both Objective-C and Swift programming languages.
 
-Since 2015, I hold a bachelor's degree in computer science from the _[Catholic University of Pernambuco][unicap]_.
+Since 2015, I hold a bachelor's degree in __computer science__ from the _[Catholic University of Pernambuco][unicap]_.
 
-Throughout my career, I have served diverse industries, including e-commerce, automobile, logistics, communications, education, IT consulting, and banking/finance with some of them listed in NASDAQ, B3, and the Global Fortune 500.
+Throughout my career, I have served diverse industries (B2B & B2C), including e-commerce, automobile, logistics, communications, education, IT consulting, and banking/finance with some of them listed in [NASDAQ][nasdaq], [B3][b3], and the [Global Fortune 500][fortune500].
 
-### Tech Skills
+### 💻 Tech Skills 
+
+For over a decade, I have been committed to working in mobile app development, with a focus on the  iOS platform.
 
 My main programming languages nowadays is **Swift(UIKit & SwiftUI), Objective-C, C/C++, and Python**. 
-However, I already played with C#, Java, PHP, JS and many others.
+However, I already played with **C#, Java, PHP, JS** and many others.
 
-This website for example, use GO as main programming language.
+This website for example, uses **GO** as main programming language.
 
-### Social & Contact
+### 📄 Resume 
+Feel free to review or download my most recent resume at the following [link][resume].
 
-You can find me on [Linkedin][linkedin], [X (Twitter)][twitter] or [Github][github]. You can send a e-mail to hello@anetto.dev.
-
+[resume]: https://drive.proton.me/urls/XP2H6N18CW#2B9RApp7RTmY
+[nasdaq]: https://www.nasdaq.com/
+[b3]: https://www.b3.com.br/en_us/
+[fortune500]: https://fortune.com/ranking/global500/
 [unicap]: https://portal.unicap.br/w/ciencia-da-computacao#presencial/sobre
 [twitter]: https://twitter.com/anettodev
 [linkedin]: https://www.linkedin.com/in/anettodev/

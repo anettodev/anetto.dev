@@ -19,7 +19,7 @@ avatarURL = "images/me.jpeg"
 images = ["images/an-cover.png"]
 description = "ANetto.dev personal website"
 keywords = "developer,desenvolvedor,engineer,software,staff,iOS,swift,objective-c,obj-c,c++,C#,python,go,rust"
-info = "Sr. Staff Software Engineer"
+info = " iOS Dev Specialist Master"
 company = "Inter"
 companyURL = "https://inter.co/"
 
@@ -101,3 +101,62 @@ identifier = "fa fa-example-external-site"
 weight = 2
 url = "https://medium.anetto.dev/"
 hrefTargetBlank = true
+
+[[menu.main]]
+name = "Projects"
+weight = 3
+url = "sideprojects/"
+
+[[menu.main]]
+name = "Gist"
+weight = 4
+url = "https://gist.github.com/anettodev"
+
+[[menu.main]]
+name = "Contact"
+weight = 5
+url = "contact/"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote = true
+      linkify = true
+      linkifyProtocol = 'https'
+      strikethrough = true
+      table = true
+      taskList = true
+      [markup.goldmark.extensions.cjk]
+        eastAsianLineBreaks = false
+        eastAsianLineBreaksStyle = 'simple'
+        enable = false
+        escapedSpace = false
+      [markup.goldmark.extensions.passthrough]
+        enable = false
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = []
+          inline = []
+      [markup.goldmark.extensions.typographer]
+        apostrophe = '&rsquo;'
+        disable = false
+        ellipsis = '&hellip;'
+        emDash = '&mdash;'
+        enDash = '&ndash;'
+        leftAngleQuote = '&laquo;'
+        leftDoubleQuote = '&ldquo;'
+        leftSingleQuote = '&lsquo;'
+        rightAngleQuote = '&raquo;'
+        rightDoubleQuote = '&rdquo;'
+        rightSingleQuote = '&rsquo;'
+    [markup.goldmark.parser]
+      autoHeadingID = true
+      autoHeadingIDType = 'github'
+      wrapStandAloneImageWithinParagraph = true
+      [markup.goldmark.parser.attribute]
+        block = false
+        title = true
+    [markup.goldmark.renderer]
+      hardWraps = false
+      unsafe = false
+      xhtml = false
