@@ -1,38 +1,15 @@
 baseURL = "https://anettodev.github.io/"
-
 title = "anetto.dev"
+
 theme = "hugo-coder"
+
 languageCode = "en"
 defaultContentLanguage = "en"
-defaultContentLanguageInSubdir = true
+# defaultContentLanguageInSubdir = true
 
 paginate = 20
 canonifyURLs = true
-
 enableEmoji = true
-
-dateFormat = "2006-01-02"
-colorScheme = "dark"
-hideColorSchemeToggle = true
-
-customSCSS = ["scss/custom.scss"]
-
-[[menu.main]]
-name = "About"
-weight = 1
-url = "about/"
-
-[params.goatCounter]
-code = "anettodev"
-
-[params.utterances]
-repo = "anettodev/anetto.dev"
-issueTerm = "pathname"
-theme = "dark"
-
-[markup.highlight]
-style = "github-dark"
-tabWidth = 4
 
 [params]
 author = "Antonio Netto"
@@ -43,6 +20,28 @@ keywords = "developer,desenvolvedor,engineer,software,staff,iOS,swift,objective-
 info = "Sr. Staff Software Engineer"
 company = "Inter"
 companyURL = "https://inter.co/"
+
+faviconSVG = "/images/favicon.ico"
+favicon_32 = "/images/favicon-32x32.png"
+favicon_16 = "/images/favicon-16x16.png"
+touchIcon = "/images/apple-touch-icon.png"
+
+dateFormat = "January 2, 2006"
+
+hideCredits = false
+hideCopyright = false
+
+rtl = false
+# Specify light/dark colorscheme
+# Supported values:
+# "auto" (use preference set by browser)
+# "dark" (dark background, light foreground)
+# "light" (light background, dark foreground) (default)
+colorScheme = "auto"
+# Hide the toggle button, along with the associated vertical divider
+hideColorSchemeToggle = false
+
+customSCSS = ["scss/custom.scss"]
 
 [[params.social]]
 name = "LinkedIn"
@@ -74,6 +73,30 @@ icon = "fa-brands fa-medium fa-2x"
 weight = 5
 url = "https://medium.com/@anettodev"
 
+[params.goatCounter]
+code = "anettodev"
+
+[params.utterances]
+repo = "anettodev/anetto.dev"
+issueTerm = "pathname"
+theme = "dark"
+
+[markup.highlight]
+style = "github-dark"
+tabWidth = 4
+
 [module]
 [module.hugoVersion]
 min = "0.77.0"
+
+[[menu.main]]
+name = "About"
+weight = 1
+url = "about/"
+
+[[menu.main]]
+name = "Blog"
+identifier = "fa fa-example-external-site"
+weight = 2
+url = "https://medium.anetto.dev/"
+hrefTargetBlank = true
