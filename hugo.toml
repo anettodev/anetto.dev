@@ -11,6 +11,8 @@ paginate = 20
 canonifyURLs = true
 enableEmoji = true
 
+customSCSS = ["scss/custom.scss"]
+
 [params]
 author = "Antonio Netto"
 avatarURL = "images/me.jpeg"
@@ -41,7 +43,6 @@ colorScheme = "auto"
 # Hide the toggle button, along with the associated vertical divider
 hideColorSchemeToggle = false
 
-customSCSS = ["scss/custom.scss"]
 
 [[params.social]]
 name = "LinkedIn"
