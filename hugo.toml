@@ -22,6 +22,8 @@ keywords = "developer,desenvolvedor,engineer,software,staff,iOS,swift,objective-
 info = " iOS Senior Staff Engineer"
 company = "Inter"
 companyURL = "https://inter.co/"
+githubBoard = "anettodev"
+githubUserIDNumber = "788332"
 
 faviconSVG = "/images/favicon.ico"
 favicon_32 = "/images/favicon-32x32.png"
