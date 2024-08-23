@@ -119,6 +119,12 @@ name = "Contact"
 weight = 5
 url = "contact/"
 
+[[menu.main]]
+identifier = "timeline"
+name = "Timeline"
+weight = 6
+url = "timeline/"
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.extensions]
