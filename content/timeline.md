@@ -7,13 +7,13 @@ slug = "timeline"
 {{< timeline >}}
 
     {{% event title="Inter&Co" from="2019-10-21"%}}
-## _Job description:_ 
+_Job description:_ 
 Activities related to the iOS software architecture and app development for the Investments area.
 My current role is to be the iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
     {{% /event %}}
 
     {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=true %}}
-## _Job description:_ 
+_Job description:_ 
 Activities related to the development and consulting of mobile software for B2C and B2B apps for larges Brazilian and American companies (Fortune 500).
 
 As a consultant, I provided information on requirements analysis and feasibility, mobile software architecture, design patterns, and good practices in mobile development using the Apple UI/UX guideline (Apple HIG).
@@ -36,5 +36,4 @@ Activities and societies:
 
 {{< /timeline >}}
 
-More info on [Linkedin][linkedin]
-[linkedin]: https://www.linkedin.com/in/anettodev/#experience
+More info on [Linkedin][https://www.linkedin.com/in/anettodev/#experience]
