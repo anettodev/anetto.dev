@@ -10,6 +10,7 @@ slug = "timeline"
 _Job description:_ 
 Activities related to the iOS software architecture and app development for the Investments area.
 My current role is to be the iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
+[+info](https://us.inter.co/)
     {{% /event %}}
 
     {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=true %}}
@@ -22,7 +23,7 @@ In April of 2019, I was promoted to be the iOS Mentor(Responsible for the tech s
 
     {{% event title="BS, Computer Science" from="2010-06-01" to="2015-06-01" collapsed=true %}}
 Successfully finished my BS in BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
-+info: https://portal.unicap.br/w/ciencia-da-computacao#presencial/sobre
+[+info](https://portal.unicap.br/w/ciencia-da-computacao#presencial/sobre)
 
 Activities and societies: 
 - Programming Paradigms
@@ -36,4 +37,4 @@ Activities and societies:
 
 {{< /timeline >}}
 
-More info on [Linkedin][https://www.linkedin.com/in/anettodev/#experience]
+More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
