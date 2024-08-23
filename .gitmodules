@@ -1,3 +1,7 @@
 [submodule "themes/hugo-coder"]
 	path = themes/hugo-coder
 	url = https://github.com/anettodev/hugo-coder.git
+
+[submodule "themes/hugo-shortcode-timeline"]
+	path = themes/hugo-shortcode-timeline
+	url = https://github.com/mfg92/hugo-shortcode-timeline.git
