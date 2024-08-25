@@ -45,7 +45,6 @@ colorScheme = "auto"
 # Hide the toggle button, along with the associated vertical divider
 hideColorSchemeToggle = false
 
-
 [[params.social]]
 name = "LinkedIn"
 icon = "fa-brands fa-linkedin fa-2x"
@@ -98,32 +97,32 @@ weight = 1
 url = "about/"
 
 [[menu.main]]
-name = "Projects"
+identifier = "resume"
+name = "Resume"
 weight = 2
+url = "resume/"
+
+[[menu.main]]
+name = "Projects"
+weight = 3
 url = "sideprojects/"
 
 [[menu.main]]
 name = "Blog"
 identifier = "fa fa-example-external-site"
-weight = 3
+weight = 4
 url = "https://medium.anetto.dev/"
 hrefTargetBlank = true
 
 [[menu.main]]
 name = "Gist"
-weight = 4
+weight = 5
 url = "https://gist.github.com/anettodev"
 
 [[menu.main]]
 name = "Contact"
-weight = 5
-url = "contact/"
-
-[[menu.main]]
-identifier = "timeline"
-name = "Timeline"
 weight = 6
-url = "timeline/"
+url = "contact/"
 
 [markup]
   [markup.goldmark]

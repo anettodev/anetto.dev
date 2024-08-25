@@ -31,10 +31,6 @@ However, I have also experimented with **C#, Java, PHP, JS** and many others.
 
 This website for example, uses **GO** as it's main programming language.
 
-### 📄 Resume 
-Feel free to check and download my most recent resume at the following [link][resume].
-
-[resume]: https://drive.proton.me/urls/SVS9G15A8R#5wh96pxpj4y0
 [nasdaq]: https://www.nasdaq.com/
 [b3]: https://www.b3.com.br/en_us/
 [fortune500]: https://fortune.com/ranking/global500/
