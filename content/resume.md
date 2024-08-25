@@ -65,8 +65,38 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [+info](https://www.avenuecode.com/)
     {{% /event %}}
 
+    {{% event title="MadeinWeb e Mobile" from="2014-03-15" to="2016-05-18" collapsed=false %}} 
+- **Senior iOS Engineer**
+    > Activities related to mobile software development for B2C iOS apps and tech lead for the iOS Team.
+    > Also, I provided to the clients informations about solutions design, requirements analysis, UI/UX (Apple HIG), analysis of viability and good practices in mobile software development.
+
+    **Main Tech Skills**
+
+        - Obj-c and Swift.
+        - Cocoapods and Carthage
+        - MVC, MVP, MVVM and VIPER architecture 
+        - Analysis of Viability 
+        - Requirements Analysis
+        - App Publishing in App Store 
+[+info](https://www.madeinweb.us/)
+    {{% /event %}}
+
+    {{% event title="Daccord Educação" from="2013-08-01" to="2014-03-18" collapsed=true %}} 
+- **iOS Engineer**
+    > Activities related to mobile apps development for Education companies.  i.e: Book Readers and e-learning tools.
+
+    **Main Tech Skills**
+
+        - Obj-c and Swift.
+        - MVC
+        - SVN
+[+info](https://www.daccord.com.br/)
+    {{% /event %}}
+
     {{% event title="BS, Computer Science" from="2010-06-01" to="2015-06-01" collapsed=true %}}
-    Successfully finished my BS in BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
+
+> Successfully finished my BS in BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
+
 [+info](https://portal.unicap.br/w/ciencia-da-computacao#presencial/sobre)
 
 **Activities and societies:**
