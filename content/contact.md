@@ -4,7 +4,7 @@ title = "📩 How to contact me"
 slug = "contact"
 +++
 
-You can send a e-mail to hello@anetto.dev.
+You can send a email to hello@anetto.dev.
 
 Also, if is available, you can book a 101 session with me 
 {{< calendly calendar="anetto" type="popupLink" >}}
@@ -13,7 +13,7 @@ here
 
 ### 🔗 Social links
 
-You can find me on [Linkedin][linkedin], [X (Twitter)][twitter] or [Github][github].
+You can find me on [LinkedIn][linkedin], [X (Twitter)][twitter] or [GitHub][github].
 
 [twitter]: https://twitter.com/anettodev
 [linkedin]: https://www.linkedin.com/in/anettodev/
