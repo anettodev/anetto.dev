@@ -18,7 +18,7 @@ More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
 My current role is to be the iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
 
     **Main Tech Skills**
-    
+
         - Objective-C and Swift (ViewCode UIKit and SwiftUI)
         - MVVM-C and Domain Driven Design architecture
         - RxSwift, Swinject, Charts, Kingfisher, Lottie
@@ -36,7 +36,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 
     **Main Tech Skills**
 
-        -  The main tech skills description of this position is similar to the tech description above
+        -  similar to the tech description above
 
 [+info](https://us.inter.co/)
 
