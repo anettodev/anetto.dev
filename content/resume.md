@@ -1,6 +1,6 @@
 +++
 date = 2024-08-25
-title = "👤 My Resume & Professional Timeline"
+title = "👤 Resume & Professional Timeline"
 slug = "resume"
 +++
 
@@ -13,9 +13,31 @@ More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
 {{< timeline >}}
 
     {{% event title="Inter&Co" from="2019-10-21"%}}
-Activities related to the iOS software architecture and app development for the Investments area.
+- **iOS Dev Specialist Master (Senior Staff Engineer)**
+    > Activities related to the iOS software architecture and app development for the Investments area.
 My current role is to be the iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
+
+    **Main Tech Skills**
+        • Objective-C and Swift (ViewCode UIKit and SwiftUI)
+        • MVVM-C and Domain Driven Design architecture
+        • RxSwift, Swinject, Charts, Kingfisher, Lottie
+        • SPM, Cocoapods, Carthage 
+        • Tuist and Buck (build tool)
+        • Git & git submodule
+        • Unit/UI tests 
+        • Code review and code conflict solving
+        • Build deploy using Fastlane, Bitrise and TestFlight
+        • Analysis of Viability and Requirements Analysis
+
+- **iOS Dev Specialist II (Staff Engineer)**
+    > Activities related to the iOS software architecture and app development for the Investments area.
+My role was to be the iOS Specialist and the iOS Chapter lead for the Investments area in a team with 9 iOS devs.
+
+    **Main Tech Skills**
+        -  The main tech skills description of this position is similar to the tech description above
+
 [+info](https://us.inter.co/)
+[Inter SuperAPP](https://apps.apple.com/br/app/banco-inter-conta-digital/id839711154Activities)
     {{% /event %}}
 
     {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=false %}} 
