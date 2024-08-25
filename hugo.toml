@@ -1,7 +1,7 @@
 baseURL = "https://anettodev.github.io/"
 title = "anetto.dev"
 
-theme = ["hugo-coder", "hugo-shortcode-timeline"]
+theme = ["hugo-coder", "hugo-shortcode-timeline", "hugo-calendly-shortcode"]
 
 languageCode = "en"
 defaultContentLanguage = "en"

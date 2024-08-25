@@ -95,7 +95,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 
     {{% event title="BS, Computer Science" from="2010-06-01" to="2015-06-01" collapsed=true %}}
 
-> Successfully finished my BS in BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
+> BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
 
 [+info](https://portal.unicap.br/w/ciencia-da-computacao#presencial/sobre)
 
