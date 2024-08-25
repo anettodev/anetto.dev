@@ -5,6 +5,7 @@
 [submodule "themes/hugo-shortcode-timeline"]
 	path = themes/hugo-shortcode-timeline
 	url = https://github.com/anettodev/hugo-shortcode-timeline.git
-[submodule "hugo-calendly-shortcode"]
-	path = hugo-calendly-shortcode
-	url = git@github.com:anettodev/hugo-calendly-shortcode.git
+
+[submodule "themes/hugo-calendly-shortcode"]
+	path = themes/hugo-calendly-shortcode
+	url = https://github.com/anettodev/hugo-calendly-shortcode.git
