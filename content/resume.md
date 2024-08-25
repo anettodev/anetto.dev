@@ -4,18 +4,21 @@ title = "👤 My Resume & Professional Timeline"
 slug = "resume"
 +++
 
+### 📄 Resume 
+Feel free to check and download my most recent resume at the following [link][resume].
+
+More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
+
 ### 🏁 Professional Timeline
 {{< timeline >}}
 
     {{% event title="Inter&Co" from="2019-10-21"%}}
-_Job description:_ 
 Activities related to the iOS software architecture and app development for the Investments area.
 My current role is to be the iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
 [+info](https://us.inter.co/)
     {{% /event %}}
 
-    {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=true %}}
-_Job description:_ 
+    {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=false %}} 
 Activities related to the development and consulting of mobile software for B2C and B2B apps for larges Brazilian and American companies (Fortune 500).
 
 As a consultant, I provided information on requirements analysis and feasibility, mobile software architecture, design patterns, and good practices in mobile development using the Apple UI/UX guideline (Apple HIG).
@@ -37,10 +40,5 @@ Activities and societies:
     {{% /event %}}
 
 {{< /timeline >}}
-
-### 📄 Resume 
-Feel free to check and download my most recent resume at the following [link][resume].
-
-More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
 
 [resume]: https://drive.proton.me/urls/SVS9G15A8R#5wh96pxpj4y0
