@@ -13,9 +13,26 @@ More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
 {{< timeline >}}
 
     {{% event title="Inter&Co" from="2019-10-21"%}}
+
+- **iOS Engineering Manager**
+    > Activities related to the mobile CORE team of the Inter Super App.
+    > The mobile CORE team is responsible for PR's Code Reviews, establishing coding best practices, and supporting all other teams to conform with app development guidelines.
+
+    **Technical Responsibilities**
+    - Code Reviews, Software Architecture Improvements, user data protection/security, and app navigation flow optimization.
+    - Systems Design, and Functional/Non-Functional requirements analysis.
+    - Establish and enforce coding best practices, provide technical support to other teams to ensure compliance with software development guidelines, and maintain the integrity of the app functionality.
+    - App delivery to the App Store, coordinate release trains, oversee CI/CD pipelines, and conduct regression tests to ensure the app stability (crash free) and performance.
+    - Coding, Bug fixes and Features Development.
+
+    **Leadership Role**
+    - Led a team of 6 iOS engineers, guiding them in executing the aforementioned responsibilities and developing significant app features, ensuring successful project outcomes and team performance.
+    - Dealing with Stakeholders and UI/UX requirements and splitting the tasks.
+    - Team Annual reviews, One-on-One feedback, and Individual Development Plan (IDP).
+
 - **iOS Dev Specialist Master (Senior Staff Engineer)**
     > Activities related to the iOS software architecture and app development for the Investments area.
-My current role is to be the iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
+iOS Dev Master for the Investments area and be the iOS Chapter lead in a team with +18 iOS devs.
 
     **Main Tech Skills**
 
