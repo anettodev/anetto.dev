@@ -7,7 +7,8 @@ languageCode = "en"
 defaultContentLanguage = "en"
 # defaultContentLanguageInSubdir = true
 
-paginate = 20
+[pagination]
+  pagerSize = 20
 canonifyURLs = true
 enableEmoji = true
 
@@ -19,7 +20,7 @@ avatarURL = "images/me.jpeg"
 images = ["images/an-cover.png"]
 description = "ANetto.dev personal website"
 keywords = "developer,desenvolvedor,engineer,software,staff,iOS,swift,objective-c,obj-c,c++,C#,python,go,rust"
-info = " iOS Senior Staff Engineer"
+info = " iOS Engineering Manager"
 company = "Inter"
 companyURL = "https://inter.co/"
 githubBoard = "anettodev"
