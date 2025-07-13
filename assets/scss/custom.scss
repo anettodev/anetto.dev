@@ -84,3 +84,23 @@ nav .nav-link.active {
     margin-bottom: 16px;
   }
 }
+
+/* Right alignment for dark mode toggle in navigation */
+.colorscheme-toggle.nav-right {
+  margin-left: auto;
+  float: right;
+  order: 999;  // High order to push to the end
+  padding: 0 10px;
+}
+
+/* Ensure navigation container uses flex for alignment */
+.navigation .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Adjust menu button to not interfere */
+.menu-button {
+  order: 998;  // Just before toggle
+}

@@ -60,7 +60,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [Inter SuperAPP](https://apps.apple.com/br/app/banco-inter-conta-digital/id839711154Activities)
     {{% /event %}}
 
-    {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=false %}} 
+    {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=true %}} 
 - **Senior iOS Engineer**
     > Activities related to the development and consulting of mobile software for B2C and B2B apps for larges Brazilian and American companies (Fortune 500).
     > As a consultant, I provided information on requirements analysis and feasibility, mobile software architecture, design patterns, and good practices in mobile development using the Apple UI/UX guideline (Apple HIG).
@@ -82,7 +82,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [+info](https://www.avenuecode.com/)
     {{% /event %}}
 
-    {{% event title="MadeinWeb e Mobile" from="2014-03-15" to="2016-05-18" collapsed=false %}} 
+    {{% event title="MadeinWeb e Mobile" from="2014-03-15" to="2016-05-18" collapsed=true %}} 
 - **Senior iOS Engineer**
     > Activities related to mobile software development for B2C iOS apps and tech lead for the iOS Team.
     > Also, I provided to the clients informations about solutions design, requirements analysis, UI/UX (Apple HIG), analysis of viability and good practices in mobile software development.
@@ -110,7 +110,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [+info](https://www.daccord.com.br/)
     {{% /event %}}
 
-    {{% event title="BS, Computer Science" from="2010-06-01" to="2015-06-01" collapsed=true %}}
+    {{% event title="BS, Computer Science - Universidade Católica de Pernambuco" from="2010-06-01" to="2015-06-01" collapsed=true %}}
 
 > BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
 
@@ -126,6 +126,33 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 - Azklepio CardioCalc
     {{% /event %}}
 
+    {{% event title="Naips Tecnologia" company="Naips Tecnologia" from="2012-01-01" to="2013-07-31" collapsed=true %}}
+> Activities related to web and iOS software engineering.
+
+**Main Tech Skills**
+- PHP, Objective-C
+- Web development frameworks
+- iOS app development
+[+info](https://example.com/naips)
+    {{% /event %}}
+
+    {{% event title="Fishy, Cappen, Idealizza, Grupo Ser Educacional" companies="Fishy, Cappen, Idealizza, Grupo Ser Educacional" from="2009-01-01" to="2012-01-01" collapsed=true %}}
+> PHP development roles across multiple companies, focusing on web applications.
+
+**Main Tech Skills**
+- PHP, MySQL
+- Web frameworks like Laravel or CodeIgniter
+- Backend development
+    {{% /event %}}
+
+    {{% event title="Federal Police (BR) - SR/DPF/PE" company="Regional Federal Police - SR/DPF/PE" from="2008-01-01" to="2009-01-01" collapsed=true %}}
+> Internship activities in IT support and development.
+
+**Main Tech Skills**
+- Basic programming
+- System administration
+    {{% /event %}}
+
 {{< /timeline >}}
 
-[resume]: https://drive.proton.me/urls/SVS9G15A8R#5wh96pxpj4y0
+[resume]: https://drive.proton.me/urls/ERWQ9A0XPR#U0bUIrcLBRHR
