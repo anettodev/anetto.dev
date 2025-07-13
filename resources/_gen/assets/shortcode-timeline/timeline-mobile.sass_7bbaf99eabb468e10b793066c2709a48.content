@@ -1,0 +1,29 @@
+/* This CSS file is used on mobile devices */
+.timeline {
+  --date_column_width: 0px; }
+
+.timeline {
+  /* Container around content */
+  /* The actual content */ }
+  .timeline .container {
+    min-height: 100px;
+    hyphens: auto;
+    /* date display */ }
+    .timeline .container .date {
+      width: auto;
+      top: calc(var(--timeline_bullet_diameter) + 2 * var(--timeline_line_width) - 1.5em);
+      left: calc(-0.5 * var(--timeline_column_width));
+      min-height: 3em;
+      font-size: medium;
+      text-align: start;
+      transform: rotate(90deg);
+      transform-origin: 0% 50%;
+      line-height: 1.5em; }
+  .timeline .content {
+    min-height: 100px;
+    /* card title format */
+    /* body size */ }
+    .timeline .content .title {
+      padding: 0px 5px; }
+    .timeline .content .body {
+      padding: 5px 10px; }
