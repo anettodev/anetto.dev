@@ -5,15 +5,17 @@
 ![Build with Hugo](https://github.com/anettodev/anetto.dev/actions/workflows/hugo.yml/badge.svg)
 ![Linting](https://github.com/anettodev/anetto.dev/actions/workflows/super-linter.yml/badge.svg)
 
-> A modern, responsive personal portfolio website showcasing professional experience, projects, and technical writing.
+> A modern, responsive personal portfolio website.
 
-**Live Site:** [https://anetto.dev](https://anetto.dev)
+**Live Demo:** [https://anetto.dev](https://anetto.dev)
 
 ![Screenshot](https://github.com/anettodev/anetto.dev/blob/main/Screenshot-anetto.dev.png)
 
 ## About
 
-This repository contains the source code for my personal portfolio website. I'm Antonio Netto, an iOS Engineering Manager with a passion for building elegant mobile experiences and leading high-performing engineering teams. This site serves as a central hub for my professional presence, showcasing my resume, side projects, and technical insights.
+This repository contains the source code for my personal portfolio website. I'm Antonio Netto, an iOS Engineering Manager (but always a dev) with a passion for building elegant mobile experiences and leading high-performing engineering teams. 
+
+This site serves as a central hub for my professional presence, showcasing my resume, side projects, and technical insights.
 
 ## Tech Stack
 
