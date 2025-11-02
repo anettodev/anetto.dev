@@ -1,0 +1,22 @@
+{{ if or (eq .Site.Params.colorScheme "auto") (eq .Site.Params.colorScheme "dark") }}
+  {{ if hugo.IsServer }}
+    {{ $cssOpts := (dict "targetPath" "css/coder-dark.css" "enableSourceMap" true ) }}
+    {{ $styles := resources.Get "scss/coder-dark.scss" | resources.ExecuteAsTemplate "style.coder-dark.css" . | toCSS $cssOpts }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}">
+  {{ else }}
+    {{ $cssOpts := (dict "targetPath" "css/coder-dark.css" ) }}
+    {{ $styles := resources.Get "scss/coder-dark.scss" | resources.ExecuteAsTemplate "style.coder-dark.css" . | toCSS $cssOpts | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" crossorigin="anonymous" media="screen" />
+  {{ end }}
+{{ end }}
+{{ if or (eq .Site.Params.colorScheme "auto") (eq .Site.Params.colorScheme "light") }}
+  {{ if hugo.IsServer }}
+    {{ $cssOpts := (dict "targetPath" "css/coder-light.css" "enableSourceMap" true ) }}
+    {{ $styles := resources.Get "scss/coder.scss" | resources.ExecuteAsTemplate "style.coder-light.css" . | toCSS $cssOpts }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}">
+  {{ else }}
+    {{ $cssOpts := (dict "targetPath" "css/coder-light.css" ) }}
+    {{ $styles := resources.Get "scss/coder.scss" | resources.ExecuteAsTemplate "style.coder-light.css" . | toCSS $cssOpts | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" crossorigin="anonymous" media="screen" />
+  {{ end }}
+{{ end }}
