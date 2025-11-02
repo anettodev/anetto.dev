@@ -49,14 +49,18 @@ nav.navigation {
   margin-bottom: 32px; }
 
 /* Menu item highlight (active/selected) */
-.header .nav-link.active,
-.navbar .nav-link.active,
-nav .nav-link.active {
-  background: #a020f0;
-  /* subtle purple glass */
+.navigation .navigation-list .navigation-item a.navigation-link.active,
+.navigation .navigation-list .navigation-item a.active {
+  background: rgba(200, 200, 200, 0.3) !important;
   border-radius: 6px;
-  color: #a020f0 !important;
-  box-shadow: 0 2px 8px #a020f0; }
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease; }
+
+.navigation .navigation-list .navigation-item a.navigation-link.active:hover,
+.navigation .navigation-list .navigation-item a.active:hover {
+  background: rgba(200, 200, 200, 0.5) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12); }
 
 /* Profile image circular border */
 .profile-img,
@@ -407,5 +411,50 @@ nav .nav-link.active {
 
 .colorscheme-light .project-description {
   color: rgba(50, 50, 60, 0.9); }
+
+/* Timeline collapsed section height */
+.timeline .content.collapsed {
+  min-height: 44px; }
+
+/* Timeline content logo - positioned at top left */
+.timeline .content .content-logo {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  max-height: 32px;
+  max-width: 32px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  z-index: 1; }
+
+/* Add padding to title when logo is present to prevent overlap */
+.timeline .content:has(.content-logo) .title {
+  padding-left: 50px; }
+
+/* Underline paragraphs in content, but not blockquotes */
+.timeline .content article p {
+  text-decoration: underline;
+  color: aliceblue; }
+
+.timeline .content .body p {
+  text-decoration: underline; }
+
+/* Remove underline from blockquotes */
+.timeline .content article blockquote p,
+.timeline .content .body blockquote p,
+.timeline .content article blockquote,
+.timeline .content .body blockquote {
+  text-decoration: none; }
+
+/* Mobile adjustments for timeline logo */
+@media screen and (max-width: 736px) {
+  .timeline .content .content-logo {
+    max-height: 32px;
+    max-width: 32px;
+    top: 3px;
+    left: 3px; }
+  .timeline .content:has(.content-logo) .title {
+    padding-left: 48px; } }
 
 /*# sourceMappingURL=custom.css.map */

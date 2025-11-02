@@ -11,15 +11,16 @@ Below is a curated list of recent projects I've either been actively involved wi
 <div class="projects-grid">
 
 {{< project-card
-  title="Nutria - Intelligent Nutrition iOS App"
+  title="Nutria - iOS App"
   icon="https://azklepio.com/nutria/assets/icons/nutria.png"
   description="An innovative AI-powered nutrition tracking app for iOS that provides personalized dietary guidance, smart meal analysis, and intelligent insights to help users achieve their health goals."
   tech="Swift,SwiftUI,CoreData,HealthKit,AI/ML"
   status="WIP"
+  appstore="#"
 >}}
 
 {{< project-card
-  title="Nutria - Web Platform"
+  title="Nutria - Website"
   icon="https://azklepio.com/nutria/assets/icons/nutria.png"
   description="Marketing website and web platform for Nutria, showcasing AI-driven nutrition tracking features, personalized meal plans, and comprehensive food database with an intuitive user interface."
   tech="HTML,CSS,JavaScript,Responsive Design"
@@ -28,7 +29,7 @@ Below is a curated list of recent projects I've either been actively involved wi
 >}}
 
 {{< project-card
-  title="anetto.dev - Personal Website"
+  title="ANetto.dev - Website"
   description="A modern personal portfolio website built with Hugo static site generator, featuring glassmorphism design, dark mode support, and automated deployment to GitHub Pages."
   tech="Hugo,Go,SCSS,GitHub Actions"
   status="Concluded"

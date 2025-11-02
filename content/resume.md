@@ -12,7 +12,7 @@ More info on [Linkedin](https://www.linkedin.com/in/anettodev/#experience)
 ### 🏁 Professional Timeline
 {{< timeline >}}
 
-    {{% event title="Inter&Co" from="2019-10-21"%}}
+    {{% event title="Inter&Co" logo="/images/inter-logo.jpg" from="2019-10-21"%}}
 
 - **iOS Engineering Manager**
     > Activities related to the mobile CORE team of the Inter Super App.
@@ -60,7 +60,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [Inter SuperAPP](https://apps.apple.com/br/app/banco-inter-conta-digital/id839711154Activities)
     {{% /event %}}
 
-    {{% event title="Avenue Code" from="2016-05-15" to="2019-10-18" collapsed=true %}} 
+    {{% event title="Avenue Code" logo="/images/avenuecode_logo.jpg" from="2016-05-15" to="2019-10-18" collapsed=true %}} 
 - **Senior iOS Engineer**
     > Activities related to the development and consulting of mobile software for B2C and B2B apps for larges Brazilian and American companies (Fortune 500).
     > As a consultant, I provided information on requirements analysis and feasibility, mobile software architecture, design patterns, and good practices in mobile development using the Apple UI/UX guideline (Apple HIG).
@@ -82,7 +82,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [+info](https://www.avenuecode.com/)
     {{% /event %}}
 
-    {{% event title="MadeinWeb e Mobile" from="2014-03-15" to="2016-05-18" collapsed=true %}} 
+    {{% event title="MadeinWeb e Mobile" logo="/images/madeinweb_mobile_logo.jpeg" from="2014-03-15" to="2016-05-18" collapsed=true %}} 
 - **Senior iOS Engineer**
     > Activities related to mobile software development for B2C iOS apps and tech lead for the iOS Team.
     > Also, I provided to the clients informations about solutions design, requirements analysis, UI/UX (Apple HIG), analysis of viability and good practices in mobile software development.
@@ -98,7 +98,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [+info](https://www.madeinweb.us/)
     {{% /event %}}
 
-    {{% event title="Daccord Educação" from="2013-08-01" to="2014-03-18" collapsed=true %}} 
+    {{% event title="Daccord Educação" logo="/images/daccord_music_software_ltda_logo.jpeg" from="2013-08-01" to="2014-03-18" collapsed=true %}} 
 - **iOS Engineer**
     > Activities related to mobile apps development for Education companies.  i.e: Book Readers and e-learning tools.
 
@@ -110,7 +110,7 @@ My role was to be the iOS Specialist and the iOS Chapter lead for the Investment
 [+info](https://www.daccord.com.br/)
     {{% /event %}}
 
-    {{% event title="BS, Computer Science - Universidade Católica de Pernambuco" from="2010-06-01" to="2015-06-01" collapsed=true %}}
+    {{% event title="BS, Computer Science - Universidade Católica de Pernambuco" logo="/images/catolicapernambuco_logo.jpeg" from="2010-06-01" to="2015-06-01" collapsed=true %}}
 
 > BS in Computer Science (Portaria MEC nº 602, de 10.08.1986. Publicação no DOU, 20.08.1986) - 140 credits (3.230 hours).
 
