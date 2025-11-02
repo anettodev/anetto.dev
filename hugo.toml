@@ -12,9 +12,8 @@ defaultContentLanguage = "en"
 canonifyURLs = true
 enableEmoji = true
 
-customSCSS = ["scss/custom.scss"]
-
 [params]
+customSCSS = ["scss/custom.scss"]
 author = "Antonio Netto"
 avatarURL = "images/me.jpeg"
 images = ["images/an-cover.png"]
@@ -166,5 +165,5 @@ url = "contact/"
         title = true
     [markup.goldmark.renderer]
       hardWraps = false
-      unsafe = false
+      unsafe = true
       xhtml = false

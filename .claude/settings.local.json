@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(hugo server:*)",
+      "Bash(pkill:*)",
+      "Bash(hugo --minify --destination /tmp/hugo-test-final:*)",
+      "Bash(hugo:*)",
+      "mcp__firecrawl__firecrawl_scrape"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
