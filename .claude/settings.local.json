@@ -5,7 +5,8 @@
       "Bash(pkill:*)",
       "Bash(hugo --minify --destination /tmp/hugo-test-final:*)",
       "Bash(hugo:*)",
-      "mcp__firecrawl__firecrawl_scrape"
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__github__get_file_contents"
     ],
     "deny": [],
     "ask": []
