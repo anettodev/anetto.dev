@@ -1,0 +1,10 @@
+---
+import { textWithPlaceholders } from "../lib/placeholders";
+
+/** A frontmatter string, escaped, with `[PLACEHOLDER: …]` marked. */
+interface Props {
+  text: string;
+}
+---
+
+<Fragment set:html={textWithPlaceholders(Astro.props.text)} />

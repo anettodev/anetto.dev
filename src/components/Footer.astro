@@ -1,0 +1,40 @@
+---
+import { PERSON } from "../lib/site";
+
+// Computed at build time, never hard-coded (§5.4).
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="inner">
+    <a href={`mailto:${PERSON.email}`}>{PERSON.email}</a>
+    <p class="label">
+      © {year} {PERSON.name}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin: var(--space-section) auto 0;
+    padding: 0 var(--gutter);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 48px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+    font-size: 1.125rem;
+  }
+</style>

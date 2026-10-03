@@ -1,0 +1,25 @@
+---
+import { localizedPath, t } from "../i18n";
+import { DEFAULT_LOCALE } from "../i18n/locales";
+import Page from "../layouts/Page.astro";
+
+const ui = t(DEFAULT_LOCALE);
+---
+
+<Page locale={DEFAULT_LOCALE} title={ui.notFound.title}>
+  <h1>{ui.notFound.title}</h1>
+  <p class="muted">{ui.notFound.body}</p>
+  <p>
+    <a class="more-link" href={localizedPath(DEFAULT_LOCALE, "home")}>
+      {ui.notFound.home}
+      <span aria-hidden="true">&nbsp;→</span>
+    </a>
+  </p>
+</Page>
+
+<style>
+  h1 {
+    margin-bottom: 24px;
+    font-size: var(--text-h1);
+  }
+</style>

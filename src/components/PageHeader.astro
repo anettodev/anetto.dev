@@ -1,0 +1,43 @@
+---
+import Copy from "./Copy.astro";
+
+interface Props {
+  label: string;
+  title: string;
+  lead?: string | undefined;
+}
+
+const { label, title, lead } = Astro.props;
+---
+
+<header class="page-header">
+  <p class="label">{label}</p>
+  <h1>
+    <Copy text={title} />
+  </h1>
+  {lead && (
+    <p class="lead muted">
+      <Copy text={lead} />
+    </p>
+  )}
+</header>
+
+<style>
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: calc(var(--space-section) * 0.75);
+  }
+
+  h1 {
+    font-size: var(--text-h1);
+    line-height: 1;
+  }
+
+  .lead {
+    max-width: 38rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+</style>

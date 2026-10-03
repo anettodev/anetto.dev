@@ -1,0 +1,130 @@
+---
+import Copy from "../../components/Copy.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { localeStaticPaths, localizedPath, t } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+import { getPage } from "../../lib/content";
+import { LINKS } from "../../lib/site";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const about = await getPage(locale, "about");
+const { label, title, facts, personal, experiencesLink, resumeLink } =
+  about.data;
+---
+
+<Page
+  locale={locale}
+  route="about"
+  title={ui.nav.about}
+  contentLang={about.lang}
+>
+  <PageHeader label={label} title={title} />
+
+  <div class="prose" set:html={about.html} />
+
+  <dl class="facts">
+    {facts.map((fact) => (
+      <div class="fact">
+        <dt class="label">{fact.label}</dt>
+        <dd>
+          <Copy text={fact.value} />
+        </dd>
+      </div>
+    ))}
+  </dl>
+
+  <p class="personal muted">
+    <Copy text={personal} />
+  </p>
+
+  <div class="button-row links">
+    <a class="button" href={localizedPath(locale, "experiences")}>
+      {experiencesLink}
+      <span aria-hidden="true">&nbsp;→</span>
+    </a>
+    <a class="button" href={LINKS.resume}>
+      {resumeLink}
+    </a>
+  </div>
+</Page>
+
+<style>
+  /* Now / CORE / since 2007 (§5.4). The first paragraph is the present, in full color. */
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 40rem;
+    font-size: clamp(1.0625rem, 0.993rem + 0.286vw, 1.25rem); /* 17 → 20 */
+    line-height: 1.65;
+  }
+
+  .prose :global(p:not(:first-child)) {
+    color: var(--muted);
+  }
+
+  .facts {
+    display: grid;
+    margin: var(--space-section) 0 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px 0;
+  }
+
+  .fact + .fact {
+    border-top: 1px solid var(--line);
+  }
+
+  dd {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @container (min-width: 45rem) {
+    .facts {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .fact {
+      padding-inline: 24px;
+    }
+
+    .fact:first-child {
+      padding-left: 0;
+    }
+
+    .fact:last-child {
+      padding-right: 0;
+    }
+
+    .fact + .fact {
+      border-top: 0;
+      border-left: 1px solid var(--line);
+    }
+  }
+
+  /* Personal life is one line, last (§2). */
+  .personal {
+    max-width: 38rem;
+    margin-top: calc(var(--space-section) * 0.6);
+  }
+
+  .links {
+    margin-top: 40px;
+  }
+</style>

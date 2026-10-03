@@ -1,5 +1,19 @@
-public/
-_website/*
-.hugo_build.lock
-*/.DS_Store
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+
+# macOS
 .DS_Store
+
+# Hugo theme checkouts left on disk from `main`; remove at cutover (Phase 7)
+/themes/

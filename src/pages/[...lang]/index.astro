@@ -1,0 +1,177 @@
+---
+import Lane from "../../components/Lane.astro";
+import PostRow from "../../components/PostRow.astro";
+import ProjectEntry from "../../components/ProjectEntry.astro";
+import RoleRow from "../../components/RoleRow.astro";
+import { localeStaticPaths, localizedPath } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+import { getPage, getProjects, getRoles } from "../../lib/content";
+import { PERSON } from "../../lib/site";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const home = await getPage(locale, "home");
+const { positioning, lanes, previews } = home.data;
+const [roles, projects, blog] = await Promise.all([
+  getRoles(home.lang),
+  getProjects(home.lang),
+  getPage(locale, "blog"),
+]);
+const featured = projects[0];
+---
+
+<Page
+  locale={locale}
+  route="home"
+  description={home.data.description}
+  contentLang={home.lang}
+>
+  <!-- The name is the visible headline of the identity card; screen readers get it here too. -->
+  <h1 class="positioning">
+    <span class="visually-hidden">{PERSON.name}. </span>
+    {positioning.map((clause, index) => (
+      <>
+        <span class:list={["clause", { muted: index > 0 }]}>{clause}</span>{" "}
+      </>
+    ))}
+  </h1>
+
+  <div class="lanes">
+    {lanes.map((lane) => (
+      <Lane {...lane} href={localizedPath(locale, lane.route)} />
+    ))}
+  </div>
+
+  <section class="preview" aria-labelledby="preview-experiences">
+    <div class="preview-head">
+      <h2 id="preview-experiences">{previews.experiences.title}</h2>
+      <a class="more-link" href={localizedPath(locale, "experiences")}>
+        {previews.experiences.linkLabel}
+        <span aria-hidden="true">&nbsp;→</span>
+      </a>
+    </div>
+    <ul class="rows">
+      {roles.map((role) => (
+        <li>
+          <RoleRow role={role} variant="compact" />
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {featured && (
+    <section class="preview" aria-labelledby="preview-projects">
+      <div class="preview-head">
+        <h2 id="preview-projects">{previews.projects.title}</h2>
+        <a class="more-link" href={localizedPath(locale, "projects")}>
+          {previews.projects.linkLabel}
+          <span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </div>
+      <ProjectEntry
+        project={featured}
+        locale={locale}
+        variant="compact"
+        headingLevel={3}
+      />
+    </section>
+  )}
+
+  <section class="preview" aria-labelledby="preview-blog">
+    <div class="preview-head">
+      <h2 id="preview-blog">{previews.blog.title}</h2>
+      <a class="more-link" href={localizedPath(locale, "blog")}>
+        {previews.blog.linkLabel}
+        <span aria-hidden="true">&nbsp;→</span>
+      </a>
+    </div>
+    <ul class="rows">
+      {blog.data.posts.slice(0, 2).map((post) => (
+        <li>
+          <PostRow {...post} />
+        </li>
+      ))}
+    </ul>
+  </section>
+</Page>
+
+<style>
+  /* Stacked positioning sentence (§5.4): 34px semibold, first clause full color. */
+  .positioning {
+    font-size: var(--text-lead);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .clause {
+    display: block;
+  }
+
+  .lanes {
+    display: grid;
+    margin-top: calc(var(--space-section) * 0.6);
+    border-top: 1px solid var(--line);
+  }
+
+  .lanes > :global(* + *) {
+    border-top: 1px solid var(--line);
+  }
+
+  /* Three lanes in a row once the content column (the <main> container) is wide enough. */
+  @container (min-width: 45rem) {
+    .lanes {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .lanes > :global(*) {
+      padding-inline: 28px;
+    }
+
+    .lanes > :global(* + *) {
+      border-top: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    .lanes > :global(:first-child) {
+      padding-left: 0;
+    }
+
+    .lanes > :global(:last-child) {
+      padding-right: 0;
+    }
+  }
+
+  .preview {
+    margin-top: var(--space-section);
+  }
+
+  .preview-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .preview-head h2 {
+    font-size: var(--text-h2);
+  }
+
+  .rows > li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .preview :global(.project) {
+    padding-top: 32px;
+  }
+</style>

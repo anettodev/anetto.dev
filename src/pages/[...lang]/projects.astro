@@ -1,0 +1,64 @@
+---
+import Copy from "../../components/Copy.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import ProjectEntry from "../../components/ProjectEntry.astro";
+import { localeStaticPaths, t } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+import { getPage, getProjects } from "../../lib/content";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const page = await getPage(locale, "projects");
+const { label, title, lead, devPlaceholder } = page.data;
+const projects = await getProjects(page.lang);
+---
+
+<Page
+  locale={locale}
+  route="projects"
+  title={ui.nav.projects}
+  contentLang={page.lang}
+>
+  <PageHeader label={label} title={title} lead={lead} />
+
+  <div class="entries">
+    {projects.map((project) => (
+      <ProjectEntry project={project} locale={locale} />
+    ))}
+    {import.meta.env.DEV && (
+      <article class="dev-placeholder">
+        <p class="label">{ui.devOnly}</p>
+        <p class="muted">
+          <Copy text={devPlaceholder} />
+        </p>
+      </article>
+    )}
+  </div>
+</Page>
+
+<style>
+  .entries > :global(.project) {
+    padding: 56px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Dev builds only (§5.4); the one place dashed borders are allowed (§6.3). */
+  .dev-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 40px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-panel);
+  }
+</style>

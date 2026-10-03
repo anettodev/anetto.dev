@@ -1,0 +1,61 @@
+---
+import PageHeader from "../../components/PageHeader.astro";
+import PostRow from "../../components/PostRow.astro";
+import { localeStaticPaths, t } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+import { getPage } from "../../lib/content";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const blog = await getPage(locale, "blog");
+const { label, title, posts, more } = blog.data;
+---
+
+<Page locale={locale} route="blog" title={ui.nav.blog} contentLang={blog.lang}>
+  <PageHeader label={label} title={title} />
+
+  <ul class="rows">
+    {posts.map((post) => (
+      <li>
+        <PostRow {...post} />
+      </li>
+    ))}
+  </ul>
+
+  <ul class="more">
+    {more.map((link) => (
+      <li>
+        <a class="more-link" href={link.href}>
+          {link.label}
+          <span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Page>
+
+<style>
+  .rows {
+    border-top: 1px solid var(--line);
+  }
+
+  .rows li {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    padding-top: 32px;
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import Footer from "../components/Footer.astro";
+import IdentityCard from "../components/IdentityCard.astro";
+import SiteNav from "../components/SiteNav.astro";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+import Base from "./Base.astro";
+
+/*
+ * Two-column shell (spec §5.1): identity card left, page content right from
+ * 900px up; one column below. The footer sits outside the grid so it pushes
+ * the sticky card up at the end of the page.
+ */
+interface Props {
+  locale: Locale;
+  route?: RouteKey | undefined;
+  title?: string | undefined;
+  description?: string | undefined;
+  /** Locale the page copy actually came from; differs while a translation is missing. */
+  contentLang?: Locale | undefined;
+}
+
+const { locale, route, title, description, contentLang = locale } = Astro.props;
+const ui = t(locale);
+---
+
+<Base locale={locale} route={route} title={title} description={description}>
+  <a class="skip-link" href="#main">
+    {ui.skipToContent}
+  </a>
+  <SiteNav locale={locale} route={route} />
+  <div class="shell">
+    <div class="card-column">
+      <IdentityCard locale={locale} />
+    </div>
+    <main
+      id="main"
+      tabindex="-1"
+      lang={contentLang === locale ? undefined : LANG_TAG[contentLang]}
+    >
+      <slot />
+    </main>
+  </div>
+  <Footer />
+</Base>
+
+<style>
+  .shell {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding: var(--nav-clearance) var(--gutter) 0;
+  }
+
+  /* Size container: components lay out by the content column's width, not the viewport's. */
+  main {
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(260px, 300px) 1fr;
+      column-gap: var(--column-gap);
+    }
+  }
+</style>

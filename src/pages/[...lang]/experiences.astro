@@ -1,0 +1,115 @@
+---
+import Copy from "../../components/Copy.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import RoleRow from "../../components/RoleRow.astro";
+import { localeStaticPaths, t } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+import { getPage, getRoles } from "../../lib/content";
+import { LINKS } from "../../lib/site";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const experiences = await getPage(locale, "experiences");
+const { label, title, lead, before, resumeLink, linkedinLink } =
+  experiences.data;
+const roles = await getRoles(experiences.lang);
+---
+
+<Page
+  locale={locale}
+  route="experiences"
+  title={ui.nav.experiences}
+  contentLang={experiences.lang}
+>
+  <PageHeader label={label} title={title} lead={lead} />
+
+  <div class="roles">
+    {roles.map((role) => (
+      <RoleRow role={role} />
+    ))}
+  </div>
+
+  <section class="before" aria-labelledby="before-title">
+    <h2 id="before-title">{before.title}</h2>
+    <p class="lead muted">
+      <Copy text={before.lead} />
+    </p>
+    <ul class="arc">
+      {[...before.rows, before.education].map((row) => (
+        <li>
+          <span class="name">
+            <Copy text={row.name} />
+          </span>
+          <span class="detail muted">
+            <Copy text={row.detail} />
+          </span>
+        </li>
+      ))}
+    </ul>
+    <div class="button-row">
+      <a class="button" href={LINKS.resume}>
+        {resumeLink}
+      </a>
+      <a class="button" href={LINKS.linkedin} rel="me">
+        {linkedinLink}
+      </a>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .roles {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .before {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: var(--space-section);
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+  }
+
+  .lead {
+    max-width: 38rem;
+    line-height: 1.6;
+  }
+
+  .arc {
+    border-top: 1px solid var(--line);
+  }
+
+  .arc li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .name {
+    font-size: 1.125rem;
+  }
+
+  .detail {
+    font-size: var(--text-small);
+  }
+
+  .button-row {
+    padding-top: 16px;
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+import "../styles/tokens.css";
+import "../styles/global.css";
+
+import { Font } from "astro:assets";
+
+import { localizedUrl, t } from "../i18n";
+import {
+  DEFAULT_LOCALE,
+  LANG_TAG,
+  LOCALES,
+  type Locale,
+} from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+
+interface Props {
+  locale: Locale;
+  /** Omit for pages without localized twins (404): no canonical or hreflang. */
+  route?: RouteKey | undefined;
+  /** Page name; the site name is appended. Omit on Home. */
+  title?: string | undefined;
+  description?: string | undefined;
+}
+
+const { locale, route, title, description } = Astro.props;
+const ui = t(locale);
+const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
+---
+
+<!doctype html>
+<html lang={LANG_TAG[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    {route && (
+      <>
+        <link rel="canonical" href={localizedUrl(locale, route)} />
+        {LOCALES.map((alt) => (
+          <link
+            rel="alternate"
+            hreflang={LANG_TAG[alt]}
+            href={localizedUrl(alt, route)}
+          />
+        ))}
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={localizedUrl(DEFAULT_LOCALE, route)}
+        />
+      </>
+    )}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {/* Not preloaded: Apple platforms render ui-rounded and never fetch Nunito. */}
+    <Font cssVariable="--font-nunito" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,12 @@
+dist/
+.astro/
+node_modules/
+themes/
+package-lock.json
+.claude/
+# Pre-revamp files; replaced or rewritten at cutover (Phase 7)
+.github/workflows/
+memory-bank/
+.cursor/
+README.md
+CLAUDE.md

@@ -1,0 +1,48 @@
+---
+import Copy from "./Copy.astro";
+
+/** One of the three Home lanes (§5.4): Now / Depth / Craft. */
+interface Props {
+  number: string;
+  label: string;
+  title: string;
+  text: string;
+  href: string;
+  linkLabel: string;
+}
+
+const { number, label, title, text, href, linkLabel } = Astro.props;
+---
+
+<article class="lane">
+  <p class="label">
+    {number} · {label}
+  </p>
+  <h2>{title}</h2>
+  <p class="text muted">
+    <Copy text={text} />
+  </p>
+  <a class="more-link" href={href}>
+    {linkLabel}
+    <span aria-hidden="true">&nbsp;→</span>
+  </a>
+</article>
+
+<style>
+  .lane {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 32px 0;
+  }
+
+  h2 {
+    font-size: var(--text-h3);
+  }
+
+  .text {
+    flex: 1;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+import type { Role } from "../lib/content";
+import Copy from "./Copy.astro";
+
+/**
+ * An Inter role. `full` (Experiences): meta column + title + sentences.
+ * `compact` (Home preview): title with label and dates.
+ */
+interface Props {
+  role: Role;
+  variant?: "full" | "compact";
+}
+
+const { role, variant = "full" } = Astro.props;
+---
+
+{variant === "full" ? (
+  <article class="role">
+    <div class="meta">
+      <p class="label">{role.label}</p>
+      <p class="dates muted">
+        <Copy text={role.dates} />
+      </p>
+    </div>
+    <div class="body">
+      <h2>{role.title}</h2>
+      <div class="text muted" set:html={role.html} />
+    </div>
+  </article>
+) : (
+  <div class="role-compact">
+    <h3>{role.title}</h3>
+    <p class="muted">
+      {role.label} · <Copy text={role.dates} />
+    </p>
+  </div>
+)}
+
+<style>
+  /* Meta column sits beside the body when there is room, above it when not. */
+  .role {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 32px;
+    padding: 48px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .meta {
+    display: flex;
+    flex: 1 1 12rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dates {
+    font-size: var(--text-small);
+  }
+
+  .body {
+    display: flex;
+    flex: 999 1 26rem;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+  }
+
+  .text {
+    max-width: 38rem;
+    line-height: 1.6;
+  }
+
+  .role-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    letter-spacing: -0.015em;
+  }
+
+  .role-compact p {
+    font-size: var(--text-small);
+  }
+</style>
