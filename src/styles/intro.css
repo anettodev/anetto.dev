@@ -1,16 +1,21 @@
 /*
- * Home intro (spec §8.1). Every rule here applies only while
+ * Home intro (spec §8.1, extended). Every rule here applies only while
  * <html data-intro="play">; afterwards the card is the plain docked card.
  * Global, not scoped: the states reach the island, toggle and page content.
+ *
+ * One card, three faces, two turns:
+ *   front side  logo face (the animated logo), then the docked card
+ *   back side   info face (photo, name, title)
+ * The docked card replaces the logo face while that side faces away
+ * (scripts/intro-card.ts), so the second turn lands on it.
  */
 
-/* Outside the intro, the front face, cover and skip button don't exist. */
-:root:not([data-intro="play"]) .intro .front,
-:root:not([data-intro="play"]) .intro-skip {
+/* Outside the intro, the logo face and info face don't exist. */
+:root:not([data-intro="play"]) .intro :is(.logo-face, .front) {
   display: none;
 }
 
-/* The card rises above the cover and may leave its column while it travels. */
+/* The card rises above the mesh and may leave its column while it travels. */
 :root[data-intro="play"] .identity {
   position: relative;
   z-index: 40;
@@ -34,30 +39,123 @@
   backface-visibility: hidden;
 }
 
-/* The docked card is the back face: turned away until the flip brings it round. */
-:root[data-intro="play"] .intro .back {
-  transform: rotateY(180deg);
+/* The docked card waits, hidden, on the front side until the logo has turned away. */
+:root[data-intro="play"] .intro .docked {
+  opacity: 0;
 }
 
-/* Front face: 320×460, centred over the docked card (§8.1). */
-.intro .front {
+/* Logo and info faces: 320×460 cards centred over the docked card (§8.1). */
+.intro :is(.logo-face, .front) {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 320px;
+  height: 460px;
+  margin: -230px 0 0 -160px;
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+}
+
+.intro .logo-face {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--logo-tile);
+}
+
+/*
+ * The card has the clip's container colour, but the container in the clip
+ * drifts a few levels over its frames, so the clip's edges fade into the card
+ * instead of meeting it at a line. The mark stays clear of the outer 8%.
+ */
+.intro .logo-face video {
+  display: block;
+  width: 320px;
+  height: 320px;
+  mask-image:
+    linear-gradient(to right, transparent, #000 8% 92%, transparent),
+    linear-gradient(to bottom, transparent, #000 8% 92%, transparent);
+  mask-composite: intersect;
+}
+
+/*
+ * "Loading..." is typed under the logo, one character at a time, after a
+ * caret. Monospace, so every character is exactly 1ch wide: the text is
+ * revealed with a stepped clip-path and the caret moves 1ch per step, both
+ * timed by --chars (set from the string, so every locale types at the same
+ * pace). The caret blinks before and after typing, and stays solid while it
+ * types. The whole face is gone after about 5.4s (WCAG 2.2.2).
+ */
+.intro .logo-loading {
+  --typing-start: 1s;
+  --typing: calc(var(--chars) * 90ms);
+
+  position: absolute;
+  right: 0;
+  bottom: 30px;
+  left: 0;
+  width: calc(var(--chars) * 1ch);
+  margin: 0 auto;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.intro .logo-loading span {
+  display: block;
+  clip-path: inset(0 100% 0 0);
+  animation: logo-typing var(--typing) steps(var(--chars)) var(--typing-start)
+    forwards;
+}
+
+.intro .logo-loading::after {
+  position: absolute;
+  top: 0.2em;
+  left: 1px;
+  width: 2px;
+  height: 1.1em;
+  background: var(--accent);
+  content: "";
+  animation:
+    logo-caret-blink 1s step-end,
+    logo-caret-move var(--typing) steps(var(--chars)) var(--typing-start)
+      forwards,
+    logo-caret-blink 1s step-end calc(var(--typing-start) + var(--typing))
+      infinite;
+}
+
+@keyframes logo-typing {
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes logo-caret-move {
+  to {
+    transform: translateX(calc(var(--chars) * 1ch));
+  }
+}
+
+@keyframes logo-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The info face is on the back side, so it starts turned away. */
+.intro .front {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  width: 320px;
-  height: 460px;
-  margin: -230px 0 0 -160px;
   padding: 32px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-card);
   background: var(--surface);
-  box-shadow: var(--card-shadow);
   text-align: center;
+  transform: rotateY(180deg);
 }
 
 .intro .front img {
@@ -107,8 +205,8 @@
  * While the card plays, the mesh rises over the page (still under the card,
  * z-index 40) and shows without its veil: it is the intro's backdrop. The page
  * underneath is fully painted from the first frame, so its largest element
- * counts for LCP without waiting for the intro (§12). At 2.9s the mesh drops
- * back behind the page and the veil fades in (scripts/intro-card.ts).
+ * counts for LCP without waiting for the intro (§12). When the card docks the
+ * mesh drops back behind the page and the veil fades in (scripts/intro-card.ts).
  */
 :root[data-intro="play"] .mesh {
   z-index: 35;
@@ -118,26 +216,19 @@
   opacity: 0;
 }
 
-.intro-skip {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 3;
-  min-height: var(--touch);
-  padding: 0 18px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--fg);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
+/*
+ * The island waits for the reveal. The theme toggle stays: the theme can
+ * change mid-intro. Phones keep the toggle in the island, which is hidden
+ * now, so the floating one stands in until the reveal.
+ */
+:root[data-intro="play"] site-island {
+  opacity: 0;
 }
 
-/* Island and toggle wait for the reveal (§8.1, 2.9s). */
-:root[data-intro="play"] site-island,
-:root[data-intro="play"] .theme-toggle.floating {
-  opacity: 0;
+@media (max-width: 599.98px) {
+  :root[data-intro="play"] .theme-toggle.floating {
+    display: block;
+  }
 }
 
 :root[data-intro="play"] .intro .stage {
@@ -145,30 +236,26 @@
 }
 
 /*
- * Failsafe: if the intro script never runs, uncover the page after 6s.
+ * Failsafe: if the intro script never runs, show the docked card and
+ * uncover the page after 12s (the intro itself takes about 9s).
  * The script's own animations take precedence while it runs.
  */
-:root[data-intro="play"] .intro .front,
-:root[data-intro="play"] .intro-skip {
-  animation: intro-failsafe-out 700ms ease 6s forwards;
+:root[data-intro="play"] .intro :is(.logo-face, .front) {
+  animation: intro-failsafe-out 700ms ease 12s forwards;
 }
 
 :root[data-intro="play"] .mesh {
-  animation: intro-failsafe-mesh 0s 6s forwards;
+  animation: intro-failsafe-mesh 0s 12s forwards;
 }
 
 :root[data-intro="play"] .mesh-veil {
-  animation: intro-failsafe-veil 700ms ease 6s forwards;
+  animation: intro-failsafe-veil 700ms ease 12s forwards;
 }
 
 :root[data-intro="play"] site-island,
-:root[data-intro="play"] .theme-toggle.floating,
-:root[data-intro="play"] .intro .stage {
-  animation: intro-failsafe-in 700ms ease 6s forwards;
-}
-
-:root[data-intro="play"] .intro .back {
-  animation: intro-failsafe-face 0s 6s forwards;
+:root[data-intro="play"] .intro .stage,
+:root[data-intro="play"] .intro .docked {
+  animation: intro-failsafe-in 700ms ease 12s forwards;
 }
 
 @keyframes intro-failsafe-out {
@@ -193,11 +280,5 @@
 @keyframes intro-failsafe-veil {
   to {
     opacity: var(--veil-opacity);
-  }
-}
-
-@keyframes intro-failsafe-face {
-  to {
-    transform: none;
   }
 }

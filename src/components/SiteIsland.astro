@@ -1,5 +1,6 @@
 ---
 import "../styles/island.css";
+import "../styles/logo.css";
 
 import { localizedPath, t } from "../i18n";
 import type { Locale } from "../i18n/locales";
@@ -11,9 +12,15 @@ import UiIcon from "./UiIcon.astro";
 
 /*
  * Navigation island (spec §7). Every link is in the DOM in both states.
- *   compact:  name | current section · language · menu
- *   expanded: name · About · Experiences · Projects · Blog · language · Say hello · close
- * Below 960px the expanded state opens as a panel; it no longer fits on one row.
+ *   compact:  [logo] (current section · language · menu)
+ *   expanded: [logo] (About · Experiences · Projects · Blog · language)
+ * The logo is its own app-icon tile beside the glass pill, not inside it.
+ * The logo is an app-icon tile with one animated clip per theme
+ * (styles/logo.css shows the current theme's). Its link is named "Antonio Netto".
+ * From 960px the menu button only opens the compact island (for touch, which
+ * can't hover); expanded, it is gone: scrolling down collapses the island.
+ * Below 960px the expanded state opens as a panel; it no longer fits on one
+ * row, and the button closes it.
  */
 interface Props {
   locale: Locale;
@@ -23,49 +30,73 @@ interface Props {
 const { locale, route } = Astro.props;
 const ui = t(locale);
 const items = ["about", "experiences", "projects", "blog"] as const;
+const themes = ["dark", "light"] as const;
 ---
 
 <site-island>
   <nav class="island" aria-label={ui.navLabel}>
-    <span class="island-glass" aria-hidden="true"></span>
     <a
       class="home"
       href={`${localizedPath(locale, "home")}?intro`}
       aria-current={route === "home" ? "page" : undefined}
     >
-      {PERSON.name}
-    </a>
-    <span class="divider only-compact" aria-hidden="true"></span>
-    {route && <span class="current only-compact">{ui.nav[route]}</span>}
-    <ul class="links only-expanded" id="island-links">
-      {items.map((item) => (
-        <li>
-          <a
-            href={localizedPath(locale, item)}
-            aria-current={route === item ? "page" : undefined}
+      <span class="logo-tile">
+        {themes.map((theme) => (
+          <video
+            class={`logo logo-${theme}`}
+            muted
+            playsinline
+            preload="none"
+            disablepictureinpicture
+            disableRemotePlayback
+            poster={`/brand/logo-${theme}-poster.jpg`}
+            width="60"
+            height="60"
+            aria-hidden="true"
           >
-            {ui.nav[item]}
-          </a>
-        </li>
-      ))}
-    </ul>
-    <LangSwitcher locale={locale} route={route} />
-    <a class="hello only-expanded" href={`mailto:${PERSON.email}`}>
-      {ui.sayHello}
+            <source
+              src={`/brand/logo-${theme}.webm`}
+              type='video/webm; codecs="av01.0.00M.08"'
+            />
+            <source
+              src={`/brand/logo-${theme}.mp4`}
+              type='video/mp4; codecs="avc1.64000c"'
+            />
+          </video>
+        ))}
+      </span>
+      <span class="visually-hidden">{PERSON.name}</span>
     </a>
-    <ThemeToggle locale={locale} variant="inline" />
-    <button
-      type="button"
-      class="menu needs-js"
-      aria-expanded="false"
-      aria-controls="island-links"
-      aria-label={ui.menu.open}
-      data-label-open={ui.menu.open}
-      data-label-close={ui.menu.close}
-    >
-      <UiIcon name="menu" class="icon-open" />
-      <UiIcon name="close" class="icon-close" />
-    </button>
+    <div class="pill">
+      <span class="island-glass" aria-hidden="true"></span>
+      {route && <span class="current only-compact">{ui.nav[route]}</span>}
+      <ul class="links only-expanded" id="island-links">
+        {items.map((item) => (
+          <li>
+            <a
+              href={localizedPath(locale, item)}
+              aria-current={route === item ? "page" : undefined}
+            >
+              {ui.nav[item]}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <LangSwitcher locale={locale} route={route} />
+      <ThemeToggle locale={locale} variant="inline" />
+      <button
+        type="button"
+        class="menu needs-js"
+        aria-expanded="false"
+        aria-controls="island-links"
+        aria-label={ui.menu.open}
+        data-label-open={ui.menu.open}
+        data-label-close={ui.menu.close}
+      >
+        <UiIcon name="menu" class="icon-open" />
+        <UiIcon name="close" class="icon-close" />
+      </button>
+    </div>
   </nav>
 </site-island>
 

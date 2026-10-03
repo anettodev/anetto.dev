@@ -1,0 +1,11 @@
+/*
+ * The logo follows the theme: each theme has its own clip of Antonio's app
+ * icon (public/brand/logo-dark.*, logo-light.*, made by
+ * scripts/encode-logo.sh). Both are in the markup; only the theme's own is
+ * shown, and a hidden <video preload="none"> loads nothing but its poster.
+ * Without JavaScript there is no data-theme, so the dark logo shows.
+ */
+:root[data-theme="light"] .logo-dark,
+:root:not([data-theme="light"]) .logo-light {
+  display: none;
+}

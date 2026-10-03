@@ -17,7 +17,7 @@
   --line-strong: #3a3d43;
   --chip: #22252a;
   --accent: #8ab4ff;
-  /* Text on an --accent fill ("Say hello"); 9.25:1. */
+  /* Text on an --accent fill; 9.25:1. */
   --on-accent: #0d0e10;
   --status: #e8c47a;
   --chip-glass: rgba(255, 255, 255, 0.08);
@@ -28,6 +28,10 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 32px rgba(0, 0, 0, 0.45);
   --card-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   --card-fill: #1a1a1c;
+  /* Logo tile: the dark logo clip's container (scripts/encode-logo.sh prints it). */
+  --logo-tile: #0f161c;
+  /* Edge of the logo tile, which would otherwise melt into the glass. */
+  --logo-hairline: rgba(255, 255, 255, 0.14);
 
   --mesh-top: #0d0e10;
   --mesh-mid: #22232a;
@@ -59,6 +63,9 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 32px rgba(0, 0, 0, 0.12);
   --card-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
   --card-fill: #ffffff;
+  /* The light logo clip's container. */
+  --logo-tile: #eff1ec;
+  --logo-hairline: rgba(0, 0, 0, 0.08);
 
   --mesh-top: #f4f3ef;
   --mesh-mid: #e9e7e1;
@@ -106,6 +113,9 @@
    * Apple platforms, everything else gets self-hosted Nunito (Fonts API).
    */
   --font-sans: ui-rounded, "SF Pro Rounded", var(--font-nunito);
+  /* System fonts only; used for the intro's typed "Loading..." line. */
+  --font-mono:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Fluid sizes run from the phone value at 390px to the desktop value at 1440px. */
   --text-display: clamp(3.75rem, 2.171rem + 6.476vw, 8rem); /* 60 → 128 */
@@ -128,9 +138,10 @@
   --content-max: 80rem; /* 1280 */
   --gutter: clamp(1.25rem, 5vw, 4rem); /* 20 → 64 */
   --column-gap: 80px;
-  --nav-clearance: 96px; /* island top (16) + height (52) + air */
-  --island-height: 52px;
-  --island-radius: 26px;
+  --nav-clearance: 104px; /* island top (16) + height (60) + air */
+  /* The 44px logo tile plus 8px all round, so the tile clears the pill's rounded end. */
+  --island-height: 60px;
+  --island-radius: 30px;
   --space-section: clamp(4.5rem, 3.386rem + 4.571vw, 7.5rem); /* 72 → 120 */
   --touch: 44px;
 

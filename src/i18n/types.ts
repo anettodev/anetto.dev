@@ -6,7 +6,6 @@ export interface UIStrings {
   skipToContent: string;
   navLabel: string;
   nav: Record<RouteKey, string>;
-  sayHello: string;
   /** Accessible names for the island's menu button. */
   menu: { open: string; close: string };
   /** Accessible name for the theme toggle; says what pressing it does. */
@@ -16,13 +15,14 @@ export interface UIStrings {
   card: {
     /** Stays in English in every locale until confirmed (spec §9, §14 #6). */
     role: string;
-    place: string;
+    /** The word before the company name: "at Inter". */
+    at: string;
     profilesLabel: string;
     portraitAlt: string;
   };
   status: Record<ProjectStatus, string>;
-  /** Home intro card (§8.1): skip button, and the word before "Inter". */
-  intro: { skip: string; at: string };
+  /** Home intro card (§8.1): the line typed under the logo. */
+  intro: { loading: string };
   screenPlaceholder: string;
   devOnly: string;
   notFound: { title: string; body: string; home: string };

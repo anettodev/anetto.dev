@@ -1,7 +1,11 @@
 export const PERSON = {
   name: "Antonio Netto",
   email: "hello@anetto.dev",
+  city: "Belo Horizonte",
 } as const;
+
+/** Current employer, linked from the identity card (the Hugo site's companyURL). */
+export const COMPANY = { name: "Inter", href: "https://inter.co/" } as const;
 
 export type SocialId = "linkedin" | "github" | "x" | "medium";
 

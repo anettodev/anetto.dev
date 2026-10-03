@@ -61,7 +61,7 @@ Choices made while building the revamp, per spec §0.5. Newest phase at the bott
 - Resume PDF uses the Proton Drive link the Hugo site has today (`LINKS.resume`). It is interim until a current PDF is supplied.
 - The resume's pre-2013 entries are not used. One links to `example.com` and another reads like filler, so they aren't reliable facts.
 
-**No `/contact/` page (§14 #4 open).** Contact is the island's "Say hello" `mailto:` plus the card's icons. Adding the page later is one file.
+**No `/contact/` page (§14 #4 open).** Contact is the identity card's email link and icons, plus the footer's email. (The island's "Say hello" was removed later; see "Island: taller, opens on hover".) Adding the page later is one file.
 
 **No second portrait on About.** §5.4 puts a portrait in About's header, but the identity card (§5.1) already shows it on every page, so About would show two. That header portrait is left out until confirmed.
 
@@ -105,11 +105,11 @@ Choices made while building the revamp, per spec §0.5. Newest phase at the bott
 
 **Island without JavaScript is the expanded form.** The server renders every link. The head script sets `<html data-js>` before first paint, so with JavaScript the island is compact from the first frame, with no visible switch. Without JavaScript the menu button and theme toggle are hidden, since they would do nothing.
 
-**The expanded island has a close button.** The canvas shows none. Touch and keyboard users need a visible way back, so the menu button stays and turns into ×. Escape, a click outside and scrolling down also collapse it (§7, §8.2).
+**The expanded island has a close button** (on wide screens, removed later at Antonio's request; see "Island: taller, opens on hover"). The canvas shows none. Touch and keyboard users need a visible way back, so the menu button stays and turns into ×. Escape, a click outside and scrolling down also collapse it (§7, §8.2).
 
 **Keyboard.** Opening the menu from the keyboard moves focus to the first link. Escape collapses the island and returns focus to the menu button. The language menu handles its own Escape and leaves the island as it is.
 
-**Below 960px the expanded island opens as a panel**: name, language and close on top, the four links two by two, then a full-width "Say hello". The single row no longer fits there, and the canvas only shows desktop.
+**Below 960px the expanded island opens as a panel**: name, language and close on top, the four links two by two, then a full-width "Say hello" (since removed). The single row no longer fits there, and the canvas only shows desktop.
 
 **Below 600px the theme toggle moves into the expanded island.** §7 allows this at ≤400px. The threshold is higher because the compact island and the floating toggle start to overlap below about 500px.
 
@@ -179,7 +179,7 @@ Otherwise the intro's front face, cover and skip button are not drawn at all.
 - Measured in Chrome: LCP fired at 232ms, together with the first paint, on the Home headline.
 - Caveat: LCP doesn't account for elements covered by others. On a first visit, people still see the page content at about 3.6s, by the spec's design. The portrait card is visible from 0.15s.
 
-**Any input ends the intro immediately**: Skip intro, any key, a click or tap, the wheel, or focus moving into the page. The spec names only the Skip button. Ending the intro jumps to the final state.
+**Any input ends the intro immediately**: any key, a click or tap, the wheel, or focus moving into the page. Ending the intro jumps to the final state. The spec's "Skip intro" button was removed later at Antonio's request (see below).
 
 **Failsafe.** If the intro script never runs, CSS uncovers the page and drops the front face after 6s.
 
@@ -261,3 +261,149 @@ Otherwise the intro's front face, cover and skip button are not drawn at all.
 - Three crawlable switcher links per page.
 - No `navigator.language` and no meta refresh anywhere.
 - The same placeholder count in every locale: Home 9, About 1, Experiences 4, Projects 2, Blog 8.
+
+## Animated logo in the island (2026-10-03)
+
+**The island shows Antonio's animated logo instead of his name (requested by Antonio; overrides §7, where the compact island starts with the name).**
+
+- It is an app-icon tile with 22.5% corners. First a 44px tile inside the pill's rounded end; now a 60px tile beside the pill (see "Island: taller, opens on hover").
+- The tile takes the clip's container colour (`--logo-tile`, per theme), with a faint hairline edge so it doesn't melt into the glass (`--logo-hairline`).
+- The link keeps its `/?intro` replay, and its accessible name stays "Antonio Netto" (visually hidden text; the video is `aria-hidden`).
+- The identity card still shows the name.
+
+**Assets come from `scripts/encode-logo.sh dark|light <master>`**, one run per theme (re-run it with a new master; don't hand-encode). The current masters are Antonio's 1080×1080, 6.6s clips of the whole app icon, one dark and one light:
+
+- The script measures the container colour, fills the black outside the icon's rounded corners with it, and speeds the clip up just enough that one play lasts 4.9s (1.34× for these masters). Motion that starts by itself and runs longer than 5s needs a pause control (WCAG 2.2.2).
+- The corner fill runs at full resolution, before scaling. Scaling first left a faint ring along the corner arc (lanczos overshoot at the black edge).
+- Island tile, 144px: AV1 WebM 18–22 KB, H.264 MP4 27–34 KB, JPEG poster 3 KB, per theme.
+- Intro card, 640px: AV1 WebM 146–171 KB, H.264 MP4 227–244 KB, JPEG poster 27–33 KB, per theme.
+- In each pair the AV1 file comes first, with H.264 for browsers without AV1 (most Safari). Audio is removed.
+- Transparency was rejected for the first master. A version with the black keyed out washed out on the light theme, and needed two browser-specific encodes at 116–171 KB.
+
+**Playback in the island.**
+
+- The clip plays once on load and again on mouse hover or keyboard focus. Otherwise it rests on its first frame, which matches its last.
+- After the Home intro it stays still, since the card has just played it.
+- It never loops, and never plays with reduced motion. If autoplay is refused (iOS Low Power Mode, for one), the poster stays.
+
+**Side effects.**
+
+- The compact island is narrower: 246px on a 390px phone, down from 315px.
+- Island padding is now 4px all round, so the tile mirrors the menu button on the other end. (Since raised to 8px with a 60px pill; see "Island: taller, opens on hover".)
+
+## Intro: logo, then info, then dock (2026-10-03)
+
+**The intro card now opens on the animated logo (requested by Antonio; extends §8.1's timeline).**
+
+- One card has three faces: the logo on the front, the info face (photo, name, title, "at Inter", profiles) on the back, and the docked card.
+- The docked card takes the logo face's place on the front side while that side faces away, so the second turn lands on it.
+
+| When                     | What happens                                                               |
+| ------------------------ | -------------------------------------------------------------------------- |
+| 0.15s                    | The card fades in centred on the logo face (scale 0.94→1, 600ms)           |
+| when the clip ends (~5s) | The card turns in place to the info face (800ms)                           |
+| +1.2s                    | The card turns again into the docked card while moving into place (1000ms) |
+| docked                   | The reveal (700ms)                                                         |
+
+The whole intro takes about 8.8s. Any input still ends it.
+
+**Under the logo, "Loading..." is typed after a caret** (requested by Antonio). It is localized ("Carregando...", "Cargando...") like the rest of the UI, and stays `aria-hidden` with the rest of the face.
+
+- The caret blinks for the first second while the card fades in. The text then types one character every 90ms with the caret solid, and the caret blinks again until the card turns. The face is gone after about 5.4s, so the blinking stays under WCAG 2.2.2's five seconds.
+- The text is the system monospace (`--font-mono`, no download), so every character is exactly 1ch wide. A stepped `clip-path` reveals it and the caret moves 1ch per step, both in pure CSS and timed from `--chars`, which is set from the string's length.
+- Colours are theme tokens on the card's container colour: text `--muted` (7.3:1 dark, 5.8:1 light), caret `--accent`.
+
+**The first turn waits for the clip to end**, capped at 1.5s past its expected end. If the clip errors or autoplay is refused, the card shows the poster for about 1.2s and moves on, so a slow network never holds the page.
+
+**The 640px clip loads only when the intro plays.** An inline script next to the `<video>` sets its poster and `preload="auto"` while the page is still parsing, so return visits to Home don't download it.
+
+**LCP is unchanged.** Re-measured with the logo face: LCP fired at 116ms, together with the first paint, on the Home headline. The page still sits fully painted under the raised mesh.
+
+**Failsafe** moved from 6s to 12s, past the longer intro.
+
+## The logo follows the theme (2026-10-03)
+
+**Each theme has its own animated logo, from Antonio's dark and light app-icon clips** (requested by Antonio). His still icons (`src/assets/brand/logo-dark.png`, `logo-light.png`) are the colour reference.
+
+- **Dark:** `public/brand/logo-dark.*` and `logo-intro-dark.*`, on #0F161C (`--logo-tile` in the dark theme).
+- **Light:** `public/brand/logo-light.*` and `logo-intro-light.*`, on #EFF1EC (`--logo-tile` in the light theme).
+- The containers are the clips' own colours as `scripts/encode-logo.sh` measures them. They are a little darker (dark) and a little greyer (light) than the still icons (#161E24, #F5F5F5); the tile and the card match the clip so the two never meet at a visible edge.
+- This replaces the first version, where the light theme showed the still icon with a CSS sheen until a light clip existed. The sheen is gone.
+
+**Where it applies.**
+
+- The island tile and the intro card's logo face both play the current theme's clip. `styles/logo.css` shows `.logo-dark` or `.logo-light`; `themedLogo()` in `scripts/logo.ts` picks the clip to play.
+- The intro holds the logo for one play (4.9s) in both themes.
+- On the intro card the clip's edges fade into the card over the outer 8% (a CSS mask). The container in the clips drifts by up to about 4 levels over their frames, which would otherwise show as a faint square on the flat card. The mark stays clear of that band.
+
+**Downloads.**
+
+- Only the current theme's clips load. The island videos are `preload="none"` and started by script. The intro clip's poster and `preload` are set by the inline script for the current theme only, and only when the intro plays.
+- Both island posters load (3 KB each), since a hidden `<video>` still fetches its poster. That was accepted rather than adding code to avoid it.
+- After a theme switch the other theme's island clip shows its poster, and plays on the next hover or focus.
+
+**Without JavaScript** there is no `data-theme`, so the dark logo shows, which matches the dark default.
+
+## Island: taller, opens on hover (2026-10-03)
+
+**Requested by Antonio; overrides §7's 52px island, its "Say hello" button and its close button on wide screens.**
+
+**The pill is 60px tall with 8px padding (was 52px with 4px).**
+
+- The 44px logo tile's rounded corners poked past the pill's rounded end, which is why the pill grew.
+- **Then the logo moved out of the pill** (also requested by Antonio): it is its own 60px tile just left of the glass pill, 8px apart, with the same shadow as the glass. The two stay centred together and move as one when the pill changes size. The divider between logo and section name went with it.
+- The pill kept its 60px height, so the tile, the pill and the floating theme toggle are all 60px tall.
+- Below 960px the open panel sits to the tile's right, its width reduced by the tile's.
+- `--island-height`, `--island-radius` and `--nav-clearance` (now 104px) follow, and so does the floating theme toggle, which uses the island height.
+- The morph reads the radius from the glass's computed style instead of a constant.
+
+**No "Say hello" in the island, in any width.** Contact stays on the identity card (email link and profile icons) and in the footer. The `sayHello` string was removed from the three locales.
+
+**From 960px up the island also expands on hover and on keyboard focus.**
+
+- A mouse resting on the pill for 120ms expands it, and it collapses 400ms after the pointer leaves (if the page is scrolled down). The delays stop a pointer passing by from flickering it.
+- Keyboard focus inside the island (`:focus-visible`, so not mouse clicks) expands it the same way, and leaving with Tab collapses it. Shift+Tab onto the compact menu button lands on the language pill instead, since the button disappears as the island expands.
+- Scrolling still sets the resting state: expanded at the top, compact further down. Hover and focus win while they last.
+
+**No close button when expanded on wide screens.** Scrolling down, moving the pointer away or tabbing out collapses it.
+
+- The menu button stays in the compact state there, for touch screens at 960px and up (tablets in landscape), which can't hover. Opened that way, a tap outside, Escape or scrolling closes it.
+- Escape no longer collapses an island held open by hover or focus, or its resting state at the top.
+
+**Below 960px nothing changes except the height:** no hover (the expanded state is a panel that would cover the page), and the menu button still opens and closes it with the ×.
+
+## No "Skip intro" button (2026-10-03)
+
+**Removed at Antonio's request; overrides §8.1, which has a Skip button for the whole intro.**
+
+- Any key, click, tap, wheel or focus move still ends the intro at once, so it can always be stopped.
+- The intro never plays with reduced motion, plays unasked only once per session, and covers the page while it runs rather than moving alongside content.
+- Trade-off: nothing on screen says how to stop it. WCAG 2.2.2 asks for a way to stop motion that runs longer than 5s next to other content. Any input ending it is that way, but it isn't visible, so a Phase 6 audit may flag it.
+- The "Skip intro" strings were removed from the three locales.
+
+## Theme toggle during the intro (2026-10-03)
+
+**The floating theme toggle stays on screen during the Home intro (requested by Antonio; §8.1 hides it until the reveal).**
+
+- Clicking it changes the theme without ending the intro; every other input still ends it.
+- The logo carries on in the new theme's clip from the same moment: the old clip pauses, and the new one gets its poster and `preload` and plays from the old one's `currentTime`.
+- The card, mesh, halo and "Loading..." line follow the theme through their tokens.
+- After the logo has played, a theme change only recolours.
+- Below 600px the toggle normally lives in the island, which is hidden during the intro. The floating toggle stands in there and fades out at the reveal, as the island fades in.
+
+## Island links hover with the halo (2026-10-03)
+
+**Hovering a link in the pill shows the brand halo (requested by Antonio; replaces the plain grey hover chip).**
+
+- The link becomes a solid `--surface` chip with the identity card's halo (copper, pearl, blue conic gradient, blurred) glowing behind it, turning once every 4s. It's a small version of the identity card.
+- Keyboard focus (`:focus-visible`) shows the same, next to the focus ring.
+- The text stays `--fg` on the solid chip, so the halo's colours never affect its contrast (about 15:1 dark, 18:1 light).
+- The current page keeps its grey chip until hovered. With reduced motion the halo doesn't turn.
+
+## Company link on the identity card (2026-10-03)
+
+**"Inter" on the identity card links to https://inter.co/ (requested by Antonio).** That is the `companyURL` the Hugo site used.
+
+- It's in the accent, semibold, with a soft underline that turns solid on hover. The underline keeps it recognisable as a link without relying on colour (WCAG 1.4.1). The accent is 8.4:1 on the dark card and 6.5:1 on the light one.
+- `COMPANY` and `PERSON.city` live in `src/lib/site.ts`. Only the preposition is translated (`card.at`: at / no / en), and the intro's info face uses the same word.
+- The link's text is set with `set:text`, because Prettier's Astro plugin reflows inline content onto separate lines. That put spaces inside the link and stretched its underline past the name.

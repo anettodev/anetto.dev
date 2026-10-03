@@ -4,7 +4,7 @@ import { Picture } from "astro:assets";
 import portrait from "../assets/portrait.jpeg";
 import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
-import { PERSON, SOCIAL } from "../lib/site";
+import { COMPANY, PERSON, SOCIAL } from "../lib/site";
 import Icon from "./Icon.astro";
 
 /** Contents of the docked identity card (spec §5.2): portrait, then a solid panel. */
@@ -34,7 +34,12 @@ const ui = t(Astro.props.locale);
       {PERSON.name}
     </p>
     <p class="role">{ui.card.role}</p>
-    <p class="place muted">{ui.card.place}</p>
+    <p class="place muted">
+      <span>{ui.card.at}</span>
+      {/* set:text: no whitespace inside the link, so its underline stops at the name. */}
+      <a class="company" href={COMPANY.href} set:text={COMPANY.name} />
+      <span>· {PERSON.city}</span>
+    </p>
     <hr />
     <ul class="profiles" aria-label={ui.card.profilesLabel}>
       {SOCIAL.map((profile) => (
@@ -93,6 +98,23 @@ const ui = t(Astro.props.locale);
 
   .place {
     font-size: var(--text-small);
+  }
+
+  /*
+   * The employer stands out in the accent. The underline keeps it
+   * recognisable as a link without relying on colour (WCAG 1.4.1).
+   */
+  .company {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .company:hover {
+    text-decoration-color: currentColor;
   }
 
   hr {

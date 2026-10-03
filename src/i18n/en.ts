@@ -11,13 +11,12 @@ export default {
     projects: "Projects",
     blog: "Blog",
   },
-  sayHello: "Say hello",
   menu: { open: "Open navigation", close: "Close navigation" },
   theme: { toLight: "Switch to light mode", toDark: "Switch to dark mode" },
   languageLabel: "Language: English",
   card: {
     role: "Executive Tech Manager",
-    place: "at Inter · Belo Horizonte",
+    at: "at",
     profilesLabel: "Profiles",
     portraitAlt: "Portrait of Antonio Netto",
   },
@@ -26,7 +25,7 @@ export default {
     "in-progress": "In progress",
     past: "Past",
   },
-  intro: { skip: "Skip intro", at: "at" },
+  intro: { loading: "Loading..." },
   screenPlaceholder: "screenshot",
   devOnly: "Dev only",
   notFound: {

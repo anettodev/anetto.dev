@@ -1,18 +1,21 @@
 ---
 import "../styles/intro.css";
+import "../styles/logo.css";
 
 import { Picture } from "astro:assets";
 
 import portrait from "../assets/portrait.jpeg";
 import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
-import { PERSON, SOCIAL } from "../lib/site";
+import { COMPANY, PERSON, SOCIAL } from "../lib/site";
 import Icon from "./Icon.astro";
 
 /*
- * Home intro (spec §7, §8.1). The slot is the docked identity card: the real,
- * accessible content and the card's back face. The front face is a decorative
- * duplicate shown only while the intro plays (aria-hidden, no links).
+ * Home intro (spec §7, §8.1, extended). The slot is the docked identity card:
+ * the real, accessible content. While the intro plays the card first shows
+ * the animated logo, turns to the info face (a decorative duplicate:
+ * aria-hidden, no links), then turns again into the docked card as it moves
+ * into place. See styles/intro.css and scripts/intro-card.ts.
  *
  * Whether it plays is decided before first paint by the head script in
  * Base.astro (<html data-intro="play">); otherwise none of this is drawn.
@@ -23,14 +26,60 @@ interface Props {
 }
 
 const ui = t(Astro.props.locale);
+const themes = ["dark", "light"] as const;
 ---
 
 <intro-card class="intro">
   <div class="stage halo-host">
     <div class="halo" aria-hidden="true"></div>
     <div class="flipper">
-      <div class="face back">
+      <div class="face docked">
         <slot />
+      </div>
+      <div class="face logo-face" aria-hidden="true">
+        {themes.map((theme) => (
+          <video
+            class={`logo-clip logo-${theme}`}
+            data-poster={`/brand/logo-intro-${theme}-poster.jpg`}
+            muted
+            playsinline
+            preload="none"
+            disablepictureinpicture
+            disableRemotePlayback
+            width="320"
+            height="320"
+          >
+            <source
+              src={`/brand/logo-intro-${theme}.webm`}
+              type='video/webm; codecs="av01.0.04M.08"'
+            />
+            <source
+              src={`/brand/logo-intro-${theme}.mp4`}
+              type='video/mp4; codecs="avc1.640028"'
+            />
+          </video>
+        ))}
+        <script is:inline>
+          // Fetch the current theme's clip while the page is still parsing,
+          // and only when the intro plays.
+          if (document.documentElement.dataset.intro === "play") {
+            const theme =
+              document.documentElement.dataset.theme === "light"
+                ? "light"
+                : "dark";
+            const clip = document.currentScript.parentElement.querySelector(
+              `.logo-${theme}`,
+            );
+            clip.poster = clip.dataset.poster;
+            clip.preload = "auto";
+          }
+        </script>
+        <p
+          class="logo-loading"
+          style={`--chars: ${[...ui.intro.loading].length}`}
+        >
+          <span>{ui.intro.loading}</span>
+        </p>
       </div>
       <div class="face front" aria-hidden="true">
         <Picture
@@ -46,7 +95,7 @@ const ui = t(Astro.props.locale);
         <p class="front-name">{PERSON.name}</p>
         <p class="front-role">{ui.card.role}</p>
         <p class="front-org muted">
-          {ui.intro.at} <span class="front-inter">Inter</span>
+          {ui.card.at} <span class="front-inter">{COMPANY.name}</span>
         </p>
         <ul class="front-profiles">
           {SOCIAL.map((profile) => (
@@ -58,9 +107,6 @@ const ui = t(Astro.props.locale);
       </div>
     </div>
   </div>
-  <button type="button" class="intro-skip">
-    {ui.intro.skip}
-  </button>
 </intro-card>
 
 <script>

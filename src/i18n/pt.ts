@@ -12,7 +12,6 @@ export default {
     projects: "Projetos",
     blog: "Blog",
   },
-  sayHello: "Diga olá",
   menu: { open: "Abrir navegação", close: "Fechar navegação" },
   theme: {
     toLight: "Mudar para o modo claro",
@@ -21,7 +20,7 @@ export default {
   languageLabel: "Idioma: Português",
   card: {
     role: "Executive Tech Manager",
-    place: "no Inter · Belo Horizonte",
+    at: "no",
     profilesLabel: "Perfis",
     portraitAlt: "Retrato de Antonio Netto",
   },
@@ -30,7 +29,7 @@ export default {
     "in-progress": "Em desenvolvimento",
     past: "Encerrado",
   },
-  intro: { skip: "Pular intro", at: "no" },
+  intro: { loading: "Carregando..." },
   screenPlaceholder: "captura de tela",
   devOnly: "Só em dev",
   notFound: {
