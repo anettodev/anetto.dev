@@ -1,12 +1,15 @@
 ---
+import "../styles/halo.css";
+
 import type { Locale } from "../i18n/locales";
 import IdentityCardBody from "./IdentityCardBody.astro";
 import IntroCard from "./IntroCard.astro";
 
 /*
- * Docked identity card (spec §5.2). Sticky in the left column from 900px up;
- * at the top of the page, scrolling away, below that. On Home it is wrapped
- * by the intro card, which flips into it once per session (§8.1).
+ * Docked identity card (spec §5.2) with its halo (§6.6). Sticky in the left
+ * column from 900px up; at the top of the page, scrolling away, below that.
+ * On Home it is wrapped by the intro card, which flips into it once per
+ * session (§8.1) and carries the halo while it travels.
  */
 interface Props {
   locale: Locale;
@@ -22,7 +25,10 @@ const { locale, intro = false } = Astro.props;
       <IdentityCardBody locale={locale} />
     </IntroCard>
   ) : (
-    <IdentityCardBody locale={locale} />
+    <div class="halo-host">
+      <div class="halo" aria-hidden="true" />
+      <IdentityCardBody locale={locale} />
+    </div>
   )}
 </aside>
 
@@ -33,13 +39,15 @@ const { locale, intro = false } = Astro.props;
     margin-inline: auto;
   }
 
+  /*
+   * No overflow clipping (it would cut the halo's glow); the compact variant
+   * in IdentityCardBody keeps the card shorter than the viewport instead.
+   */
   @media (min-width: 900px) {
     .identity {
       position: sticky;
       top: var(--nav-clearance);
       max-width: none;
-      max-height: calc(100dvh - 120px);
-      overflow-y: auto;
     }
   }
 </style>

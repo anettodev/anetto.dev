@@ -1,0 +1,180 @@
+---
+import Copy from "./Copy.astro";
+import UiIcon from "./UiIcon.astro";
+
+/**
+ * Glowing feature card (spec §6.7): a solid card whose 8px border is a brand
+ * gradient, over a blurred glow of the same gradient. Used for Home's lanes.
+ */
+interface Props {
+  icon: "briefcase" | "layers" | "smartphone";
+  gradient: "pink" | "cyan" | "violet";
+  /** 0-based position; staggers the entrance by 0.1s steps (§8.6). */
+  index: number;
+  label: string;
+  title: string;
+  text: string;
+  href: string;
+  linkLabel: string;
+}
+
+const { icon, gradient, index, label, title, text, href, linkLabel } =
+  Astro.props;
+const style = `--card-gradient: var(--gradient-${gradient}); --stagger: ${(index + 1) * 0.1}s`;
+---
+
+<article class="feature-card" style={style}>
+  <div class="glow" aria-hidden="true"></div>
+  <div class="card">
+    <div class="top">
+      <UiIcon name={icon} size={32} strokeWidth={2.5} />
+      <p class="label">{label}</p>
+    </div>
+    <div class="bottom">
+      <h2>{title}</h2>
+      <p class="text muted">
+        <Copy text={text} />
+      </p>
+      <a class="more-link" href={href}>
+        {linkLabel}
+        <span aria-hidden="true">&nbsp;→</span>
+      </a>
+    </div>
+  </div>
+</article>
+
+<script>
+  import "../scripts/feature-cards";
+</script>
+
+<style>
+  .feature-card {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    transition:
+      opacity 800ms ease-out,
+      transform 800ms ease-out;
+    transition-delay: var(--stagger);
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 40px;
+    background: var(--card-gradient);
+    opacity: 0.6;
+    filter: blur(45px);
+    pointer-events: none;
+  }
+
+  .card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 260px;
+    padding: 28px;
+    border: 8px solid transparent;
+    border-radius: 40px;
+    background:
+      linear-gradient(var(--card-fill), var(--card-fill)) padding-box,
+      var(--card-gradient) border-box;
+  }
+
+  /*
+   * Hover / keyboard focus: card and glow grow a little and the glow
+   * brightens. On the children, not .feature-card, whose transition carries
+   * the entrance stagger delay.
+   */
+  .card,
+  .glow {
+    transition:
+      transform 250ms var(--ease-out),
+      opacity 250ms ease;
+  }
+
+  .feature-card:focus-within {
+    z-index: 1;
+  }
+
+  .feature-card:focus-within :is(.card, .glow) {
+    transform: scale(1.03);
+  }
+
+  .feature-card:focus-within .glow {
+    opacity: 0.85;
+  }
+
+  /* Pointer hover only where hover exists, so a tap on a phone doesn't stick. */
+  @media (hover: hover) {
+    .feature-card:hover {
+      z-index: 1;
+    }
+
+    .feature-card:hover :is(.card, .glow) {
+      transform: scale(1.03);
+    }
+
+    .feature-card:hover .glow {
+      opacity: 0.85;
+    }
+  }
+
+  .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+
+  .text {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .more-link {
+    margin-top: 6px;
+  }
+
+  /* Hidden until scrolled into view, only when the entrance script can run. */
+  :global(:root[data-js]) .feature-card:not(:global(.is-in)) {
+    opacity: 0;
+    transform: translateY(30px);
+    /* Failsafe if the script never runs. */
+    animation: feature-card-failsafe 0s 6s forwards;
+  }
+
+  @keyframes feature-card-failsafe {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feature-card {
+      transition: none;
+    }
+
+    /* Highlight without the size change. */
+    .feature-card:is(:hover, :focus-within) :is(.card, .glow) {
+      transform: none;
+    }
+
+    :global(:root[data-js]) .feature-card:not(:global(.is-in)) {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+  }
+</style>

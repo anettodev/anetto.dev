@@ -189,3 +189,44 @@ Otherwise the intro's front face, cover and skip button are not drawn at all.
 - The cover is a flat `--bg` and would hide the mesh during the intro, so it has to be revisited when the mesh arrives.
 
 **JavaScript on Home: about 3.8 KB gzipped.** Astro inlines the 1 KB intro script into Home only.
+
+## Phase 4 — Mesh, veil, halo, feature cards (2026-10-03)
+
+**The mesh is dimmed whenever page content is on screen (Antonio's call; overrides §5.3 and §8.3, where the veil comes in only after 120px of scroll).**
+
+- The spec's wave puts its brightest part in the bottom ~30% of the screen, under page text, on every page at load.
+- Text there would fail contrast, and the spec's 72% veil only lifts muted text to 3.3:1. The veil is now 90% (`--veil-opacity`): muted text over the brightest part of the wave reaches 6.1:1 in dark and 4.9:1 in light.
+- The full, undimmed mesh plays behind the Home intro card. At the reveal it drops behind the page and the veil fades in.
+
+**The mesh only animates during the intro.** §8.3 pauses the mesh while the veil is up, which is now all the time outside the intro.
+
+- The SMIL animations use `begin="indefinite"` and the drift waits for `data-live`; the intro script starts both and pauses them at the end.
+- Elsewhere the mesh is static: no ongoing cost on phones, and nothing to pause when the tab is hidden.
+
+**The mesh replaces Phase 3's flat cover.** During the intro the mesh rises over the page (`z-index` 35, under the card's 40), still hiding the fully painted page so LCP isn't held back. At 2.9s the mesh drops back and the page fades in. Re-measured: LCP fired at 220ms, together with the first paint.
+
+**Halo.** It is a registered `--halo-angle` turning every 9s, at 0.7 during the intro and fading to 0.35 over 900ms as the card docks. It is still with reduced motion. It sits on the intro's stage, so it travels with the card but doesn't flip. On other pages it sits behind the docked card.
+
+**The sticky card no longer clips its overflow.** `overflow-y: auto` cut off the halo's glow. The compact variant keeps the card shorter than the screen down to about 480px tall.
+
+**Feature cards on Home's three lanes (decision #7).**
+
+- Gradients and icons: pink/briefcase for Now, cyan/layers for Depth, violet/smartphone for Craft.
+- Built in Astro and CSS; the React prototype was only a visual reference.
+- Three across, square, but free to grow taller when the copy needs it, once the content column is ≥45rem. Stacked below that.
+- They enter on scroll with a 0.1s stagger (§8.6). On a first Home visit they wait for the intro's reveal. They show immediately with reduced motion, and a 6s failsafe applies.
+
+**Feature cards highlight on hover (requested by Antonio).**
+
+- Hovering a card grows it and its glow by 3% and brightens the glow from 0.6 to 0.85, over 250ms. Keyboard focus on the card's link does the same.
+- Pointer hover only applies where the device has hover, so a tap on a phone doesn't leave a card stuck enlarged.
+- With reduced motion the glow still brightens, but the size doesn't change.
+- The effect sits on the card's inner layers, because the outer element's transition carries the entrance stagger delay.
+
+**Glass refraction dropped.** The Chromium-only refraction (§6.4) would refract a 90% veil, which is nearly flat, and the island is hidden during the intro, the only time the full mesh shows. The glass stays blur plus edge everywhere.
+
+**Performance.**
+
+- Measured on the dev machine (unthrottled desktop Chrome): 60fps, with no frame over 17.7ms during the intro (mesh, filters, flip) or afterwards (halo).
+- Not yet measured on a mid-range Android or with 4× CPU throttling; that is Phase 6.
+- About 5 KB of gzipped JavaScript on Home.

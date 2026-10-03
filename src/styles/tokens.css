@@ -68,6 +68,38 @@
   --mesh-tint: rgba(90, 115, 220, 0.3);
 }
 
+/* Brand gradients and glows: the same in both themes (§6.6, §6.7). */
+:root {
+  --halo-copper: #e0793a;
+  --halo-pearl: #f2f2f4;
+  --halo-blue: #6e87e6;
+  --gradient-pink: linear-gradient(
+    137deg,
+    #ff3d77 0%,
+    #ffb1ce 45%,
+    #ff9d3c 100%
+  );
+  --gradient-cyan: linear-gradient(
+    137deg,
+    #ffffff 0%,
+    #7dd3fc 45%,
+    #06b6d4 100%
+  );
+  --gradient-violet: linear-gradient(
+    137deg,
+    #4361ee 0%,
+    #e0aeff 45%,
+    #f72585 100%
+  );
+
+  /*
+   * Veil over the mesh whenever page content is on screen. The spec's 0.72
+   * leaves muted text over the brightest part of the wave at 3.3:1; 0.9
+   * passes 4.5:1 in both themes (dark 6.1:1, light 4.9:1).
+   */
+  --veil-opacity: 0.9;
+}
+
 :root {
   /*
    * Type (§6.2). SF Pro Rounded is never bundled: `ui-rounded` reaches it on

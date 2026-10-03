@@ -6,7 +6,6 @@
 
 /* Outside the intro, the front face, cover and skip button don't exist. */
 :root:not([data-intro="play"]) .intro .front,
-:root:not([data-intro="play"]) .intro-cover,
 :root:not([data-intro="play"]) .intro-skip {
   display: none;
 }
@@ -23,12 +22,6 @@
   :root[data-intro="play"] .identity {
     position: sticky;
   }
-}
-
-/* The cover sits inside the card's stacking context (z-index 40), so the stage goes above it there. */
-:root[data-intro="play"] .intro .stage {
-  position: relative;
-  z-index: 2;
 }
 
 .intro .flipper {
@@ -111,15 +104,18 @@
 }
 
 /*
- * The cover hides the page while the card plays. The page underneath is
- * fully painted from the first frame, so the largest element counts for LCP
- * without waiting for the intro (§12); it is revealed when the cover fades.
+ * While the card plays, the mesh rises over the page (still under the card,
+ * z-index 40) and shows without its veil: it is the intro's backdrop. The page
+ * underneath is fully painted from the first frame, so its largest element
+ * counts for LCP without waiting for the intro (§12). At 2.9s the mesh drops
+ * back behind the page and the veil fades in (scripts/intro-card.ts).
  */
-.intro-cover {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  background: var(--bg);
+:root[data-intro="play"] .mesh {
+  z-index: 35;
+}
+
+:root[data-intro="play"] .mesh-veil {
+  opacity: 0;
 }
 
 .intro-skip {
@@ -152,10 +148,17 @@
  * Failsafe: if the intro script never runs, uncover the page after 6s.
  * The script's own animations take precedence while it runs.
  */
-:root[data-intro="play"] .intro-cover,
 :root[data-intro="play"] .intro .front,
 :root[data-intro="play"] .intro-skip {
   animation: intro-failsafe-out 700ms ease 6s forwards;
+}
+
+:root[data-intro="play"] .mesh {
+  animation: intro-failsafe-mesh 0s 6s forwards;
+}
+
+:root[data-intro="play"] .mesh-veil {
+  animation: intro-failsafe-veil 700ms ease 6s forwards;
 }
 
 :root[data-intro="play"] site-island,
@@ -178,6 +181,18 @@
 @keyframes intro-failsafe-in {
   to {
     opacity: 1;
+  }
+}
+
+@keyframes intro-failsafe-mesh {
+  to {
+    z-index: -1;
+  }
+}
+
+@keyframes intro-failsafe-veil {
+  to {
+    opacity: var(--veil-opacity);
   }
 }
 

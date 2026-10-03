@@ -26,3 +26,6 @@ export function prefersReducedMotion(): boolean {
 export function isRendered(el: Element | null): boolean {
   return el instanceof HTMLElement && el.checkVisibility();
 }
+
+/** Fired by the Home intro when the page is revealed (scripts/intro-card.ts). */
+export const INTRO_REVEAL_EVENT = "anetto:intro-reveal";

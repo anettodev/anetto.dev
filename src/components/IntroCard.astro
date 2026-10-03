@@ -16,6 +16,7 @@ import Icon from "./Icon.astro";
  *
  * Whether it plays is decided before first paint by the head script in
  * Base.astro (<html data-intro="play">); otherwise none of this is drawn.
+ * The halo sits on the stage, so it travels with the card but doesn't flip.
  */
 interface Props {
   locale: Locale;
@@ -25,7 +26,8 @@ const ui = t(Astro.props.locale);
 ---
 
 <intro-card class="intro">
-  <div class="stage">
+  <div class="stage halo-host">
+    <div class="halo" aria-hidden="true"></div>
     <div class="flipper">
       <div class="face back">
         <slot />
@@ -56,7 +58,6 @@ const ui = t(Astro.props.locale);
       </div>
     </div>
   </div>
-  <div class="intro-cover" aria-hidden="true"></div>
   <button type="button" class="intro-skip">
     {ui.intro.skip}
   </button>

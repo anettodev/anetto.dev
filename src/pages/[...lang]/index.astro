@@ -1,5 +1,5 @@
 ---
-import Lane from "../../components/Lane.astro";
+import FeatureCard from "../../components/FeatureCard.astro";
 import PostRow from "../../components/PostRow.astro";
 import ProjectEntry from "../../components/ProjectEntry.astro";
 import RoleRow from "../../components/RoleRow.astro";
@@ -26,6 +26,13 @@ const [roles, projects, blog] = await Promise.all([
   getPage(locale, "blog"),
 ]);
 const featured = projects[0];
+
+/* Lanes render as feature cards (§6.7, decision #7): one gradient and icon each. */
+const LANE_LOOK = [
+  { icon: "briefcase", gradient: "pink" },
+  { icon: "layers", gradient: "cyan" },
+  { icon: "smartphone", gradient: "violet" },
+] as const;
 ---
 
 <Page
@@ -46,8 +53,16 @@ const featured = projects[0];
   </h1>
 
   <div class="lanes">
-    {lanes.map((lane) => (
-      <Lane {...lane} href={localizedPath(locale, lane.route)} />
+    {lanes.map((lane, index) => (
+      <FeatureCard
+        {...LANE_LOOK[index % LANE_LOOK.length]!}
+        index={index}
+        label={`${lane.number} · ${lane.label}`}
+        title={lane.title}
+        text={lane.text}
+        href={localizedPath(locale, lane.route)}
+        linkLabel={lane.linkLabel}
+      />
     ))}
   </div>
 
@@ -118,35 +133,26 @@ const featured = projects[0];
 
   .lanes {
     display: grid;
+    gap: 24px;
     margin-top: calc(var(--space-section) * 0.6);
-    border-top: 1px solid var(--line);
   }
 
-  .lanes > :global(* + *) {
-    border-top: 1px solid var(--line);
-  }
-
-  /* Three lanes in a row once the content column (the <main> container) is wide enough. */
+  /* Three cards in a row once the content column (the <main> container) is wide enough; square there (§6.7). */
   @container (min-width: 45rem) {
     .lanes {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
     }
 
-    .lanes > :global(*) {
-      padding-inline: 28px;
-    }
-
-    .lanes > :global(* + *) {
-      border-top: 0;
-      border-left: 1px solid var(--line);
-    }
-
-    .lanes > :global(:first-child) {
-      padding-left: 0;
-    }
-
-    .lanes > :global(:last-child) {
-      padding-right: 0;
+    /*
+     * Square, but free to grow taller when the copy needs it (min-height:
+     * auto). min-width: 0 stops that taller height from being turned back
+     * into a minimum width through the aspect ratio.
+     */
+    .lanes :global(.card) {
+      aspect-ratio: 1;
+      min-width: 0;
+      min-height: auto;
     }
   }
 
