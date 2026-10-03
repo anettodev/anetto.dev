@@ -1,0 +1,67 @@
+---
+import "../styles/intro.css";
+
+import { Picture } from "astro:assets";
+
+import portrait from "../assets/portrait.jpeg";
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import { PERSON, SOCIAL } from "../lib/site";
+import Icon from "./Icon.astro";
+
+/*
+ * Home intro (spec §7, §8.1). The slot is the docked identity card: the real,
+ * accessible content and the card's back face. The front face is a decorative
+ * duplicate shown only while the intro plays (aria-hidden, no links).
+ *
+ * Whether it plays is decided before first paint by the head script in
+ * Base.astro (<html data-intro="play">); otherwise none of this is drawn.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const ui = t(Astro.props.locale);
+---
+
+<intro-card class="intro">
+  <div class="stage">
+    <div class="flipper">
+      <div class="face back">
+        <slot />
+      </div>
+      <div class="face front" aria-hidden="true">
+        <Picture
+          src={portrait}
+          alt=""
+          formats={["avif", "webp"]}
+          widths={[144, 288]}
+          sizes="144px"
+          width={144}
+          height={144}
+          loading="eager"
+        />
+        <p class="front-name">{PERSON.name}</p>
+        <p class="front-role">{ui.card.role}</p>
+        <p class="front-org muted">
+          {ui.intro.at} <span class="front-inter">Inter</span>
+        </p>
+        <ul class="front-profiles">
+          {SOCIAL.map((profile) => (
+            <li>
+              <Icon name={profile.id} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="intro-cover" aria-hidden="true"></div>
+  <button type="button" class="intro-skip">
+    {ui.intro.skip}
+  </button>
+</intro-card>
+
+<script>
+  import "../scripts/intro-card";
+</script>

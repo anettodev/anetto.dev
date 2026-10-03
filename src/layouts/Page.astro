@@ -20,13 +20,28 @@ interface Props {
   description?: string | undefined;
   /** Locale the page copy actually came from; differs while a translation is missing. */
   contentLang?: Locale | undefined;
+  /** Home only: the identity card plays the intro (§8.1). */
+  intro?: boolean | undefined;
 }
 
-const { locale, route, title, description, contentLang = locale } = Astro.props;
+const {
+  locale,
+  route,
+  title,
+  description,
+  contentLang = locale,
+  intro = false,
+} = Astro.props;
 const ui = t(locale);
 ---
 
-<Base locale={locale} route={route} title={title} description={description}>
+<Base
+  locale={locale}
+  route={route}
+  title={title}
+  description={description}
+  intro={intro}
+>
   <a class="skip-link" href="#main">
     {ui.skipToContent}
   </a>
@@ -34,7 +49,7 @@ const ui = t(locale);
   <ThemeToggle locale={locale} variant="floating" />
   <div class="shell">
     <div class="card-column">
-      <IdentityCard locale={locale} />
+      <IdentityCard locale={locale} intro={intro} />
     </div>
     <main
       id="main"

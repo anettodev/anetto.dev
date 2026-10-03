@@ -26,6 +26,7 @@ export default {
     "in-progress": "In progress",
     past: "Past",
   },
+  intro: { skip: "Skip intro", at: "at" },
   screenPlaceholder: "screenshot",
   devOnly: "Dev only",
   notFound: {

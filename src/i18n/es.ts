@@ -30,6 +30,7 @@ export default {
     "in-progress": "En curso",
     past: "Anterior",
   },
+  intro: { skip: "Saltar introducción", at: "en" },
   screenPlaceholder: "captura de pantalla",
   devOnly: "Solo en dev",
   notFound: {

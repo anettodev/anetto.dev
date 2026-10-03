@@ -21,6 +21,8 @@ export interface UIStrings {
     portraitAlt: string;
   };
   status: Record<ProjectStatus, string>;
+  /** Home intro card (§8.1): skip button, and the word before "Inter". */
+  intro: { skip: string; at: string };
   screenPlaceholder: string;
   devOnly: string;
   notFound: { title: string; body: string; home: string };

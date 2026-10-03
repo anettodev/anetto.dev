@@ -1,9 +1,14 @@
 import { isRendered, prefersReducedMotion } from "./prefs";
 
 /*
- * <site-island> (spec §7, §8.2). Compact by default once JavaScript runs (the
- * head script sets <html data-js> so the first paint is already compact);
- * without JavaScript the markup stays in its expanded form.
+ * <site-island> (spec §7, §8.2). Without JavaScript the markup stays in its
+ * expanded form. With it:
+ *   - at the top of the page, wide screens show the expanded row; scrolled
+ *     down, the island is compact. A scroll only changes the state once the
+ *     new position has held for AUTO_DELAY, so quick scrolls don't flicker it;
+ *   - narrow screens never expand on their own: there the expanded state is a
+ *     panel that would cover the top of the page;
+ *   - the menu button, Escape and a click outside still toggle it by hand.
  *
  * The morph never animates width: the glass layer is clipped with clip-path,
  * and the items present in both states slide with a transform (FLIP).
@@ -11,13 +16,17 @@ import { isRendered, prefersReducedMotion } from "./prefs";
 const DURATION = 350;
 const EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
 const RADIUS = 26; // half the 52px island height
-/** Scrolling down this far after expanding returns the island to compact. */
-const SCROLL_COLLAPSE = 24;
+const AUTO_DELAY = 500;
+/** Within this many pixels of the top counts as "at the top". */
+const TOP = 4;
+/** Where the expanded island fits on one row (matches island.css). */
+const WIDE = matchMedia("(min-width: 960px)");
 
 class SiteIsland extends HTMLElement {
   #glass: HTMLElement | null = null;
   #button: HTMLButtonElement | null = null;
-  #scrollAnchor = 0;
+  #autoTimer = 0;
+  #autoTarget: boolean | null = null;
 
   connectedCallback() {
     this.#glass = this.querySelector(".island-glass");
@@ -26,6 +35,11 @@ class SiteIsland extends HTMLElement {
     document.addEventListener("keydown", this.#onKeydown);
     document.addEventListener("pointerdown", this.#onPointerdown);
     window.addEventListener("scroll", this.#onScroll, { passive: true });
+    WIDE.addEventListener("change", this.#onScroll);
+
+    // First state without animation; island.css already drew this guess.
+    this.#setExpanded(this.#autoState() === true, { animate: false });
+    document.documentElement.dataset.islandReady = "";
   }
 
   disconnectedCallback() {
@@ -33,26 +47,45 @@ class SiteIsland extends HTMLElement {
     document.removeEventListener("keydown", this.#onKeydown);
     document.removeEventListener("pointerdown", this.#onPointerdown);
     window.removeEventListener("scroll", this.#onScroll);
+    WIDE.removeEventListener("change", this.#onScroll);
+    this.#cancelAuto();
   }
 
   get expanded() {
     return this.hasAttribute("data-expanded");
   }
 
-  #setExpanded(next: boolean, { focusFirstLink = false } = {}) {
-    if (next === this.expanded || !this.#button) return;
-    const button = this.#button;
-    const focusInside = this.contains(document.activeElement);
+  /** The state scrolling asks for: true/false, or null for "leave it as it is". */
+  #autoState(): boolean | null {
+    if (window.scrollY > TOP) return false;
+    return WIDE.matches ? true : null;
+  }
 
-    this.#morph(() => {
+  #cancelAuto() {
+    window.clearTimeout(this.#autoTimer);
+    this.#autoTimer = 0;
+    this.#autoTarget = null;
+  }
+
+  #setExpanded(next: boolean, { focusFirstLink = false, animate = true } = {}) {
+    if (!this.#button) return;
+    const button = this.#button;
+    const apply = () => {
       this.toggleAttribute("data-expanded", next);
       button.setAttribute("aria-expanded", String(next));
       const label = next ? button.dataset.labelClose : button.dataset.labelOpen;
       if (label) button.setAttribute("aria-label", label);
       if (!next) this.querySelector("lang-switcher")?.close();
-    });
+    };
+    if (!animate) {
+      apply();
+      return;
+    }
+    if (next === this.expanded) return;
+    const focusInside = this.contains(document.activeElement);
 
-    this.#scrollAnchor = window.scrollY;
+    this.#morph(apply);
+
     if (next && focusFirstLink) {
       this.querySelector<HTMLElement>(".links a")?.focus();
     } else if (!next && focusInside && !isRendered(document.activeElement)) {
@@ -141,6 +174,7 @@ class SiteIsland extends HTMLElement {
   }
 
   #onToggle = (event: MouseEvent) => {
+    this.#cancelAuto();
     // detail is 0 for keyboard activation: then move focus into the links.
     this.#setExpanded(!this.expanded, { focusFirstLink: event.detail === 0 });
   };
@@ -152,18 +186,31 @@ class SiteIsland extends HTMLElement {
   };
 
   #onPointerdown = (event: PointerEvent) => {
-    if (this.expanded && !this.contains(event.target as Node)) {
+    // At the top of a wide screen, expanded is the resting state, not an open menu.
+    if (
+      this.expanded &&
+      this.#autoState() !== true &&
+      !this.contains(event.target as Node)
+    ) {
       this.#setExpanded(false);
     }
   };
 
   #onScroll = () => {
-    if (
-      this.expanded &&
-      window.scrollY - this.#scrollAnchor > SCROLL_COLLAPSE
-    ) {
-      this.#setExpanded(false);
+    const target = this.#autoState();
+    if (target === null || target === this.expanded) {
+      this.#cancelAuto();
+      return;
     }
+    if (this.#autoTimer && this.#autoTarget === target) return;
+    this.#cancelAuto();
+    this.#autoTarget = target;
+    this.#autoTimer = window.setTimeout(() => {
+      this.#autoTimer = 0;
+      this.#autoTarget = null;
+      // Only if the page is still where it was asked from.
+      if (this.#autoState() === target) this.#setExpanded(target);
+    }, AUTO_DELAY);
   };
 }
 

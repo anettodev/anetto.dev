@@ -146,3 +146,46 @@ Choices made while building the revamp, per spec §0.5. Newest phase at the bott
 **Contrast "over the mesh" waits for Phase 4.** The mesh doesn't exist yet. For now, glass legibility was checked with the About headline scrolled under the island, in both themes.
 
 **JavaScript on Home: about 2.6 KB gzipped**, against the §12 budget of 30 KB.
+
+## Phase 3 — Intro card, floating card, island on scroll (2026-10-03)
+
+**The island now follows scroll position (requested by Antonio; overrides §7/§8.2 "expands on tap/click/keyboard" and Phase 2's "scrolling down collapses it").**
+
+- At the top of the page the island is expanded; scrolled down, it is compact.
+- A change only happens once the new position has held for 0.5s, so quick scrolls don't flicker it. (First 1s; halved at Antonio's request.)
+- This applies from 960px up. Below that, the expanded state is a tall panel that would cover the top of the page, so phones only collapse automatically and never expand on their own.
+- At the top of a wide screen, a click outside doesn't collapse the island, since expanded is its resting state there. The menu button and Escape still work at any position.
+- Pages load at the top, so wide screens draw the expanded row from first paint. CSS guesses the state until the script sets `<html data-island-ready>`, so nothing jumps on load.
+
+**How the intro is built.**
+
+- On Home, the docked identity card is wrapped by `<intro-card>`. The docked card is the real, accessible content and the flip's back face.
+- The front face is a decorative duplicate: `aria-hidden`, with no links. The name on it is not a heading; Home's only `<h1>` stays the positioning sentence.
+- Opacity, translate and scale run on an outer "stage". The 3D flip runs on an inner "flipper" with `perspective()` in its own transform. Opacity on a 3D element would flatten it and break the faces' hidden backs.
+- The front face is a true 320×460 card centred over the docked one. The two faces swap at 90°, so nothing is scaled unevenly.
+
+**Whether it plays is decided before first paint** by the head script:
+
+- only on Home (`<html data-intro-page>`);
+- only if `anetto:intro-seen` isn't in session storage;
+- never with reduced motion;
+- never when storage is blocked, since the intro would then replay on every visit.
+
+Otherwise the intro's front face, cover and skip button are not drawn at all.
+
+**LCP: the page is painted from the first frame, under a cover.**
+
+- During the intro an opaque `--bg` cover hides the page, and it fades out at 2.9s. Nothing is ever `display: none`.
+- Measured in Chrome: LCP fired at 232ms, together with the first paint, on the Home headline.
+- Caveat: LCP doesn't account for elements covered by others. On a first visit, people still see the page content at about 3.6s, by the spec's design. The portrait card is visible from 0.15s.
+
+**Any input ends the intro immediately**: Skip intro, any key, a click or tap, the wheel, or focus moving into the page. The spec names only the Skip button. Ending the intro jumps to the final state.
+
+**Failsafe.** If the intro script never runs, CSS uncovers the page and drops the front face after 6s.
+
+**Deferred to Phase 4.**
+
+- The halo (§6.6, §8.4).
+- The cover is a flat `--bg` and would hide the mesh during the intro, so it has to be revisited when the mesh arrives.
+
+**JavaScript on Home: about 3.8 KB gzipped.** Astro inlines the 1 KB intro script into Home only.

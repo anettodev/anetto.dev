@@ -30,6 +30,7 @@ export default {
     "in-progress": "Em andamento",
     past: "Encerrado",
   },
+  intro: { skip: "Pular introdução", at: "no" },
   screenPlaceholder: "captura de tela",
   devOnly: "Só em dev",
   notFound: {

@@ -13,14 +13,36 @@
 }
 
 /* Compact: expanded-only items leave the layout and the accessibility tree. */
-:root[data-js] site-island:not([data-expanded]) .only-expanded {
+:root[data-island-ready] site-island:not([data-expanded]) .only-expanded {
   display: none;
 }
 
 /* Expanded, or no JavaScript: compact-only items leave. */
 :root:not([data-js]) .only-compact,
-site-island[data-expanded] .only-compact {
+:root[data-island-ready] site-island[data-expanded] .only-compact {
   display: none;
+}
+
+/*
+ * Between first paint and the island script (data-island-ready), draw the
+ * state the script will pick for a page at the top: expanded on wide
+ * screens, compact on narrow ones. No visible switch on load.
+ */
+@media (min-width: 960px) {
+  :root[data-js]:not([data-island-ready]) .only-compact,
+  :root[data-js]:not([data-island-ready]) .menu .icon-open {
+    display: none;
+  }
+
+  :root[data-js]:not([data-island-ready]) .menu .icon-close {
+    display: block;
+  }
+}
+
+@media (max-width: 959.98px) {
+  :root[data-js]:not([data-island-ready]) site-island .only-expanded {
+    display: none;
+  }
 }
 
 /* ---------- Island ---------- */

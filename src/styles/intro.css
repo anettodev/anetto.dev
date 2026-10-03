@@ -1,0 +1,188 @@
+/*
+ * Home intro (spec §8.1). Every rule here applies only while
+ * <html data-intro="play">; afterwards the card is the plain docked card.
+ * Global, not scoped: the states reach the island, toggle and page content.
+ */
+
+/* Outside the intro, the front face, cover and skip button don't exist. */
+:root:not([data-intro="play"]) .intro .front,
+:root:not([data-intro="play"]) .intro-cover,
+:root:not([data-intro="play"]) .intro-skip {
+  display: none;
+}
+
+/* The card rises above the cover and may leave its column while it travels. */
+:root[data-intro="play"] .identity {
+  position: relative;
+  z-index: 40;
+  max-height: none;
+  overflow: visible;
+}
+
+@media (min-width: 900px) {
+  :root[data-intro="play"] .identity {
+    position: sticky;
+  }
+}
+
+/* The cover sits inside the card's stacking context (z-index 40), so the stage goes above it there. */
+:root[data-intro="play"] .intro .stage {
+  position: relative;
+  z-index: 2;
+}
+
+.intro .flipper {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+:root[data-intro="play"] .intro .face {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* The docked card is the back face: turned away until the flip brings it round. */
+:root[data-intro="play"] .intro .back {
+  transform: rotateY(180deg);
+}
+
+/* Front face: 320×460, centred over the docked card (§8.1). */
+.intro .front {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 320px;
+  height: 460px;
+  margin: -230px 0 0 -160px;
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+}
+
+.intro .front img {
+  width: 144px;
+  height: 144px;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.front-name {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.front-role {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.front-org {
+  font-size: 0.875rem;
+}
+
+.front-inter {
+  color: var(--accent);
+}
+
+.front-profiles {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.front-profiles li {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  border-radius: 50%;
+  background: var(--chip);
+}
+
+/*
+ * The cover hides the page while the card plays. The page underneath is
+ * fully painted from the first frame, so the largest element counts for LCP
+ * without waiting for the intro (§12); it is revealed when the cover fades.
+ */
+.intro-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: var(--bg);
+}
+
+.intro-skip {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 3;
+  min-height: var(--touch);
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* Island and toggle wait for the reveal (§8.1, 2.9s). */
+:root[data-intro="play"] site-island,
+:root[data-intro="play"] .theme-toggle.floating {
+  opacity: 0;
+}
+
+:root[data-intro="play"] .intro .stage {
+  opacity: 0;
+}
+
+/*
+ * Failsafe: if the intro script never runs, uncover the page after 6s.
+ * The script's own animations take precedence while it runs.
+ */
+:root[data-intro="play"] .intro-cover,
+:root[data-intro="play"] .intro .front,
+:root[data-intro="play"] .intro-skip {
+  animation: intro-failsafe-out 700ms ease 6s forwards;
+}
+
+:root[data-intro="play"] site-island,
+:root[data-intro="play"] .theme-toggle.floating,
+:root[data-intro="play"] .intro .stage {
+  animation: intro-failsafe-in 700ms ease 6s forwards;
+}
+
+:root[data-intro="play"] .intro .back {
+  animation: intro-failsafe-face 0s 6s forwards;
+}
+
+@keyframes intro-failsafe-out {
+  to {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+@keyframes intro-failsafe-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes intro-failsafe-face {
+  to {
+    transform: none;
+  }
+}

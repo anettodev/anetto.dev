@@ -20,15 +20,17 @@ interface Props {
   /** Page name; the site name is appended. Omit on Home. */
   title?: string | undefined;
   description?: string | undefined;
+  /** Home: the head script may play the intro card (§8.1). */
+  intro?: boolean | undefined;
 }
 
-const { locale, route, title, description } = Astro.props;
+const { locale, route, title, description, intro = false } = Astro.props;
 const ui = t(locale);
 const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
 ---
 
 <!doctype html>
-<html lang={LANG_TAG[locale]}>
+<html lang={LANG_TAG[locale]} data-intro-page={intro ? "" : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -49,6 +51,23 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
             : "dark";
         }
         root.dataset.theme = theme;
+
+        // Intro (spec §8.1): once per session, never with reduced motion.
+        // Without working storage it would replay on every visit, so skip it.
+        if (root.hasAttribute("data-intro-page")) {
+          let seen = true;
+          try {
+            seen = sessionStorage.getItem("anetto:intro-seen") !== null;
+          } catch {
+            // Storage blocked: treat as seen.
+          }
+          if (
+            !seen &&
+            !matchMedia("(prefers-reduced-motion: reduce)").matches
+          ) {
+            root.dataset.intro = "play";
+          }
+        }
       })();
     </script>
     <title>{pageTitle}</title>
