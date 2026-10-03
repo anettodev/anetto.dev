@@ -7,6 +7,12 @@ export interface UIStrings {
   navLabel: string;
   nav: Record<RouteKey, string>;
   sayHello: string;
+  /** Accessible names for the island's menu button. */
+  menu: { open: string; close: string };
+  /** Accessible name for the theme toggle; says what pressing it does. */
+  theme: { toLight: string; toDark: string };
+  /** Accessible name for the language pill, e.g. "Language: English". */
+  languageLabel: string;
   card: {
     /** Stays in English in every locale until confirmed (spec §9, §14 #6). */
     role: string;

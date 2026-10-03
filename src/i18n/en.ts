@@ -12,6 +12,9 @@ export default {
     blog: "Blog",
   },
   sayHello: "Say hello",
+  menu: { open: "Open navigation", close: "Close navigation" },
+  theme: { toLight: "Switch to light mode", toDark: "Switch to dark mode" },
+  languageLabel: "Language: English",
   card: {
     role: "Executive Tech Manager",
     place: "at Inter · Belo Horizonte",

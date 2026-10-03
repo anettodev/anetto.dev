@@ -158,6 +158,24 @@ main:focus {
   text-decoration: none;
 }
 
+/*
+ * Page transitions (spec §8.7): cross-document View Transitions where
+ * supported, a normal navigation elsewhere. The island and theme toggle carry
+ * their own names, so they hold still while the page crossfades. The same
+ * 300ms crossfade serves theme switches (§8.5, see scripts/theme.ts).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 300ms;
+}
+
 /* Copy still to be supplied (spec §0.2). Stays visible until replaced. */
 mark.placeholder {
   padding: 0.05em 0.35em;

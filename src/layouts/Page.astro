@@ -1,7 +1,8 @@
 ---
 import Footer from "../components/Footer.astro";
 import IdentityCard from "../components/IdentityCard.astro";
-import SiteNav from "../components/SiteNav.astro";
+import SiteIsland from "../components/SiteIsland.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
 import { t } from "../i18n";
 import { LANG_TAG, type Locale } from "../i18n/locales";
 import type { RouteKey } from "../i18n/routes";
@@ -29,7 +30,8 @@ const ui = t(locale);
   <a class="skip-link" href="#main">
     {ui.skipToContent}
   </a>
-  <SiteNav locale={locale} route={route} />
+  <SiteIsland locale={locale} route={route} />
+  <ThemeToggle locale={locale} variant="floating" />
   <div class="shell">
     <div class="card-column">
       <IdentityCard locale={locale} />

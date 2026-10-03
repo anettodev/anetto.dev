@@ -32,6 +32,25 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      // Before first paint (spec §10): saved theme, else the system's; flag JS for the island.
+      (() => {
+        const root = document.documentElement;
+        root.dataset.js = "";
+        let theme = null;
+        try {
+          theme = localStorage.getItem("anetto:theme");
+        } catch {
+          // Storage blocked: fall back to the system preference.
+        }
+        if (theme !== "light" && theme !== "dark") {
+          theme = matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        root.dataset.theme = theme;
+      })();
+    </script>
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
     {route && (

@@ -1,0 +1,74 @@
+---
+import "../styles/island.css";
+
+import { localizedPath, t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+import { PERSON } from "../lib/site";
+import LangSwitcher from "./LangSwitcher.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Navigation island (spec §7). Every link is in the DOM in both states.
+ *   compact:  name | current section · language · menu
+ *   expanded: name · About · Experiences · Projects · Blog · language · Say hello · close
+ * Below 960px the expanded state opens as a panel; it no longer fits on one row.
+ */
+interface Props {
+  locale: Locale;
+  route?: RouteKey | undefined;
+}
+
+const { locale, route } = Astro.props;
+const ui = t(locale);
+const items = ["about", "experiences", "projects", "blog"] as const;
+---
+
+<site-island>
+  <nav class="island" aria-label={ui.navLabel}>
+    <span class="island-glass" aria-hidden="true"></span>
+    <a
+      class="home"
+      href={localizedPath(locale, "home")}
+      aria-current={route === "home" ? "page" : undefined}
+    >
+      {PERSON.name}
+    </a>
+    <span class="divider only-compact" aria-hidden="true"></span>
+    {route && <span class="current only-compact">{ui.nav[route]}</span>}
+    <ul class="links only-expanded" id="island-links">
+      {items.map((item) => (
+        <li>
+          <a
+            href={localizedPath(locale, item)}
+            aria-current={route === item ? "page" : undefined}
+          >
+            {ui.nav[item]}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <LangSwitcher locale={locale} route={route} />
+    <a class="hello only-expanded" href={`mailto:${PERSON.email}`}>
+      {ui.sayHello}
+    </a>
+    <ThemeToggle locale={locale} variant="inline" />
+    <button
+      type="button"
+      class="menu needs-js"
+      aria-expanded="false"
+      aria-controls="island-links"
+      aria-label={ui.menu.open}
+      data-label-open={ui.menu.open}
+      data-label-close={ui.menu.close}
+    >
+      <UiIcon name="menu" class="icon-open" />
+      <UiIcon name="close" class="icon-close" />
+    </button>
+  </nav>
+</site-island>
+
+<script>
+  import "../scripts/site-island";
+</script>

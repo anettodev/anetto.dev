@@ -13,6 +13,12 @@ export default {
     blog: "Blog",
   },
   sayHello: "Saluda",
+  menu: { open: "Abrir navegación", close: "Cerrar navegación" },
+  theme: {
+    toLight: "Cambiar al modo claro",
+    toDark: "Cambiar al modo oscuro",
+  },
+  languageLabel: "Idioma: Español",
   card: {
     role: "Executive Tech Manager",
     place: "en Inter · Belo Horizonte",

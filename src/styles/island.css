@@ -1,0 +1,361 @@
+/*
+ * Island, language pill and theme toggle (spec §6.4, §7).
+ * Global rather than scoped: their states hang off <html data-js> (set by the
+ * head script) and <site-island data-expanded>.
+ */
+
+/* ---------- States ---------- */
+
+/* Controls that only work with JavaScript disappear when it never ran. */
+:root:not([data-js]) .needs-js,
+:root:not([data-js]) theme-toggle {
+  display: none !important;
+}
+
+/* Compact: expanded-only items leave the layout and the accessibility tree. */
+:root[data-js] site-island:not([data-expanded]) .only-expanded {
+  display: none;
+}
+
+/* Expanded, or no JavaScript: compact-only items leave. */
+:root:not([data-js]) .only-compact,
+site-island[data-expanded] .only-compact {
+  display: none;
+}
+
+/* ---------- Island ---------- */
+
+site-island {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  z-index: 50;
+  display: block;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%);
+}
+
+.island {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--island-height);
+  padding: 4px 4px 4px 22px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* The only glass on the site besides the theme toggle (§6.4). */
+.island-glass {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--island-radius);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  /* Named here, not on <site-island>: a named element is a backdrop root,
+     which would blind any backdrop-filter inside it. */
+  view-transition-name: site-island;
+}
+
+.island a {
+  text-decoration: none;
+}
+
+.home {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 0 10px;
+  margin-left: -10px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+
+.divider {
+  width: 1px;
+  height: 16px;
+  background: var(--hairline);
+}
+
+/*
+ * Island text stays in --fg: big headlines scroll under the glass, and muted
+ * text over them drops below 4.5:1 (§6.1). Hierarchy comes from weight instead.
+ */
+.current {
+  padding: 0 6px 0 4px;
+}
+
+.links {
+  display: flex;
+  gap: 2px;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+}
+
+/* Hover shows a chip, not a color: accent text over the glass can fall below 4.5:1. */
+.home:hover,
+.links a:hover {
+  background: var(--chip-glass);
+  color: var(--fg);
+}
+
+.links a[aria-current="page"] {
+  background: var(--chip-glass);
+  font-weight: 600;
+}
+
+.hello {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch);
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.hello:hover {
+  color: var(--on-accent);
+}
+
+.menu {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--chip-glass);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.menu .icon-close,
+site-island[data-expanded] .menu .icon-open {
+  display: none;
+}
+
+site-island[data-expanded] .menu .icon-close {
+  display: block;
+}
+
+/* Expanded on narrow screens: a panel, since the full row no longer fits. */
+@media (max-width: 959.98px) {
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .island {
+    display: grid;
+    grid-template-areas:
+      "home lang theme menu"
+      "links links links links"
+      "hello hello hello hello";
+    grid-template-columns: 1fr auto auto auto;
+    gap: 8px 4px;
+    width: min(26rem, calc(100vw - 32px));
+    padding: 4px 4px 12px 8px;
+    white-space: normal;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .home {
+    grid-area: home;
+    justify-self: start;
+    margin-left: 0;
+    padding-left: 14px;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .lang {
+    grid-area: lang;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded])
+    .theme-toggle.inline {
+    grid-area: theme;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .menu {
+    grid-area: menu;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .links {
+    display: grid;
+    grid-area: links;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding-right: 4px;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .links a {
+    padding: 0 14px;
+    font-size: 1rem;
+  }
+
+  :is(:root:not([data-js]) site-island, site-island[data-expanded]) .hello {
+    grid-area: hello;
+    margin-right: 4px;
+  }
+}
+
+/* Phones: a tighter compact row. */
+@media (max-width: 479.98px) {
+  .island {
+    gap: 4px;
+    padding-left: 16px;
+  }
+}
+
+/* ---------- Language pill ---------- */
+
+.lang {
+  position: relative;
+  display: block;
+}
+
+.lang summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--touch);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-glass);
+  list-style: none;
+  cursor: pointer;
+}
+
+.lang summary::-webkit-details-marker {
+  display: none;
+}
+
+.lang details[open] summary > svg:not(.flag) {
+  transform: rotate(180deg);
+}
+
+.flag {
+  flex: none;
+  clip-path: inset(0 round 3px);
+}
+
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 220px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  white-space: normal;
+}
+
+.lang-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 0 12px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.lang-menu a[aria-current] {
+  background: var(--chip);
+}
+
+.lang-menu a > span {
+  flex: 1;
+}
+
+.lang-menu a > svg:not(.flag) {
+  color: var(--accent);
+}
+
+/* ---------- Theme toggle ---------- */
+
+.theme-toggle button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+/* Moon in dark, sun in light (§7). */
+.theme-toggle .sun,
+:root[data-theme="light"] .theme-toggle .moon {
+  display: none;
+}
+
+:root[data-theme="light"] .theme-toggle .sun {
+  display: block;
+}
+
+.theme-toggle.floating {
+  position: fixed;
+  top: 16px;
+  right: 24px;
+  z-index: 50;
+  display: block;
+}
+
+.theme-toggle.floating button {
+  width: var(--island-height);
+  height: var(--island-height);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  view-transition-name: theme-toggle;
+}
+
+.theme-toggle.inline {
+  display: none;
+}
+
+.theme-toggle.inline button {
+  width: var(--touch);
+  height: var(--touch);
+  background: var(--chip-glass);
+}
+
+/* Below 600px the top band is too crowded: the toggle moves into the expanded island (§7). */
+@media (max-width: 599.98px) {
+  .theme-toggle.floating {
+    display: none;
+  }
+
+  site-island[data-expanded] .theme-toggle.inline {
+    display: block;
+  }
+}
+
+/* ---------- Reduced transparency (Chromium only; §6.4) ---------- */
+
+@media (prefers-reduced-transparency: reduce) {
+  .island-glass,
+  .theme-toggle.floating button {
+    border-color: var(--line-strong);
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

@@ -97,6 +97,8 @@
   --gutter: clamp(1.25rem, 5vw, 4rem); /* 20 → 64 */
   --column-gap: 80px;
   --nav-clearance: 96px; /* island top (16) + height (52) + air */
+  --island-height: 52px;
+  --island-radius: 26px;
   --space-section: clamp(4.5rem, 3.386rem + 4.571vw, 7.5rem); /* 72 → 120 */
   --touch: 44px;
 

@@ -98,3 +98,51 @@ Choices made while building the revamp, per spec §0.5. Newest phase at the bott
 **Portrait (interim).** `src/assets/portrait.jpeg` is the 350×350 `me.jpeg` from `main`, served as AVIF and WebP at 184 and 350px wide. Replace it with the ≥800×800 original (§13.1).
 
 **LinkedIn icon.** Simple Icons dropped LinkedIn in v14, so its path comes from `simple-icons@13.21.0` (same CC0 license). GitHub, X and Medium come from the current release.
+
+## Phase 2 — Island, theme toggle, language switcher (2026-10-03)
+
+**Defaults taken for open decisions.** Mastodon stays out (§14 #3); the card and island show only the four profiles §5.2 lists. Spanish stays in (§14 #2).
+
+**Island without JavaScript is the expanded form.** The server renders every link. The head script sets `<html data-js>` before first paint, so with JavaScript the island is compact from the first frame, with no visible switch. Without JavaScript the menu button and theme toggle are hidden, since they would do nothing.
+
+**The expanded island has a close button.** The canvas shows none. Touch and keyboard users need a visible way back, so the menu button stays and turns into ×. Escape, a click outside and scrolling down also collapse it (§7, §8.2).
+
+**Keyboard.** Opening the menu from the keyboard moves focus to the first link. Escape collapses the island and returns focus to the menu button. The language menu handles its own Escape and leaves the island as it is.
+
+**Below 960px the expanded island opens as a panel**: name, language and close on top, the four links two by two, then a full-width "Say hello". The single row no longer fits there, and the canvas only shows desktop.
+
+**Below 600px the theme toggle moves into the expanded island.** §7 allows this at ≤400px. The threshold is higher because the compact island and the floating toggle start to overlap below about 500px.
+
+**Island text uses `--fg`, not `--muted`** as on the canvas. Large headlines scroll under the 55% glass, and the blurred ink lowers the contrast of muted text to about 3.6:1 (dark) and 3.8:1 (light), below §6.1's 4.5:1. Hierarchy comes from weight and the current-page chip instead. Hover shows a chip rather than accent text, for the same reason.
+
+**The compact ↔ expanded morph is hand-built, not a View Transition.**
+
+- The glass layer is clipped from the old shape to the new one with `clip-path`, and the name, language pill and menu button slide with a FLIP transform. Nothing animates `width` (§8.2).
+- A View Transition was rejected for two reasons. Its snapshots stretch the pill's text while the width changes. And naming an element makes it a backdrop root, which blinds any `backdrop-filter` inside it.
+- Known cost: the glass's drop shadow is clipped during the 350ms morph.
+- With reduced motion the switch is instant.
+
+**Page and theme transitions use View Transitions.**
+
+- Cross-document transitions (§8.7) are on for visitors who haven't asked for reduced motion.
+- The transition name sits on the glass layer and on the floating toggle button, not on `<site-island>`, for the backdrop-root reason above.
+- Theme switches crossfade for 300ms through `document.startViewTransition` (§8.5). They are instant without support or with reduced motion.
+
+**Theme.**
+
+- The theme is saved under `anetto:theme` and applied before paint by the inline head script.
+- Until the visitor picks a theme, it follows the system setting, including live changes.
+
+**Language switcher.**
+
+- It is a native `<details>` of real links to the same page in each locale, so it works and can be crawled without JavaScript.
+- With JavaScript it adds Escape (focus back to the pill) and click-outside closing.
+- It saves the choice under `anetto:lang` and never redirects. There is no "switch language?" suggestion either, since §9 allows one at most.
+
+**Flags** are the canvas's simplified SVGs. Their colors are imagery, the one exception to the tokens-only color rule.
+
+**Glass refraction deferred.** The Chromium-only SVG refraction (§6.4) waits for Phase 4, when the mesh gives it something to refract. Until then the glass is blur plus edge in every engine.
+
+**Contrast "over the mesh" waits for Phase 4.** The mesh doesn't exist yet. For now, glass legibility was checked with the About headline scrolled under the island, in both themes.
+
+**JavaScript on Home: about 2.6 KB gzipped**, against the §12 budget of 30 KB.
