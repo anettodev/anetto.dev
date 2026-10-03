@@ -27,10 +27,10 @@ export default {
   },
   status: {
     shipping: "Publicado",
-    "in-progress": "Em andamento",
+    "in-progress": "Em desenvolvimento",
     past: "Encerrado",
   },
-  intro: { skip: "Pular introdução", at: "no" },
+  intro: { skip: "Pular intro", at: "no" },
   screenPlaceholder: "captura de tela",
   devOnly: "Só em dev",
   notFound: {

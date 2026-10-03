@@ -1,5 +1,6 @@
 ---
 page: blog
+description: "Selected writing by Antonio Netto on Medium and GitHub Gists."
 label: "Blog"
 title: "Selected writing."
 posts:

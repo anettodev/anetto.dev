@@ -9,6 +9,7 @@ import {
   DEFAULT_LOCALE,
   LANG_TAG,
   LOCALES,
+  OG_LOCALE,
   type Locale,
 } from "../i18n/locales";
 import type { RouteKey } from "../i18n/routes";
@@ -54,7 +55,20 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
 
         // Intro (spec §8.1): once per session, never with reduced motion.
         // Without working storage it would replay on every visit, so skip it.
+        // `?intro` (the island's name link) replays it on request; the
+        // parameter is removed at once so a reload or a shared link doesn't.
         if (root.hasAttribute("data-intro-page")) {
+          const params = new URLSearchParams(location.search);
+          const replay = params.has("intro");
+          if (replay) {
+            params.delete("intro");
+            const query = params.toString();
+            history.replaceState(
+              history.state,
+              "",
+              location.pathname + (query ? "?" + query : "") + location.hash,
+            );
+          }
           let seen = true;
           try {
             seen = sessionStorage.getItem("anetto:intro-seen") !== null;
@@ -62,7 +76,7 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
             // Storage blocked: treat as seen.
           }
           if (
-            !seen &&
+            (replay || !seen) &&
             !matchMedia("(prefers-reduced-motion: reduce)").matches
           ) {
             root.dataset.intro = "play";
@@ -72,6 +86,17 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
     </script>
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
+    {/* Social previews (§13.2). No og:image until the new 1200×630 image exists (§13.1). */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={ui.siteName} />
+    <meta property="og:title" content={pageTitle} />
+    {description && <meta property="og:description" content={description} />}
+    {route && <meta property="og:url" content={localizedUrl(locale, route)} />}
+    <meta property="og:locale" content={OG_LOCALE[locale]} />
+    {LOCALES.filter((alt) => alt !== locale).map((alt) => (
+      <meta property="og:locale:alternate" content={OG_LOCALE[alt]} />
+    ))}
+    <meta name="twitter:card" content="summary" />
     {route && (
       <>
         <link rel="canonical" href={localizedUrl(locale, route)} />

@@ -20,7 +20,13 @@ const blog = await getPage(locale, "blog");
 const { label, title, posts, more } = blog.data;
 ---
 
-<Page locale={locale} route="blog" title={ui.nav.blog} contentLang={blog.lang}>
+<Page
+  locale={locale}
+  route="blog"
+  title={ui.nav.blog}
+  description={blog.data.description}
+  contentLang={blog.lang}
+>
   <PageHeader label={label} title={title} />
 
   <ul class="rows">

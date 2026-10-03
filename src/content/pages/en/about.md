@@ -1,5 +1,6 @@
 ---
 page: about
+description: "Technology executive at Inter who still practices the craft. iOS specialist since 2011, software engineer since 2007, based in Belo Horizonte."
 label: "About"
 title: "I’m a technology executive at Inter who still practices the craft."
 facts:

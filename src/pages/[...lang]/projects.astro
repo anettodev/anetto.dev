@@ -26,6 +26,7 @@ const projects = await getProjects(page.lang);
   locale={locale}
   route="projects"
   title={ui.nav.projects}
+  description={page.data.description}
   contentLang={page.lang}
 >
   <PageHeader label={label} title={title} lead={lead} />

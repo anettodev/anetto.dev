@@ -39,7 +39,12 @@ export async function getPage<P extends PageKey>(locale: Locale, page: P) {
       };
     }
   }
-  throw new Error(`Missing page copy: ${DEFAULT_LOCALE}/${page}.md`);
+  throw new Error(
+    `Missing page copy: ${DEFAULT_LOCALE}/${page}.md` +
+      (import.meta.env.DEV
+        ? ". If the file exists, restart the dev server (npx astro dev stop && npm run dev): it can miss changes to src/content.config.ts."
+        : ""),
+  );
 }
 
 /** Inter roles in `lang`, newest first. */

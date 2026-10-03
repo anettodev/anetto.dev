@@ -12,6 +12,13 @@ export const LANG_TAG: Record<Locale, string> = {
   es: "es",
 };
 
+/** Open Graph locale (language_TERRITORY). Spanish is Latin American, as on the old About page. */
+export const OG_LOCALE: Record<Locale, string> = {
+  en: "en_US",
+  pt: "pt_BR",
+  es: "es_LA",
+};
+
 /** Language switcher label, always written in its own language. */
 export const LOCALE_LABEL: Record<Locale, string> = {
   en: "English",

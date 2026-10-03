@@ -30,7 +30,7 @@ const items = ["about", "experiences", "projects", "blog"] as const;
     <span class="island-glass" aria-hidden="true"></span>
     <a
       class="home"
-      href={localizedPath(locale, "home")}
+      href={`${localizedPath(locale, "home")}?intro`}
       aria-current={route === "home" ? "page" : undefined}
     >
       {PERSON.name}

@@ -1,5 +1,6 @@
 ---
 page: experiences
+description: "At Inter since October 2019: iOS Engineering Manager of the mobile CORE team, and Investments iOS specialist and chapter lead. Before that, Avenue Code, MadeinWeb and Daccord."
 label: "Experiences"
 title: "Inter, since October 2019."
 lead: "Three roles, newest first. Before Inter, a short arc."

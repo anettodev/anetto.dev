@@ -230,3 +230,34 @@ Otherwise the intro's front face, cover and skip button are not drawn at all.
 - Measured on the dev machine (unthrottled desktop Chrome): 60fps, with no frame over 17.7ms during the intro (mesh, filters, flip) or afterwards (halo).
 - Not yet measured on a mid-range Android or with 4× CPU throttling; that is Phase 6.
 - About 5 KB of gzipped JavaScript on Home.
+
+## Phase 5 — Localization and content (2026-10-03)
+
+**Portuguese and Spanish copy is a draft for Antonio's review (§9).** Every pt/es content file starts with a YAML comment saying so.
+
+- Home uses §9's draft sentences and the canvas prototype's phrasing ("do Super App do Inter", "em desenvolvimento", "Pular intro" / "Saltar intro"). The other pages are new translations.
+- Job titles stay in English in every locale: Executive Tech Manager, iOS Engineering Manager, Senior iOS Engineer, iOS Engineer. Company names are untouched.
+- The Investments role title is translated as a description ("Especialista iOS e chapter lead em Investimentos"), since it isn't a formal title.
+- Spanish is neutral Latin American, matching the old About page's es-419; its Open Graph locale is `es_LA`.
+- Placeholders are translated too, so each page reads in its own language while waiting for copy. They still all start with `[PLACEHOLDER:`.
+
+**No more English fallback.** Every page exists in all three locales, so `<main>` no longer carries `lang="en"`. The fallback code stays for pages added later.
+
+**Meta descriptions per page and locale** come only from the allowed claims (§2), with Home using the positioning sentence (§13.2).
+
+**Social metadata.** `og:type`, `og:site_name`, `og:title`, `og:description`, `og:url`, `og:locale` with alternates, and `twitter:card` summary. There is no `og:image` until the new 1200×630 image exists (§13.1); the old cover shows the old title.
+
+**The name in the island replays the intro (Antonio's request; extends §8.1's once-per-session rule).**
+
+- The island's "Antonio Netto" link goes to the locale's Home with `?intro`.
+- With that parameter, the head script plays the intro even if this session has already seen it, and even when storage is blocked.
+- It still never plays with reduced motion.
+- The script removes `?intro` from the address before first paint, so a reload, the back button or a shared link doesn't replay it. The canonical URL stays `/`.
+
+**Checked over the built site:**
+
+- 15 pages, each with the right `lang` and a self-referencing canonical.
+- Reciprocal hreflang for en, pt-BR and es, with `x-default` pointing to English.
+- Three crawlable switcher links per page.
+- No `navigator.language` and no meta refresh anywhere.
+- The same placeholder count in every locale: Home 9, About 1, Experiences 4, Projects 2, Blog 8.

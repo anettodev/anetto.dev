@@ -39,6 +39,7 @@ const home = z.object({
 
 const about = z.object({
   page: z.literal("about"),
+  description: z.string(),
   label: z.string(),
   title: z.string(),
   facts: z.array(z.object({ label: z.string(), value: z.string() })),
@@ -52,6 +53,7 @@ const row = z.object({ name: z.string(), detail: z.string() });
 
 const experiences = z.object({
   page: z.literal("experiences"),
+  description: z.string(),
   label: z.string(),
   title: z.string(),
   lead: z.string(),
@@ -67,6 +69,7 @@ const experiences = z.object({
 
 const projects = z.object({
   page: z.literal("projects"),
+  description: z.string(),
   label: z.string(),
   title: z.string(),
   lead: z.string(),
@@ -76,6 +79,7 @@ const projects = z.object({
 
 const blog = z.object({
   page: z.literal("blog"),
+  description: z.string(),
   label: z.string(),
   title: z.string(),
   /** Posts without `href` are placeholders and render as plain rows. */
