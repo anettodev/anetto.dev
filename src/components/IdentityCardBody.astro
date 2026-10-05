@@ -4,8 +4,9 @@ import { Picture } from "astro:assets";
 import portrait from "../assets/portrait.jpeg";
 import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
-import { COMPANY, PERSON, SOCIAL } from "../lib/site";
+import { CALENDLY_URL, COMPANY, PERSON, SOCIAL } from "../lib/site";
 import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
 
 /** Contents of the docked identity card (spec §5.2): portrait, then a solid panel. */
 interface Props {
@@ -53,8 +54,29 @@ const ui = t(Astro.props.locale);
     <a class="email" href={`mailto:${PERSON.email}`}>
       {PERSON.email}
     </a>
+    {/*
+      Calendly's popup (scripts/book-call.ts loads it on the first click);
+      without JavaScript, or if it fails to load, the link opens the page.
+    */}
+    <p class="book">
+      <a
+        class="book-call"
+        href={CALENDLY_URL}
+        target="_blank"
+        rel="noopener"
+        data-calendly
+        aria-label={ui.card.bookCallLabel}
+      >
+        <UiIcon name="calendar" size={16} strokeWidth={2} />
+        <span>{ui.card.bookCall}</span>
+      </a>
+    </p>
   </div>
 </div>
+
+<script>
+  import "../scripts/book-call";
+</script>
 
 <style>
   .card-body {
@@ -141,6 +163,70 @@ const ui = t(Astro.props.locale);
     min-height: var(--touch);
     margin-top: 4px;
     font-size: var(--text-small);
+  }
+
+  /*
+   * "Book a call": a pill under the email with a constant halo in the
+   * intelligence ring (requested by Antonio), turning slowly and brighter,
+   * faster on hover and focus. The glow sits at z-index -1 in .book, the
+   * isolated parent, so it shows behind the pill and not over it.
+   */
+  .book {
+    margin-top: 8px;
+    isolation: isolate;
+  }
+
+  .book-call {
+    position: relative;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+    color: var(--fg);
+    font-size: var(--text-small);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .book-call::before {
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--halo-angle),
+      var(--intelligence-ring)
+    );
+    filter: blur(8px);
+    opacity: 0.7;
+    transition: opacity 200ms ease;
+    animation: halo-turn 8s linear infinite;
+    content: "";
+    pointer-events: none;
+  }
+
+  .book-call:is(:hover, :focus-visible)::before {
+    opacity: 1;
+    animation-duration: 4s;
+  }
+
+  /* While Calendly's script loads after the first click. */
+  .book-call[aria-busy="true"] {
+    cursor: progress;
+    opacity: 0.7;
+  }
+
+  /* Reduced motion: the halo stays, still. */
+  @media (prefers-reduced-motion: reduce) {
+    .book-call::before,
+    .book-call:is(:hover, :focus-visible)::before {
+      transition: none;
+      animation: none;
+    }
   }
 
   /* Short desktop viewports: compact variant so the sticky card never overflows (§5.2). */

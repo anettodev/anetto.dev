@@ -129,6 +129,7 @@ main:focus {
 }
 
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: var(--touch);
@@ -139,14 +140,54 @@ main:focus {
   text-decoration: none;
 }
 
-.button:hover {
-  border-color: var(--accent);
+/*
+ * Hover or keyboard focus: the intelligence halo, the ring that turns
+ * behind "Book a call" (requested by Antonio). It sits at z-index -1 in
+ * the row's isolated context, and the button turns solid, so the glow
+ * never shows through its text.
+ */
+.button::before {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(from var(--halo-angle), var(--intelligence-ring));
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  content: "";
+  pointer-events: none;
+}
+
+.button:is(:hover, :focus-visible) {
+  background: var(--surface);
+}
+
+.button:is(:hover, :focus-visible)::before {
+  opacity: 1;
+  animation: halo-turn 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button::before {
+    transition: none;
+  }
+
+  .button:is(:hover, :focus-visible)::before {
+    animation: none;
+  }
+}
+
+/* An icon before the label (LinkedIn's mark, the resume's PDF page). */
+.button.with-icon {
+  gap: 8px;
 }
 
 .button-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  isolation: isolate;
 }
 
 /* "Experiences →": the arrow is decoration, so it is hidden from screen readers in markup. */
@@ -184,4 +225,15 @@ mark.placeholder {
   color: var(--status);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+}
+
+/*
+ * Calendly's popup (the identity card's "Book a call"): its stock 40% grey
+ * backdrop lets the island and theme toggle show through as if live. A
+ * darker, blurred one makes the popup take over. `body >` outranks the rule
+ * in Calendly's stylesheet, which loads after this one.
+ */
+body > .calendly-overlay {
+  background-color: rgb(0 0 0 / 0.65);
+  backdrop-filter: blur(6px);
 }

@@ -1,0 +1,64 @@
+---
+import type { Locale } from "../i18n/locales";
+
+/*
+ * A section heading's total in a circle after the title (requested by
+ * Antonio): Tech Stack on Home and About, Pinned and All projects on
+ * Projects. Screen readers get ", 16 technologies" instead of a bare
+ * number, from `words` (`{n}` is the count, singular or plural by
+ * Intl.PluralRules). Nothing when the count is 0. `small` fits About's
+ * uppercase label; the default, an h2.
+ */
+interface Props {
+  count: number;
+  words: { one: string; other: string };
+  locale: Locale;
+  small?: boolean;
+}
+
+const { count, words, locale, small = false } = Astro.props;
+const plural = new Intl.PluralRules(locale === "pt" ? "pt-BR" : locale);
+const spoken = words[plural.select(count) === "one" ? "one" : "other"].replace(
+  "{n}",
+  String(count),
+);
+---
+
+{count > 0 && (
+  <>
+    <span class:list={["count-badge", { small }]} aria-hidden="true">
+      {count}
+    </span>
+    <span class="visually-hidden">, {spoken}</span>
+  </>
+)}
+
+<style>
+  .count-badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.75rem;
+    height: 1.75rem;
+    margin-left: 0.6rem;
+    padding: 0 0.4rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+    color: var(--fg);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1;
+    vertical-align: 0.35em;
+  }
+
+  .count-badge.small {
+    min-width: 1.35rem;
+    height: 1.35rem;
+    margin-left: 0.5rem;
+    padding: 0 0.3rem;
+    font-size: 0.6875rem;
+    vertical-align: 0;
+  }
+</style>

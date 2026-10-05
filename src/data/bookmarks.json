@@ -1,0 +1,176 @@
+{
+  "fetchedAt": "2026-10-04",
+  "profile": "https://anettodev.raindrop.page/",
+  "collections": [
+    {
+      "id": 75790357,
+      "title": "videos",
+      "count": 1
+    },
+    {
+      "id": 75790140,
+      "title": "articles",
+      "count": 5
+    },
+    {
+      "id": 75790082,
+      "title": "tools",
+      "count": 2
+    },
+    {
+      "id": 75789986,
+      "title": "websites",
+      "count": 1
+    },
+    {
+      "id": 75789860,
+      "title": "github projects",
+      "count": 4
+    }
+  ],
+  "bookmarks": [
+    {
+      "id": 1876718465,
+      "title": "How to reduce token usage in Claude Code, Codex, and Cursor",
+      "link": "https://www.avanderlee.com/ai-development/reduce-token-usage-claude-code-codex-cursor/",
+      "domain": "avanderlee.com",
+      "excerpt": "I analyzed 1,674 agent sessions to reduce token usage in Claude Code, Codex, and Cursor. 10 rules and a hook fixed most of it.",
+      "tags": ["iOS", "prompts", "token", "ai"],
+      "created": "2026-10-04T19:00:05.396Z",
+      "collection": 75790140,
+      "icon": "/bookmarks/icons/avanderlee.com.png"
+    },
+    {
+      "id": 1876718087,
+      "title": "The iPhone Duo Isn’t About the Phone. It’s About the Apps.",
+      "link": "https://www.youtube.com/watch?v=wRBEaFrmNeI",
+      "domain": "youtube.com",
+      "excerpt": "For years, every iPhone app has lived inside one rectangle. What happens when that rectangle folds?In this video, I explore what a foldable iPhone could mean...",
+      "tags": ["iPhone Duo", "iOS"],
+      "created": "2026-10-04T18:59:42.713Z",
+      "collection": 75790357,
+      "icon": "/bookmarks/icons/youtube.com.png"
+    },
+    {
+      "id": 1876715190,
+      "title": "miolini/autoresearch-macos: AI agents running research on single-GPU nanochat training automatically adopted for MacOS",
+      "link": "https://github.com/miolini/autoresearch-macos",
+      "domain": "github.com",
+      "excerpt": "AI agents running research on single-GPU nanochat training automatically adopted for MacOS - miolini/autoresearch-macos",
+      "tags": ["ai", "Engineering"],
+      "created": "2026-10-04T18:56:12.897Z",
+      "collection": 75789860,
+      "icon": "/bookmarks/icons/github.com.ico"
+    },
+    {
+      "id": 1876715066,
+      "title": "What you give up when moving into engineering management - Stack Overflow",
+      "link": "https://stackoverflow.blog/2022/02/23/what-you-give-up-when-moving-into-engineering-management/",
+      "domain": "stackoverflow.blog",
+      "excerpt": "Moving into a management role may be a rewarding step in your career, but you should know about the things you're leaving behind.",
+      "tags": ["Engineering", "manager", "article"],
+      "created": "2026-10-04T18:55:44.026Z",
+      "collection": 75790140,
+      "icon": "/bookmarks/icons/stackoverflow.blog.ico"
+    },
+    {
+      "id": 1876708491,
+      "title": "From engineer to manager: what I love, what I hate",
+      "link": "https://thoughtspile.github.io/2024/02/16/eng-to-em/",
+      "domain": "thoughtspile.github.io",
+      "excerpt": "",
+      "tags": ["Engineering", "manager", "article"],
+      "created": "2026-10-04T18:47:38.829Z",
+      "collection": 75790140,
+      "icon": null
+    },
+    {
+      "id": 1876708364,
+      "title": "Ways Engineering Managers Get Stuck",
+      "link": "https://lethain.com/ways-engineering-managers-get-stuck/",
+      "domain": "lethain.com",
+      "excerpt": "It’s performance review season, which is a great time to review Camille Fournier’s discussion of how individual contributors get stuck, and also a good time for me to write up a f…",
+      "tags": ["Engineering", "manager"],
+      "created": "2026-10-04T18:47:05.920Z",
+      "collection": 75790140,
+      "icon": "/bookmarks/icons/lethain.com.ico"
+    },
+    {
+      "id": 1876707968,
+      "title": "CI/CD with Robert Erez",
+      "link": "https://newsletter.pragmaticengineer.com/p/cicd-with-robert-erez?publication_id=458709&post_id=202192974&triggerShare=true&isFreemail=true&r=3tz0fl&triedRedirect=true&utm_source=substack&utm_medium=email",
+      "domain": "newsletter.pragmaticengineer.com",
+      "excerpt": "Robert Erez of Octopus Deploy joins me to discuss Kubernetes, GitOps, progressive delivery, AI in CI/CD, and the evolving practices behind modern software delivery.",
+      "tags": ["article", "cicd", "pragmatic engineer", "podcast"],
+      "created": "2026-10-04T18:46:25.921Z",
+      "collection": 75790140,
+      "icon": "/bookmarks/icons/newsletter.pragmaticengineer.com.png"
+    },
+    {
+      "id": 1876706857,
+      "title": "Turn ideas into videos | AI video creator | invideo AI",
+      "link": "https://ai.invideo.io/login",
+      "domain": "ai.invideo.io",
+      "excerpt": "Make videos easily by giving a prompt to invideo AI. Ideal for content creators, YouTubers and marketers, invideo AI offers a seamless way to turn your ideas into publish-ready vi…",
+      "tags": ["ai", "video"],
+      "created": "2026-10-04T18:45:05.456Z",
+      "collection": 75790082,
+      "icon": "/bookmarks/icons/ai.invideo.io.ico"
+    },
+    {
+      "id": 1876703853,
+      "title": "bpisano/Sticker: Holographic sticker effects for SwiftUI views.",
+      "link": "https://github.com/bpisano/Sticker?tab=readme-ov-file",
+      "domain": "github.com",
+      "excerpt": "Holographic sticker effects for SwiftUI views. Contribute to bpisano/Sticker development by creating an account on GitHub.",
+      "tags": ["inspiration"],
+      "created": "2026-10-04T18:42:58.284Z",
+      "collection": 75789860,
+      "icon": "/bookmarks/icons/github.com.ico"
+    },
+    {
+      "id": 1876703713,
+      "title": "Generative AI Dashboard | Run Image, Video, 3D and Audio Models | fal",
+      "link": "https://fal.ai/dashboard",
+      "domain": "fal.ai",
+      "excerpt": "Manage your AI models, API keys, serverless apps, and usage. Generate media with FLUX, Kling, Hailuo, and 1000+ models.",
+      "tags": [],
+      "created": "2026-10-04T18:42:36.959Z",
+      "collection": 75790082,
+      "icon": "/bookmarks/icons/fal.ai.png"
+    },
+    {
+      "id": 1876697514,
+      "title": "BentoGrids",
+      "link": "https://bentogrids.com/",
+      "domain": "bentogrids.com",
+      "excerpt": "BentoGrids is a curated collection of bento designs for your inspiration.",
+      "tags": ["websites", "grids", "inspiration"],
+      "created": "2026-10-04T18:37:12.948Z",
+      "collection": 75789986,
+      "icon": "/bookmarks/icons/bentogrids.com.ico"
+    },
+    {
+      "id": 1876692359,
+      "title": "junhoyeo/tokscale: 🛰️ Track token usage across AI coding agents from your terminal. 🏅 Global leaderboard with trillions of tokens tracked.",
+      "link": "https://github.com/junhoyeo/tokscale",
+      "domain": "github.com",
+      "excerpt": "🛰️ Track token usage across AI coding agents from your terminal. 🏅 Global leaderboard with trillions of tokens tracked. - junhoyeo/tokscale",
+      "tags": ["token", "ai"],
+      "created": "2026-10-04T18:32:05.172Z",
+      "collection": 75789860,
+      "icon": "/bookmarks/icons/github.com.ico"
+    },
+    {
+      "id": 1876692021,
+      "title": "petergpt/3d-prompt-collection: A presentation-order collection of 3D prompts for copying and reuse.",
+      "link": "https://github.com/petergpt/3d-prompt-collection#living-art-worlds",
+      "domain": "github.com",
+      "excerpt": "A presentation-order collection of 3D prompts for copying and reuse. - petergpt/3d-prompt-collection",
+      "tags": ["prompts", "ai", "3d"],
+      "created": "2026-10-04T18:30:56.950Z",
+      "collection": 75789860,
+      "icon": "/bookmarks/icons/github.com.ico"
+    }
+  ]
+}

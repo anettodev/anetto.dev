@@ -13,12 +13,14 @@
 # that starts by itself and runs longer than 5s needs a pause control) and
 # writes to public/brand/:
 #
-#   logo-<theme>.webm / .mp4 / -poster.jpg                    144px, island tile
-#   logo-intro-<theme>.webm / .mp4 / -poster.jpg              640px, intro card
+#   logo-<theme>.webm / .mp4 / -poster.webp                   144px, island tile
+#   logo-intro-<theme>.webm / .mp4 / -poster.webp             640px, intro card
 #
 # The printed container colour is that theme's --logo-tile in tokens.css.
 # AV1 WebM first; H.264 MP4 for browsers without AV1 (most Safari). No audio.
-# Needs ffmpeg with libsvtav1 and libx264, and python3.
+# Posters are WebP (the intro's is Home's LCP image while it plays), written
+# by sharp, which Astro installs. Needs ffmpeg with libsvtav1 and libx264,
+# python3, and node_modules.
 set -euo pipefail
 
 THEME="${1:?usage: scripts/encode-logo.sh dark|light <master.mp4>}"
@@ -77,7 +79,9 @@ encode() { # name size av1-crf h264-crf
     -c:v libx264 -crf "$4" -preset veryslow -profile:v high -movflags +faststart "$OUT/$name.mp4"
   ffmpeg -v error -y -i "$SRC" \
     -vf "select='eq(n\,0)',$CORNERS,scale=$size:$size:flags=lanczos" \
-    -frames:v 1 -q:v 3 "$OUT/$name-poster.jpg"
+    -frames:v 1 -f image2pipe -c:v png - |
+    node -e 'require("sharp")(require("fs").readFileSync(0)).webp({ quality: 82 }).toFile(process.argv[1])' \
+      "$OUT/$name-poster.webp" >/dev/null
 }
 
 encode "logo-$THEME" 144 34 22

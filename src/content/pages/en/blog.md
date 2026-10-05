@@ -1,24 +1,16 @@
 ---
 page: blog
-description: "Selected writing by Antonio Netto on Medium and GitHub Gists."
+description: "Articles, notes and code snippets by Antonio Netto, from Medium, Evernote and GitHub Gists."
 label: "Blog"
-title: "Selected writing."
+title: "Notes from the craft."
+lead: "Articles on Medium, notes from Evernote and code snippets on GitHub, all in one place."
 posts:
-  - title: "[PLACEHOLDER: Medium post title]"
-    source: "Medium"
-    year: "[PLACEHOLDER: year]"
-  - title: "[PLACEHOLDER: Medium post title]"
-    source: "Medium"
-    year: "[PLACEHOLDER: year]"
   - title: "[PLACEHOLDER: gist title]"
     source: "Gist"
     year: "[PLACEHOLDER: year]"
+    description: "[PLACEHOLDER: one-line summary of the post]"
   - title: "[PLACEHOLDER: gist title]"
     source: "Gist"
     year: "[PLACEHOLDER: year]"
-more:
-  - label: "All writing on Medium"
-    href: "https://medium.com/@anettodev"
-  - label: "All gists"
-    href: "https://gist.github.com/anettodev"
+    description: "[PLACEHOLDER: one-line summary of the post]"
 ---

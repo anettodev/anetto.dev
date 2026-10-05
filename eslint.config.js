@@ -15,4 +15,11 @@ export default defineConfig([
       globals: { ...globals.browser },
     },
   },
+  // Maintenance scripts run in Node, not the browser.
+  {
+    files: ["scripts/**/*.{js,mjs}"],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
 ]);

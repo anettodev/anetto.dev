@@ -1,0 +1,336 @@
+---
+import Copy from "../../components/Copy.astro";
+import ListChips from "../../components/ListChips.astro";
+import ListTools from "../../components/ListTools.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import Pager from "../../components/Pager.astro";
+import UiIcon from "../../components/UiIcon.astro";
+import data from "../../data/bookmarks.json";
+import { localeStaticPaths, t } from "../../i18n";
+import { LANG_TAG, type Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+
+/*
+ * Bookmarks (requested by Antonio): his public Raindrop collections, newest
+ * first, from the snapshot data/bookmarks.json that
+ * `npm run bookmarks:refresh` writes; the build never calls Raindrop.
+ *
+ * A compact list (his choice over cards): the title linking out, the
+ * site's icon and domain, a short excerpt, up to three tags and the date.
+ * A search field (titles and descriptions), collection chips when there's
+ * more than one, a Date / Title sort and pages of 10, 25 or 50: the shared
+ * list components and scripts/filter-list.ts. Without JavaScript they hide
+ * and everything shows. Site icons are copies
+ * saved with the site by the refresh script, so no third party is contacted;
+ * a site without one gets a globe.
+ */
+interface Bookmark {
+  id: number;
+  title: string;
+  link: string;
+  domain: string;
+  excerpt: string;
+  tags: string[];
+  created: string;
+  collection: number;
+  /** A site icon saved with the site (public/bookmarks/icons), or null. */
+  icon: string | null;
+}
+interface Collection {
+  id: number;
+  title: string;
+  count: number;
+}
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const lang = LANG_TAG[locale];
+const { label, title, lead, description } = ui.bookmarks;
+const bookmarks: Bookmark[] = data.bookmarks;
+const collections: Collection[] = data.collections;
+
+const thisYear = (data.fetchedAt ?? "").slice(0, 4);
+const shortDate = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+const longDate = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+/*
+ * The date pill's hue, from the day it was saved (UTC, as the date shows):
+ * the same day always gets the same colour, and each next day turns by the
+ * golden angle, so neighbouring days never look alike.
+ */
+const dayHue = (iso: string) =>
+  Math.round(
+    ((Date.parse(`${iso.slice(0, 10)}T00:00:00Z`) / 86_400_000) * 137.508) %
+      360,
+  );
+
+/* The year only when it isn't the snapshot's. */
+const dateOf = (iso: string) =>
+  (iso.startsWith(thisYear) ? shortDate : longDate).format(new Date(iso));
+const updated = data.fetchedAt
+  ? ui.bookmarks.updated.replace(
+      "{date}",
+      longDate.format(new Date(`${data.fetchedAt}T00:00:00Z`)),
+    )
+  : "";
+---
+
+<Page
+  locale={locale}
+  route="bookmarks"
+  title={ui.nav.bookmarks}
+  description={description}
+>
+  <PageHeader label={label} title={title} lead={lead} />
+
+  {bookmarks.length > 0 ? (
+    <filter-list
+      class="wrap"
+      data-store="bookmarks"
+      data-sort="date:desc"
+      data-per-page="10"
+      data-results={ui.list.results}
+      data-page-label={ui.pager.page}
+    >
+      {/* Where the links come from, above the list (requested by Antonio). */}
+      <p class="list-source muted">
+        <span>{updated}</span>
+        <a href={data.profile}>
+          {ui.bookmarks.viewOnRaindrop}
+          <span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </p>
+
+      <ListTools
+        locale={locale}
+        search={ui.bookmarks.search}
+        sorts={["date", "title"]}
+        sort="date:desc"
+        perPage={[10, 25, 50]}
+        perPageLabel={ui.bookmarks.perPage}
+      >
+        {collections.length > 1 && (
+          <ListChips
+            slot="chips"
+            filter="collection"
+            label={ui.bookmarks.filterLabel}
+            total={bookmarks.length}
+            items={collections.map((collection) => ({
+              value: collection.id,
+              label: collection.title,
+              count: collection.count,
+            }))}
+            locale={locale}
+          />
+        )}
+      </ListTools>
+
+      <ol class="bookmarks">
+        {bookmarks.map((bookmark) => (
+          <li
+            class="bookmark"
+            data-item
+            data-collection={bookmark.collection}
+            data-title={bookmark.title}
+            data-date={bookmark.created}
+          >
+            <p class="meta">
+              <time
+                class="day"
+                datetime={bookmark.created}
+                style={`--day-hue: ${dayHue(bookmark.created)}`}
+              >
+                {dateOf(bookmark.created)}
+              </time>
+              {bookmark.tags.length > 0 && (
+                <span class="tags muted">
+                  {bookmark.tags
+                    .slice(0, 3)
+                    .map((tag) => `#${tag}`)
+                    .join(" ")}
+                </span>
+              )}
+              <span class="domain muted">
+                {bookmark.icon ? (
+                  <img
+                    class="site-icon"
+                    src={bookmark.icon}
+                    alt=""
+                    width="18"
+                    height="18"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <UiIcon name="globe" size={14} strokeWidth={1.8} />
+                )}
+                {bookmark.domain}
+              </span>
+            </p>
+            <a class="title" href={bookmark.link} rel="noopener" data-search>
+              {bookmark.title}
+            </a>
+            {bookmark.excerpt && (
+              <p class="excerpt muted" data-search>
+                {bookmark.excerpt}
+              </p>
+            )}
+          </li>
+        ))}
+      </ol>
+
+      <p class="no-match muted" hidden>
+        {ui.bookmarks.noMatch}
+      </p>
+
+      <Pager locale={locale} />
+    </filter-list>
+  ) : (
+    <p class="empty">
+      {data.fetchedAt ? (
+        <>
+          {ui.bookmarks.none}{" "}
+          <a href={data.profile}>{ui.bookmarks.viewOnRaindrop}</a>
+        </>
+      ) : (
+        <Copy text={ui.bookmarks.empty} />
+      )}
+    </p>
+  )}
+</Page>
+
+<script>
+  import "../../scripts/filter-list";
+</script>
+
+<style>
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .no-match {
+    font-size: var(--text-small);
+  }
+
+  /* ---------- The list ---------- */
+
+  .bookmarks {
+    border-top: 1px solid var(--line);
+  }
+
+  /*
+   * Each bookmark: a top line with the date pill and hashtags on the left
+   * and the site on the right, then the title, then the excerpt.
+   */
+  .bookmark {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bookmark[hidden] {
+    display: none;
+  }
+
+  .title {
+    margin-top: 4px;
+    color: var(--fg);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .title:hover {
+    text-decoration: underline;
+  }
+
+  /* The site's icon, then its domain, at the right of the top line. */
+  .domain {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  /*
+   * On a small white backing, so a dark icon (GitHub's black mark) still
+   * shows on the dark theme; on the light theme the backing melts in.
+   */
+  .site-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    padding: 2px;
+    border-radius: 5px;
+    background: #fff;
+    object-fit: contain;
+  }
+
+  .excerpt {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: var(--text-small);
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    font-size: 0.8125rem;
+  }
+
+  /* The date in a pill tinted by its day, like the timeline's skill tags. */
+  .day {
+    --day: oklch(0.74 0.14 var(--day-hue));
+
+    padding: 1px 10px;
+    border: 1px solid color-mix(in oklab, var(--day) 65%, transparent);
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--day) 16%, transparent);
+    color: var(--fg);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  :global(:root[data-theme="light"]) .day {
+    --day: oklch(0.6 0.15 var(--day-hue));
+  }
+
+  .list-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    justify-content: space-between;
+    font-size: var(--text-small);
+  }
+
+  .list-source a {
+    color: var(--fg);
+  }
+</style>

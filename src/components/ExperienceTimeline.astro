@@ -1,0 +1,700 @@
+---
+import { Image } from "astro:assets";
+
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import type { Company } from "../lib/content";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Experience timeline (requested by Antonio, after his Hugo resume's): one
+ * node per employer on a vertical line, labelled with its end, then its
+ * start, newest first like the timeline (short month and year; "Present"
+ * while current). The time at the company, all positions together
+ * ("7 years"), is a pill by the company's name. Each entry is a native <details> (logo, company and
+ * latest role; the dates are on the node only), with its Markdown body
+ * inside. On the Experiences page the newest starts open; on Home all start
+ * closed. Home passes the latest three, and the count of the rest: a
+ * centred link under the timeline goes to the Experiences page ("1 more
+ * experience"), which shows them all.
+ *
+ * The body is cut into blocks at build time so each position reads on its
+ * own: one block per `####` (a position, with a dot on a rail; the current
+ * one filled), and within it one per `#####` (a section such as Technical
+ * Responsibilities, under a small label). Conventions in the Markdown:
+ *   > quote          the position's highlight, shown as a callout
+ *   `inline code`    a tag: skills render as pills, each in its own hue
+ */
+interface Props {
+  companies: Company[];
+  locale: Locale;
+  /** Entries left out (Home shows three): a last node links to them. */
+  more?: { count: number; href: string } | undefined;
+  /** Open the newest entry at first (the Experiences page); Home starts all closed. */
+  openFirst?: boolean;
+}
+
+const { companies, locale, more, openFirst = true } = Astro.props;
+const ui = t(locale);
+const lang = LANG_TAG[locale];
+const asDate = (yearMonth: string) => new Date(`${yearMonth}-01T00:00:00Z`);
+const shortMonth = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const moreLabel = (count: number) =>
+  ui.experience.more[
+    new Intl.PluralRules(lang).select(count) === "one" ? "one" : "other"
+  ].replace("{n}", new Intl.NumberFormat(lang).format(count));
+/**
+ * Time at the company (all positions together) or in one position, to the
+ * build date while current: years and months ("1 year, 6 months"; Antonio's
+ * request), whole years when the months are 0, months under a year.
+ */
+const lengthOf = (start: string, end?: string) => {
+  const [startYear = 0, startMonth = 0] = start.split("-").map(Number);
+  const now = new Date();
+  const [endYear, endMonth] = end
+    ? end.split("-").map(Number)
+    : [now.getUTCFullYear(), now.getUTCMonth() + 1];
+  const months = Math.max(
+    1,
+    ((endYear ?? startYear) - startYear) * 12 +
+      ((endMonth ?? startMonth) - startMonth),
+  );
+  const years = Math.floor(months / 12);
+  return new Intl.DurationFormat(lang, { style: "long" }).format({
+    years,
+    months: months % 12,
+  });
+};
+const duration = (company: Company) => lengthOf(company.start, company.end);
+const textOf = (html: string) => html.replace(/<[^>]+>/g, "").trim();
+/**
+ * The pill beside a position's title: its length when its dates are known
+ * (a company's only position takes the company's), else a placeholder.
+ */
+const positionPill = (company: Company, title: string, count: number) => {
+  const dates =
+    // `?? []`: a dev server's cached content can predate the field's default.
+    (company.positions ?? []).find((position) => position.title === title) ??
+    (count === 1
+      ? { start: company.start, end: company.end, current: !company.end }
+      : undefined);
+  if (dates?.start && (dates.end || dates.current)) {
+    return `<span class="length small">${lengthOf(dates.start, dates.end)}</span>`;
+  }
+  const missing = dates?.current
+    ? ui.experience.unknownStart
+    : ui.experience.unknownLength;
+  return `<mark class="placeholder">${missing}</mark>`;
+};
+/** Puts the pill beside the position's <h4>, on one line. */
+const withPill = (lead: string, company: Company, count: number) =>
+  lead.replace(
+    /^<h4([^>]*)>([\s\S]*?)<\/h4>/,
+    (heading, _attributes, title: string) =>
+      `<div class="position-head">${heading}${positionPill(company, textOf(title), count)}</div>`,
+  );
+const host = (url: string) => new URL(url).hostname.replace(/^www\./, "");
+/** Rendered Markdown, cut before each <h4> (positions) or <h5> (sections). */
+const cutBefore = (html: string, tag: "h4" | "h5") =>
+  html
+    .split(new RegExp(`(?=<${tag}[\\s>])`))
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+/** A stable hue (0–359) from a tag's text: the same skill, the same colour. */
+const hueOf = (text: string) => {
+  let hash = 0;
+  for (const char of text)
+    hash = (hash * 31 + (char.codePointAt(0) ?? 0)) >>> 0;
+  return hash % 360;
+};
+const hueGap = (a: number, b: number) =>
+  Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
+/** The middle of the widest arc of the hue wheel not yet taken. */
+const widestGapMiddle = (used: number[]) => {
+  const sorted = [...used].sort((a, b) => a - b);
+  let middle = 0;
+  let widest = -1;
+  sorted.forEach((hue, index) => {
+    const next = sorted[index + 1] ?? (sorted[0] ?? 0) + 360;
+    if (next - hue > widest) {
+      widest = next - hue;
+      middle = (hue + widest / 2) % 360;
+    }
+  });
+  return Math.round(middle);
+};
+/**
+ * Gives each tag (inline code) its own hue, as --tag-hue. Within one row of
+ * tags, a hue closer than 24° to an earlier one is replaced by the middle of
+ * the widest free arc, so neighbours never look alike.
+ */
+const tintTags = (html: string) =>
+  html.replace(/<p>(?:\s*<code>[^<]*<\/code>\s*)+<\/p>/g, (row) => {
+    const used: number[] = [];
+    return row.replace(/<code>([^<]*)<\/code>/g, (_, text: string) => {
+      const wanted = hueOf(text);
+      const hue = used.some((other) => hueGap(other, wanted) < 24)
+        ? widestGapMiddle(used)
+        : wanted;
+      used.push(hue);
+      return `<code style="--tag-hue: ${hue}">${text}</code>`;
+    });
+  });
+---
+
+<ol class="timeline">
+  {companies.map((company, index) => (
+    <li class="entry">
+      <p class="dates">
+        {company.end ? (
+          <time class="end" datetime={company.end}>
+            {shortMonth.format(asDate(company.end))}
+          </time>
+        ) : (
+          <span class="end">{ui.experience.present}</span>
+        )}
+        <span class="from">
+          <span class="visually-hidden">– </span>
+          <time datetime={company.start}>
+            {shortMonth.format(asDate(company.start))}
+          </time>
+        </span>
+      </p>
+      <span class="node" aria-hidden="true" />
+      <details class="cell" open={openFirst && index === 0}>
+        <summary>
+          <Image
+            class="logo"
+            src={company.logo}
+            alt=""
+            width={36}
+            height={36}
+            densities={[1, 2, 3]}
+          />
+          <span class="heading">
+            <span class="company-row">
+              <h3 class="company">{company.company}</h3>
+              <span class="length">
+                <span class="visually-hidden">, </span>
+                {duration(company)}
+              </span>
+            </span>
+            <span class="meta muted">{company.title}</span>
+          </span>
+          <span class="toggle" aria-hidden="true">
+            <UiIcon name="chevron" size={14} strokeWidth={2.2} />
+          </span>
+        </summary>
+        <div class="md">
+          <ol class="positions">
+            {cutBefore(tintTags(company.html), "h4").map(
+              (position, number, all) => {
+                const [lead = "", ...sections] = cutBefore(position, "h5");
+                return (
+                  <li
+                    class:list={[
+                      "position",
+                      { now: !company.end && number === 0 },
+                    ]}
+                  >
+                    <Fragment set:html={withPill(lead, company, all.length)} />
+                    {sections.map((section) => (
+                      <div class="section">
+                        <Fragment set:html={section} />
+                      </div>
+                    ))}
+                  </li>
+                );
+              },
+            )}
+          </ol>
+          <p class="company-links">
+            {company.url && (
+              <a href={company.url}>
+                {host(company.url)}
+                <UiIcon name="external" size={12} strokeWidth={2} />
+              </a>
+            )}
+            {company.links.map((link) => (
+              <a href={link.href}>
+                {link.label}
+                <UiIcon name="external" size={12} strokeWidth={2} />
+              </a>
+            ))}
+          </p>
+        </div>
+      </details>
+    </li>
+  ))}
+</ol>
+{more && more.count > 0 && (
+  <p class="timeline-more">
+    <a href={more.href}>
+      {moreLabel(more.count)}
+      <span aria-hidden="true">&nbsp;→</span>
+    </a>
+  </p>
+)}
+
+<style>
+  .timeline {
+    /* Fits the widest label unbroken: "mar. de 2019" (pt) at 13px. */
+    --date-w: 6.25rem;
+    --node-col: 40px;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* The line through the nodes. */
+  .timeline::before {
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    left: calc(var(--date-w) + var(--node-col) / 2 - 1px);
+    width: 2px;
+    background: var(--line-strong);
+    content: "";
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: var(--date-w) var(--node-col) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /*
+   * The time at the company (all positions), as a pill by its name: next to
+   * the role it would read as time in that role.
+   */
+  .company-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-width: 0;
+  }
+
+  /* A position's pill: the same, a size down. */
+  .md :global(.position-head) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    align-items: center;
+  }
+
+  .md :global(.length.small) {
+    padding: 0 8px;
+    font-size: 0.6875rem;
+  }
+
+  .md :global(.position-head mark) {
+    font-size: 0.8125rem;
+  }
+
+  .timeline :global(.length) {
+    flex: none;
+    padding: 1px 9px;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius: var(--radius-pill);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  /*
+   * The end over the start, with a thin rule between them as wide as the
+   * wider date (a one-column grid sized to its content, pushed right).
+   */
+  .dates {
+    display: grid;
+    justify-content: end;
+    align-content: start;
+    padding: 18px 6px 0 0;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  .dates > .end,
+  .dates > .from {
+    white-space: nowrap;
+  }
+
+  .dates > .from {
+    margin-top: 3px;
+    padding-top: 3px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .node {
+    position: relative;
+    z-index: 1;
+    justify-self: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 21px;
+    border-radius: 50%;
+    background: var(--fg);
+    box-shadow:
+      0 0 0 4px var(--line-strong),
+      0 0 0 7px var(--bg);
+  }
+
+  .cell {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--surface);
+  }
+
+  .cell summary {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    min-height: 60px;
+    padding: 12px 12px 12px 12px;
+    border-radius: inherit;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .cell summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .logo {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .heading {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  /* Side by side with its pill, on one line. */
+  .company {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .meta {
+    font-size: var(--text-small);
+  }
+
+  .toggle {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    color: var(--muted);
+  }
+
+  .cell[open] .toggle :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  /*
+   * After the timeline: a link to the entries Home leaves out. Hover and
+   * focus give it the navigation links' halo (island.css): the glow sits at
+   * z-index -1 in this wrapper's stacking context, behind the link's solid
+   * background, so its colours never touch the text.
+   */
+  .timeline-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    isolation: isolate;
+  }
+
+  .timeline-more a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+    padding: 0 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--fg);
+    font-size: var(--text-small);
+    text-decoration: none;
+  }
+
+  .timeline-more a::before {
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--halo-angle),
+      var(--intelligence-ring)
+    );
+    filter: blur(8px);
+    opacity: 0;
+    transition: opacity 200ms ease;
+    content: "";
+    pointer-events: none;
+  }
+
+  .timeline-more a:is(:hover, :focus-visible)::before {
+    opacity: 1;
+    animation: halo-turn 4s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-more a::before {
+      transition: none;
+    }
+
+    .timeline-more a:is(:hover, :focus-visible)::before {
+      animation: none;
+    }
+  }
+
+  /* ---------- The Markdown body ---------- */
+
+  .md {
+    padding: 2px 22px 22px 62px;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* Positions: a rail with a dot per title; the current position's is filled. */
+  .positions {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    margin-left: 5px;
+    padding-left: 22px;
+    border-left: 2px solid var(--line);
+  }
+
+  .position {
+    position: relative;
+  }
+
+  .position::before {
+    position: absolute;
+    top: 7px;
+    left: -30px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--line-strong);
+    border-radius: 50%;
+    background: var(--surface);
+    content: "";
+  }
+
+  .position.now::before {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  .position :global(h4) {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .position :global(p) {
+    margin-top: 8px;
+  }
+
+  /* The highlight: the position's summary as a callout. */
+  .position :global(blockquote) {
+    margin: 10px 0 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+
+  .position :global(blockquote p) {
+    margin: 0;
+  }
+
+  /* Sections: a small label, then compact content. */
+  .section {
+    margin-top: 18px;
+  }
+
+  .section :global(h5) {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .section :global(ul) {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+    padding-left: 1.1rem;
+    list-style: disc;
+  }
+
+  .section :global(li::marker) {
+    color: var(--muted);
+  }
+
+  /* Tags: inline code in the Markdown, shown as pills (the skills). */
+  .section :global(p:has(> code)) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  /*
+   * Each tag has its own hue (--tag-hue, from tintTags): a coloured border
+   * and a light tint of it. The text stays --fg, so contrast never depends
+   * on the hue.
+   */
+  .md :global(code) {
+    --tag: oklch(0.74 0.14 var(--tag-hue, 250));
+
+    padding: 3px 10px;
+    border: 1px solid color-mix(in oklab, var(--tag) 65%, transparent);
+    border-radius: 8px;
+    background: color-mix(in oklab, var(--tag) 14%, transparent);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  :global(:root[data-theme="light"]) .md :global(code) {
+    --tag: oklch(0.6 0.15 var(--tag-hue, 250));
+  }
+
+  .company-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 22px;
+  }
+
+  .company-links:empty {
+    display: none;
+  }
+
+  .company-links a {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: var(--text-small);
+  }
+
+  /*
+   * Narrow columns: the date moves above its card, next to the node, and the
+   * line runs down a slim gutter, so the card keeps nearly the full width.
+   */
+  @container (max-width: 34rem) {
+    .timeline {
+      --node-col: 22px;
+
+      gap: 20px;
+    }
+
+    .timeline::before {
+      top: 10px;
+      left: calc(var(--node-col) / 2 - 1px);
+    }
+
+    .entry {
+      grid-template-areas:
+        "node dates"
+        ". cell";
+      grid-template-columns: var(--node-col) minmax(0, 1fr);
+      column-gap: 10px;
+    }
+
+    /* Above the card, end and start share one line. */
+    .dates {
+      grid-area: dates;
+      padding: 0 0 8px;
+      font-size: 0.8125rem;
+      text-align: left;
+    }
+
+    /* One line: the end, a thin upright rule, the start. */
+    .dates {
+      display: flex;
+      justify-content: start;
+      gap: 8px;
+    }
+
+    .dates > .from {
+      margin: 0;
+      padding: 0 0 0 8px;
+      border-top: 0;
+      border-left: 1px solid var(--line-strong);
+    }
+
+    .node {
+      grid-area: node;
+      width: 14px;
+      height: 14px;
+      margin-top: 2px;
+    }
+
+    .cell {
+      grid-area: cell;
+    }
+
+    /*
+     * A long name may wrap within its own space here, rather than be cut
+     * off; the pill stays beside it, level with the first line.
+     */
+    .company-row {
+      align-items: flex-start;
+    }
+
+    .company {
+      overflow: visible;
+      white-space: normal;
+    }
+
+    .length {
+      margin-top: 2px;
+    }
+
+    .md {
+      padding: 2px 16px 18px;
+    }
+
+    .positions {
+      padding-left: 18px;
+    }
+
+    .position::before {
+      left: -26px;
+    }
+  }
+</style>

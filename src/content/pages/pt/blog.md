@@ -1,25 +1,17 @@
 ---
 # Rascunho de tradução (pt-BR): revisar antes do lançamento (spec §9).
 page: blog
-description: "Textos selecionados de Antonio Netto no Medium e no GitHub Gists."
+description: "Artigos, notas e trechos de código de Antonio Netto, do Medium, do Evernote e do GitHub Gists."
 label: "Blog"
-title: "Textos selecionados."
+title: "Notas do ofício."
+lead: "Artigos no Medium, notas do Evernote e trechos de código no GitHub, tudo num só lugar."
 posts:
-  - title: "[PLACEHOLDER: título do post no Medium]"
-    source: "Medium"
-    year: "[PLACEHOLDER: ano]"
-  - title: "[PLACEHOLDER: título do post no Medium]"
-    source: "Medium"
-    year: "[PLACEHOLDER: ano]"
   - title: "[PLACEHOLDER: título do gist]"
     source: "Gist"
     year: "[PLACEHOLDER: ano]"
+    description: "[PLACEHOLDER: resumo do post em uma linha]"
   - title: "[PLACEHOLDER: título do gist]"
     source: "Gist"
     year: "[PLACEHOLDER: ano]"
-more:
-  - label: "Todos os textos no Medium"
-    href: "https://medium.com/@anettodev"
-  - label: "Todos os gists"
-    href: "https://gist.github.com/anettodev"
+    description: "[PLACEHOLDER: resumo do post em uma linha]"
 ---

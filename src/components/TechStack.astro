@@ -1,0 +1,134 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import { TECH_STACK } from "../lib/tech-stack";
+import Copy from "./Copy.astro";
+import Icon from "./Icon.astro";
+
+/*
+ * Tech Stack (requested by Antonio): compact one-line pills, each a logo
+ * tile (or the name's initial) and the technology's name, from
+ * lib/tech-stack.ts.
+ * The page gives the section its heading, in its own style (Home's section
+ * head, About's label). With no list yet it shows a [PLACEHOLDER].
+ */
+interface Props {
+  locale: Locale;
+  /** The heading this list belongs to. */
+  labelledBy: string;
+}
+
+const { locale, labelledBy } = Astro.props;
+const ui = t(locale);
+
+/*
+ * A pill with its own `color` gets that background and whichever ink, near
+ * black or white, contrasts more with it (WCAG relative luminance). Without
+ * one it keeps the theme's surface and text colours.
+ */
+const INK_DARK = "#141416";
+const INK_LIGHT = "#ffffff";
+const luminance = (hex: string) => {
+  const [r = 0, g = 0, b = 0] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a: number, b: number) =>
+  (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+const styleOf = (color?: string) => {
+  if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
+  const bg = luminance(color);
+  const ink =
+    contrast(bg, luminance(INK_DARK)) >= contrast(bg, luminance(INK_LIGHT))
+      ? INK_DARK
+      : INK_LIGHT;
+  return `--pill-bg: ${color}; --pill-ink: ${ink}`;
+};
+---
+
+{TECH_STACK.length > 0 ? (
+  <ul class="tech-grid" aria-labelledby={labelledBy}>
+    {TECH_STACK.map((item) => (
+      <li
+        class:list={["tech-pill", { tinted: Boolean(styleOf(item.color)) }]}
+        style={styleOf(item.color)}
+      >
+        <span class="tech-mark" aria-hidden="true">
+          {item.icon ? (
+            <Icon name={item.icon} size={14} />
+          ) : (
+            item.name.charAt(0).toUpperCase()
+          )}
+        </span>
+        {/* Non-breaking hyphens: "Objective-C" never splits at its hyphen. */}
+        <span class="tech-name">{item.name.replaceAll("-", "\u2011")}</span>
+      </li>
+    ))}
+  </ul>
+) : (
+  <p class="tech-empty">
+    <Copy text={ui.tech.empty} />
+  </p>
+)}
+
+<style>
+  /*
+   * Compact pills, one line each, as wide as their names, wrapping across
+   * rows (Antonio asked for discreet pills that grow in width, not height).
+   */
+  .tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tech-pill {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    height: 34px;
+    padding: 0 12px 0 4px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /*
+   * A pill with its own colour stays quiet: a light tint of it over the
+   * surface (so it still follows the theme) and a tinted border, with the
+   * full colour on the logo tile, its mark in the contrasting ink.
+   */
+  .tech-pill.tinted {
+    border-color: color-mix(in srgb, var(--pill-bg) 40%, var(--line));
+    background: color-mix(in srgb, var(--pill-bg) 12%, var(--surface));
+  }
+
+  .tinted .tech-mark {
+    background: var(--pill-bg);
+    color: var(--pill-ink);
+  }
+
+  /* The mark on a chip in the text colour, as the AI page's tool tiles. */
+  .tech-mark {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--chip);
+    color: var(--fg);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .tech-empty {
+    font-size: var(--text-small);
+  }
+</style>

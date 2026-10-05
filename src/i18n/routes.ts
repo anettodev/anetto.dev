@@ -5,6 +5,8 @@ export const ROUTES = {
   experiences: "experiences",
   projects: "projects",
   blog: "blog",
+  ai: "ai",
+  bookmarks: "bookmarks",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

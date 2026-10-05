@@ -80,6 +80,15 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
             !matchMedia("(prefers-reduced-motion: reduce)").matches
           ) {
             root.dataset.intro = "play";
+            // The logo poster is the intro's largest image (its LCP): fetch
+            // it now rather than when the card's own inline script sets it
+            // (IntroCard.astro, same path).
+            const poster = document.createElement("link");
+            poster.rel = "preload";
+            poster.as = "image";
+            poster.fetchPriority = "high";
+            poster.href = `/brand/logo-intro-${theme}-poster.webp`;
+            document.head.append(poster);
           }
         }
       })();
@@ -114,7 +123,10 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
         />
       </>
     )}
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    {/* The site's app-icon logo (src/assets/brand/logo-dark.png), not the old Hugo mark. */}
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     {/* Not preloaded: Apple platforms render ui-rounded and never fetch Nunito. */}

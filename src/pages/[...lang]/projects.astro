@@ -1,12 +1,29 @@
 ---
-import Copy from "../../components/Copy.astro";
+import CountBadge from "../../components/CountBadge.astro";
+import GitHubActivity from "../../components/GitHubActivity.astro";
+import ListChips from "../../components/ListChips.astro";
+import ListPick from "../../components/ListPick.astro";
+import ListTools from "../../components/ListTools.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import ProjectEntry from "../../components/ProjectEntry.astro";
+import Pager from "../../components/Pager.astro";
+import ProjectCards from "../../components/ProjectCards.astro";
+import ProjectCarousel from "../../components/ProjectCarousel.astro";
 import { localeStaticPaths, t } from "../../i18n";
-import type { Locale } from "../../i18n/locales";
+import { LANG_TAG, type Locale } from "../../i18n/locales";
 import Page from "../../layouts/Page.astro";
 import { getPage, getProjects } from "../../lib/content";
+import { PROJECT_STATUSES } from "../../lib/status";
 
+/*
+ * Projects (Antonio's layout): GitHub Activity under the header, then
+ * "Pinned", the projects marked `pinned` in a horizontal carousel, then
+ * "All projects", every project in a three-column grid. All projects works
+ * like Bookmarks (the shared list components and scripts/filter-list.ts):
+ * a search over titles and descriptions, status chips, a stack picker, a
+ * Title A–Z / Z–A sort (A–Z first; Pinned keeps the projects' own order)
+ * and pages of 9, 18 or 36, nine filling three rows of three. Without
+ * JavaScript the tools hide and every project shows.
+ */
 export function getStaticPaths() {
   return localeStaticPaths();
 }
@@ -20,6 +37,21 @@ const ui = t(locale);
 const page = await getPage(locale, "projects");
 const { label, title, lead, devPlaceholder } = page.data;
 const projects = await getProjects(page.lang);
+const pinned = projects.filter((project) => project.pinned);
+
+/* The statuses in use, in their natural order, with their dot colours. */
+const statuses = PROJECT_STATUSES.map((status) => ({
+  value: status,
+  label: ui.status[status],
+  count: projects.filter((project) => project.status === status).length,
+  dot: `var(--status-${status})`,
+})).filter((status) => status.count > 0);
+
+/* Every technology any project lists, A–Z. */
+const collator = new Intl.Collator(LANG_TAG[locale], { sensitivity: "base" });
+const stacks = [...new Set(projects.flatMap((project) => project.stack))].sort(
+  collator.compare,
+);
 ---
 
 <Page
@@ -31,35 +63,113 @@ const projects = await getProjects(page.lang);
 >
   <PageHeader label={label} title={title} lead={lead} />
 
-  <div class="entries">
-    {projects.map((project) => (
-      <ProjectEntry project={project} locale={locale} />
-    ))}
-    {import.meta.env.DEV && (
-      <article class="dev-placeholder">
-        <p class="label">{ui.devOnly}</p>
-        <p class="muted">
-          <Copy text={devPlaceholder} />
-        </p>
-      </article>
-    )}
-  </div>
+  {/* Above the projects (requested by Antonio). */}
+  <GitHubActivity locale={locale} flush />
+
+  {pinned.length > 0 && <ProjectCarousel projects={pinned} locale={locale} />}
+
+  <section class="block" aria-labelledby="all-projects">
+    <div class="block-head">
+      <h2 id="all-projects">
+        {ui.projectsPage.all}
+        <CountBadge
+          count={projects.length}
+          words={ui.projectsPage.count}
+          locale={locale}
+        />
+      </h2>
+    </div>
+    <filter-list
+      class="list"
+      data-store="projects"
+      data-sort="title:asc"
+      data-per-page="9"
+      data-results={ui.list.results}
+      data-page-label={ui.pager.page}
+    >
+      {projects.length > 0 && (
+        <ListTools
+          locale={locale}
+          search={ui.projectsPage.search}
+          sorts={["title"]}
+          sort="title:asc"
+          perPage={[9, 18, 36]}
+          perPageLabel={ui.projectsPage.perPage}
+        >
+          {stacks.length > 0 && (
+            <label slot="filters" class="stack-pick muted">
+              {ui.projectsPage.stack}
+              <ListPick
+                label={ui.projectsPage.stackFilter}
+                filter="stack"
+                size="lg"
+                options={[
+                  { value: "all", label: ui.list.all },
+                  ...stacks.map((stack) => ({ value: stack, label: stack })),
+                ]}
+                selected="all"
+              />
+            </label>
+          )}
+          <ListChips
+            slot="chips"
+            filter="status"
+            label={ui.projectsPage.statusFilter}
+            total={projects.length}
+            items={statuses}
+            locale={locale}
+          />
+        </ListTools>
+      )}
+      <ProjectCards
+        projects={projects}
+        locale={locale}
+        headingLevel={3}
+        layout="grid-3"
+        devPlaceholder={devPlaceholder}
+      />
+      <p class="no-match muted" hidden>
+        {ui.projectsPage.noMatch}
+      </p>
+      <Pager locale={locale} />
+    </filter-list>
+  </section>
 </Page>
 
+<script>
+  import "../../scripts/filter-list";
+</script>
+
 <style>
-  .entries > :global(.project) {
-    padding: 56px 0;
-    border-top: 1px solid var(--line);
+  .block {
+    margin-top: var(--space-section);
   }
 
-  /* Dev builds only (§5.4); the one place dashed borders are allowed (§6.3). */
-  .dev-placeholder {
+  .block-head {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .block-head h2 {
+    font-size: var(--text-h2);
+  }
+
+  .list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 24px;
-    padding: 40px;
-    border: 1px dashed var(--line-strong);
-    border-radius: var(--radius-panel);
+    gap: 24px;
+    margin-top: 32px;
+    scroll-margin-top: var(--nav-clearance);
+  }
+
+  .stack-pick {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-size: var(--text-small);
+  }
+
+  .no-match {
+    font-size: var(--text-small);
   }
 </style>

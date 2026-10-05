@@ -3,36 +3,30 @@
 page: home
 description: "Executive Tech Manager no Inter. Especialista iOS que liderou o time CORE de iOS mobile. Desenvolvedor iOS indie e engenheiro de software."
 positioning:
-  - "Executive Tech Manager no Inter."
-  - "Especialista iOS que liderou o time CORE de iOS mobile."
-  - "Desenvolvedor iOS indie e engenheiro de software."
+  - "Olá, sou Antonio 👋"
 lanes:
   - number: "01"
+    label: "Quem"
+    title: "Sobre mim"
+    text: "Mais de uma década em desenvolvimento de apps mobile, com foco em iOS. Cientista da computação, desenvolvedor de software e pai orgulhoso de gêmeos."
+    route: about
+    linkLabel: "Sobre"
+  - number: "02"
     label: "Agora"
     title: "Inter"
-    text: "Executive Tech Manager. [PLACEHOLDER: duas ou três frases sobre o que lidero hoje no Inter]"
-    route: experiences
-    linkLabel: "Experiências"
-  - number: "02"
-    label: "Profundidade"
-    title: "CORE iOS"
-    text: "Liderei o time CORE de iOS mobile do Super App do Inter: padrões, code reviews, arquitetura e o release train, com seis engenheiros iOS."
+    text: "Executive Tech Manager. Lidero o time Core Mobile Platform, um grupo de 18 pessoas, e conduzo seus padrões de engenharia."
     route: experiences
     linkLabel: "Experiências"
   - number: "03"
-    label: "Ofício"
-    title: "iOS indie"
-    text: "Continuo entregando. O Nutria, um app iOS, está em desenvolvimento. Software desde 2007."
+    label: "Recente"
+    title: "Nutria"
+    text: "Meu app iOS indie, em desenvolvimento, feito com Swift e SwiftUI."
     route: projects
     linkLabel: "Projetos"
 previews:
   experiences:
-    title: "Experiências"
+    title: "Últimas experiências"
     linkLabel: "Todas as experiências"
-  projects:
-    title: "Projetos"
-    linkLabel: "Todos os projetos"
-  blog:
-    title: "Textos"
-    linkLabel: "Todos os textos"
+  tech:
+    linkLabel: "Mais sobre mim"
 ---

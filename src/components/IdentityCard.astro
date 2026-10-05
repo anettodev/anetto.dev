@@ -4,12 +4,14 @@ import "../styles/halo.css";
 import type { Locale } from "../i18n/locales";
 import IdentityCardBody from "./IdentityCardBody.astro";
 import IntroCard from "./IntroCard.astro";
+import MusicPlayer from "./MusicPlayer.astro";
 
 /*
  * Docked identity card (spec §5.2) with its halo (§6.6). Sticky in the left
  * column from 900px up; at the top of the page, scrolling away, below that.
  * On Home it is wrapped by the intro card, which flips into it once per
- * session (§8.1) and carries the halo while it travels.
+ * session (§8.1) and carries the halo while it travels. Under the card,
+ * in the same sticky column, Antonio's Apple Music playlist (MusicPlayer).
  */
 interface Props {
   locale: Locale;
@@ -30,7 +32,30 @@ const { locale, intro = false } = Astro.props;
       <IdentityCardBody locale={locale} />
     </div>
   )}
+  <MusicPlayer locale={locale} />
 </aside>
+
+<script>
+  /*
+   * The column (card + playlist) is taller than most windows. Sticky at the
+   * nav clearance, its bottom would never come into view, so when it doesn't
+   * fit its sticky top turns negative: it scrolls with the page until its
+   * bottom is 24px above the window's, then stays there, keeping the
+   * playlist in sight. A column that fits keeps the CSS top.
+   */
+  const column = document.querySelector<HTMLElement>(".identity");
+  if (column) {
+    const fit = () => {
+      column.style.removeProperty("top");
+      const top = parseFloat(getComputedStyle(column).top);
+      if (Number.isNaN(top)) return; // Not sticky (narrow screens).
+      const room = window.innerHeight - column.offsetHeight - 24;
+      if (room < top) column.style.top = `${room}px`;
+    };
+    new ResizeObserver(fit).observe(column);
+    window.addEventListener("resize", fit);
+  }
+</script>
 
 <style>
   .identity {

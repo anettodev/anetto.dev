@@ -275,8 +275,8 @@ Otherwise the intro's front face, cover and skip button are not drawn at all.
 
 - The script measures the container colour, fills the black outside the icon's rounded corners with it, and speeds the clip up just enough that one play lasts 4.9s (1.34× for these masters). Motion that starts by itself and runs longer than 5s needs a pause control (WCAG 2.2.2).
 - The corner fill runs at full resolution, before scaling. Scaling first left a faint ring along the corner arc (lanczos overshoot at the black edge).
-- Island tile, 144px: AV1 WebM 18–22 KB, H.264 MP4 27–34 KB, JPEG poster 3 KB, per theme.
-- Intro card, 640px: AV1 WebM 146–171 KB, H.264 MP4 227–244 KB, JPEG poster 27–33 KB, per theme.
+- Island tile, 144px: AV1 WebM 18–22 KB, H.264 MP4 27–34 KB, WebP poster 1.5 KB, per theme.
+- Intro card, 640px: AV1 WebM 146–171 KB, H.264 MP4 227–244 KB, WebP poster 13–15 KB, per theme. (Posters were JPEG until Phase 6; see there.)
 - In each pair the AV1 file comes first, with H.264 for browsers without AV1 (most Safari). Audio is removed.
 - Transparency was rejected for the first master. A version with the black keyed out washed out on the light theme, and needed two browser-specific encodes at 116–171 KB.
 
@@ -391,11 +391,12 @@ The whole intro takes about 8.8s. Any input still ends it.
 - After the logo has played, a theme change only recolours.
 - Below 600px the toggle normally lives in the island, which is hidden during the intro. The floating toggle stands in there and fades out at the reveal, as the island fades in.
 
-## Island links hover with the halo (2026-10-03)
+## Island links hover with the intelligence palette (2026-10-03)
 
 **Hovering a link in the pill shows the brand halo (requested by Antonio; replaces the plain grey hover chip).**
 
-- The link becomes a solid `--surface` chip with the identity card's halo (copper, pearl, blue conic gradient, blurred) glowing behind it, turning once every 4s. It's a small version of the identity card.
+- The link becomes a solid `--surface` chip with a blurred conic glow behind it, turning once every 4s like the identity card's halo.
+- The glow uses the **intelligence palette**: the feature cards' pink, cyan and violet stops (§6.7). The first version used the identity halo's copper/pearl/blue (§6.6) by mistake, and Phase 6 corrected it.
 - Keyboard focus (`:focus-visible`) shows the same, next to the focus ring.
 - The text stays `--fg` on the solid chip, so the halo's colours never affect its contrast (about 15:1 dark, 18:1 light).
 - The current page keeps its grey chip until hovered. With reduced motion the halo doesn't turn.
@@ -407,3 +408,520 @@ The whole intro takes about 8.8s. Any input still ends it.
 - It's in the accent, semibold, with a soft underline that turns solid on hover. The underline keeps it recognisable as a link without relying on colour (WCAG 1.4.1). The accent is 8.4:1 on the dark card and 6.5:1 on the light one.
 - `COMPANY` and `PERSON.city` live in `src/lib/site.ts`. Only the preposition is translated (`card.at`: at / no / en), and the intro's info face uses the same word.
 - The link's text is set with `set:text`, because Prettier's Astro plugin reflows inline content onto separate lines. That put spaces inside the link and stretched its underline past the name.
+
+## Phase 6 — QA (2026-10-03)
+
+**Budgets (§12), measured on the production build.**
+
+| Budget                       | Limit                                 | Result                                                              |
+| ---------------------------- | ------------------------------------- | ------------------------------------------------------------------- |
+| JS on Home, gzip             | ≤ 30 KB                               | 4.5 KB (other pages 3.0 KB)                                         |
+| Portrait                     | ≤ 60 KB                               | 1.5–16 KB per variant (AVIF 5.7 KB at 2×)                           |
+| Fonts                        | Nunito latin, swap, adjusted fallback | latin subset, `font-display: swap`, fallback `size-adjust: 101.39%` |
+| LCP (lab, Lighthouse mobile) | < 2.5s                                | 1.65s inner pages, 1.80s Home with the intro                        |
+| CLS (lab)                    | < 0.1                                 | 0 on every page                                                     |
+| INP                          | < 200ms                               | TBT 0ms in the lab; INP needs field data after launch               |
+
+**Lighthouse 12** (headless Brave, mobile preset unless noted): performance 98–100, accessibility, best practices and SEO 100 on Home (light, dark, desktop, reduced motion), About, Experiences, Projects, Blog and pt Home. Lighthouse is for debugging only (§12); field data after launch decides.
+
+**Fixed during Phase 6.**
+
+- **Home's LCP image during the intro.** The intro's logo poster (320×320) is larger than the headline, so it is Home's LCP while the intro plays. It was a JPEG set late by the card's inline script. Now the posters are WebP (intro 13–15 KB, was 27–33 KB; island 1.5 KB, was 3 KB), written by `scripts/encode-logo.sh` through sharp. The head script preloads the current theme's intro poster with high priority as soon as it decides the intro will play. Lighthouse's "LCP request discovery" and "modern image formats" findings are gone, and Speed Index dropped to 1.35s.
+- **Link hover palette:** corrected to the intelligence palette (see above).
+
+**Deviations, accepted.**
+
+- **Home's LCP element is the logo poster while the intro plays**, not the H1 or portrait as §12 states. That follows from the logo-first intro Antonio asked for, and LCP stays under budget (1.80s). Without the intro (return visits, reduced motion) it's the portrait or the headline again.
+- **The intro poster is 640px for a 320px box.** Lighthouse estimates 10 KB of savings on 1× screens, but a video poster can't be responsive, and 640px is what 2× screens need.
+- **The stylesheets are render-blocking** (about 6 KB gzip per page). Inlining them all would cost caching across pages. Not worth it at these scores.
+- **No visible way to stop the intro** (see "No 'Skip intro' button"). Any input still stops it.
+
+**Accessibility (§11), checked by hand.**
+
+- **Keyboard:** the skip link is the first stop. Then the logo, the four links, the language pill and the theme toggle, then the identity card's Inter link, profiles and email, then the page. Every stop shows the 2px `--accent` ring at 2px offset. The language menu opens with Enter, Tab walks its three links, and Escape closes it and returns focus to the pill.
+- **Contrast of island text over content under the glass,** measured from screenshots with the H1 scrolled right under the pill: 10.2:1 dark, 13.3:1 light, at the worst backdrop pixel next to the label.
+- **Reduced motion:** a run with `--force-prefers-reduced-motion` loads no intro assets and doesn't play the island logo; LCP is the portrait. In code, the mesh, halo, link glow, feature-card entrance, island morph, logo playback, page transitions and theme crossfade are all off with reduced motion.
+- **Reduced transparency** makes the island glass and the floating toggle solid (Chromium only, per §6.4).
+
+**Site-wide checks.** All 401 internal references across the 16 built pages resolve. The i18n check passes on all 15 localized pages: reciprocal hreflang, self canonicals, three crawlable switcher links each, no fallback.
+
+**Left for Antonio (they can't be done from here).**
+
+- VoiceOver on macOS Safari and iOS Safari (§11).
+- A mid-range Android phone, for the glass and mesh cost (§12).
+- Open decision #9: three.js on Projects, yes or no.
+- Field data (CrUX / Search Console) after launch decides INP and real LCP.
+
+## GitHub Activity (2026-10-03)
+
+**A GitHub contribution chart on Home, as its last section (first between Projects and Writing, then above Experiences, then moved last at Antonio's request), and on Projects, under the page header and above the project grid (first at the end of the page, moved at Antonio's request) (requested by Antonio, modelled on a chart he shared).** It shows the total for the last year, a week-by-day calendar with month labels, a tooltip per day ("23 contributions on Jun 28, 2026"), the snapshot date, and a "Top Public Contributions in:" row with up to five repositories.
+
+**Data: a committed snapshot, not a live call.**
+
+- `npm run github:refresh` (`scripts/fetch-github-activity.mjs`) queries GitHub's GraphQL API and rewrites `src/data/github-activity.json`. The token comes from `GITHUB_TOKEN`, or else `gh auth token`.
+- The build reads only the JSON, so it needs no network or token and stays reproducible.
+- The page shows "Updated {date}" so the snapshot's age is honest.
+- **Refresh before each deploy.** At cutover (Phase 7) the deploy workflow should run it with the Actions token, ideally on a daily schedule. Until then it's manual.
+- **Privacy.** The calendar counts private contributions the way GitHub's public profile does (counts only; 911 of 957 today). Repositories are kept only when public, so a private repository's name never reaches the site, whatever token runs the script.
+
+**Look.**
+
+- The squares use the **intelligence palette** (Antonio's choice over GitHub green and the accent blue). Each week takes a colour from a sweep across the year (orange, pink, lilac, blue, cyan), blended in OKLCH so it stays vivid. Activity levels 1–4 mix 45/65/85/100% of that colour into the empty-square colour. The light theme uses deeper pink, lilac and cyan stops.
+- The tooltip is a pill in the inverse colours.
+- A centred footer below a hairline shows the GitHub mark and "@anettodev" (the snapshot's login), linking to the profile.
+- The snapshot date is the local date when the script runs. UTC would read a day ahead late in the evening in Brazil.
+- **Top Public Contributions** (refined at Antonio's request): up to five public repositories with commits in the year, most commits first. With none, the row isn't drawn at all. Each is a glossy orb (pink, cyan, violet, orange, blue) showing its commit count inside. The count is at most three characters at 0.7rem; 1,000 and up become "1k"…"99k".
+  - Each orb is a link to the repository. On hover or keyboard focus, the stack fans out and the repository name slides out to the orb's right in a pill. The width animates through a 0fr → 1fr grid track.
+  - On narrow cards the orbs take a full row. If a long name needs more room while it's open, the orbs after it wrap to a second line.
+  - A chevron button (`aria-expanded`) shows the full list with names and counts. Without JavaScript the list stays open.
+  - This replaced a `<details>`, because links can't sit inside its `<summary>`, which behaves as a button.
+- On cards narrower than 34rem (phones) the calendar shows the last 26 weeks. The whole year would shrink each day to about 4px.
+
+**Accessibility.**
+
+- The calendar is one `role="img"` labelled with its date range. The total, snapshot date and repositories are real text. Orb links are named like "github-planner, 22 commits", which includes their visible text, and the list's counts carry a visually hidden "commits".
+- The days aren't focusable, so 371 tab stops aren't added. The tooltip is a hover extra.
+- Lighthouse: accessibility 100 on Home and Projects. Text sizes use the existing tokens, and month labels are `--muted` on `--surface`.
+
+**Cost.** One small inline script for the tooltip (about 0.7 KB gzip). Home's JavaScript is 5.1 KB of the 30 KB budget, and the calendar markup adds about 3.5 KB gzipped HTML. LCP and CLS are unchanged.
+
+## Project cards (2026-10-03)
+
+**Projects are cards in a two-column grid (requested by Antonio):** one row of two on Home (the first two by `order`), and every project on the Projects page. They drop to one column when the content column is under 40rem. This replaces the device-frame entry (`ProjectEntry`).
+
+- **Each card:** a 16:10 cover, the title, a status dot, the description clamped to three lines, up to five stack pills, then buttons. A missing cover shows `[PLACEHOLDER: <title> cover image]` (§13.1).
+- **Statuses:** `todo` / `wip` / `done`, with dots in cyan / orange / green (`--status-todo/-wip/-done`, deeper shades in light mode). This **replaces spec §4's shipping / in progress / past**. The labels read Planned / In progress / Shipped (pt: Planejado / Em desenvolvimento / Publicado; es: Planeado / En desarrollo / Publicado). Nutria is `wip`.
+- **Buttons:** `links.appStore` ("App Store"), `links.demo` ("Live demo") and `links.source` ("Source code", with the GitHub mark). Each shows only when set, and they wrap two to a row on phones, three on desktop.
+  - **A fourth, `links.website` ("Website"), was added** so Nutria keeps its product-page link (azklepio.com/nutria). It isn't an App Store page, a demo or source code. It replaces the old free-text `link` and its label.
+  - Buttons are named "Live demo: Nutria" and so on, so they stay distinct out of context.
+- **The schema enforces** five stack items at most (`.max(5)`) and URLs for the links. Content that breaks either fails the build.
+- **One project exists today**, so Home's row has one card in the left column. Dev builds show the dashed "Dev only" card after the projects on the Projects page, as before. **A second project (cover, one-line description, stack, links) is content Antonio still owes.**
+- Lighthouse: 100 in every category on Home and Projects; CLS 0.
+
+## Experience timeline on Home (2026-10-03)
+
+**Home's Experiences is a collapsible timeline of the latest three employers (requested by Antonio, modelled on his Hugo resume's timeline).** It replaces the three Inter role rows.
+
+- **Entries are companies**, not Inter roles (Antonio's choice): Inter&Co, Avenue Code, MadeinWeb e Mobile. A new `companies` collection holds one Markdown file per company and locale: `order`, `company`, `title` (latest role, shown under the name), `logo`, `start` / `end` as `YYYY-MM` (no `end` while current), `url`.
+- **Each entry:** a node on a vertical line with its dates beside it in short months, newest first like the timeline: the end over the start, with no dash, separated by a thin rule as wide as the wider date ("Present" / "Oct 2019"; pt "Atual" / "out. de 2019"). Screen readers still get "Present – Oct 2019" from a visually hidden dash. The label is 13px in a 6.25rem column, sized to the widest case. Above the card on narrow screens, both share one line, split by a thin upright rule.
+  - **Time at each company** (all its positions together) is a pill beside the company's name: Inter&Co "7 years", then 3 years, 2 years and 7 months. Beside the role it read as time in that role, which is wrong for Inter. Name and pill stay on one line; on narrow cards a long name wraps within its own space and the pill stays level with its first line. It counts whole years, or months under a year, through `Intl.NumberFormat` units; a current job counts to the build date.
+  - **Each position has its own pill** beside its title, from a `positions` frontmatter list matched to the `####` headings by title (`start`, `end`, `current`). A company with a single position uses the company's dates.
+    - Positions without dates show a visible placeholder pill: `[PLACEHOLDER: start date]` for a current position, `[PLACEHOLDER: years]` otherwise. Today that's all four Inter positions; iOS Dev Specialist II has its Oct 2019 start but no end.
+    - Inter's separate "[PLACEHOLDER: start date] – present" and "[PLACEHOLDER: years]" lines moved into these pills, so each is stated once.
+  - The card is a native `<details>`. Its header holds the logo, the company (an `<h3>`) with its length pill, and the latest role; the dates appear on the node and nowhere else (Antonio's request, to avoid showing them twice).
+  - On Home all entries start closed (Antonio's request); on the Experiences page the newest starts open (`openFirst`). Home passes `companies.slice(0, 3)`.
+  - Below a 34rem content column the date moves above its card and the line runs down a slim gutter, so cards keep nearly the full width.
+- **The body copy is migrated from the Hugo resume** (`git show main:content/resume.md`). Spec §0.3 names the Hugo content as the migration source, and §13.2 says to copy the earlier roles from it. Changes:
+  - Role titles became `####` headings and sections `#####`, under the company `<h3>`.
+  - The old 8-space-indented skill lists (which rendered as code blocks) became real lists.
+  - A broken App Store URL lost its stray "Activities" suffix, and "informations" became "information".
+  - Inter&Co's body opens with Executive Tech Manager, still the same `[PLACEHOLDER]` as before.
+- **pt and es bodies are drafts**, marked with the usual comment, with job titles kept in English.
+- **Positions laid out one by one** (Antonio's follow-up). The rendered Markdown is cut at build time before each `<h4>` (a position) and each `<h5>` (a section).
+  - Each position sits on a rail inside the card, with a dot by its title. The current one (first position of a company with no `end`) has a filled accent dot.
+  - The quote under a title is the position's **highlight**: a tinted callout with an accent edge, upright text.
+  - Each section gets a small uppercase label over compact lists.
+  - **Skills are tags.** In the Markdown they're inline code, one span per original item, wording unchanged, and they render as pills.
+  - **Each tag has its own colour** (Antonio's request): a hue derived at build time from the tag's text, so the same skill gets the same colour on every page and in every row. It's shown as a coloured border and a light tint, with the text kept in `--fg` for contrast. Within one row, a hue closer than 24° to an earlier one moves to the middle of the widest free arc of the wheel; every row in all locales keeps at least 25° between hues.
+  - Company-level links (Inter's App Store page) moved from the end of the body into a `links` frontmatter list, shown beside the website. Before, the App Store link read as part of the last position.
+  - The current position's class is `now` and the links row's is `company-links`. The island stylesheet's global `.current` and `.links` rules would otherwise add its padding, hover chip and halo glow.
+- **Logos** come from the Hugo site's `static/images/` (Inter, Avenue Code, MadeinWeb), now in `src/assets/companies/` and served through the image pipeline at 36px, 1–3×.
+- **A "{n} more experiences" link** follows the timeline, centred below it with no node (the line ends at the last company). It links to the Experiences page and shows only when more companies exist than Home shows; today that's "1 more experience" (pt: "Mais 1 experiência", es: "1 experiencia más"). Hover and focus give it the navigation links' intelligence-palette halo behind a solid chip. Both now read the stops from one token, `--intelligence-ring`.
+- **Daccord Educação** (iOS Engineer, Aug 2013 – Mar 2014) was migrated as the fourth company, from the Hugo resume; §13.2 names it. The resume's entries after it (education, Naips, the PHP years, the internship) aren't migrated: some look unfinished (an example.com link) and need Antonio's check first.
+- **The Experiences page uses the full timeline** (requested by Antonio): every company, newest open. A visually hidden "Timeline" h2 keeps the headings in order (h1 → h2 → company h3 → position h4).
+  - The Resume PDF and LinkedIn buttons sit in the page header, under the lead and above the timeline (Antonio's request). `PageHeader` gained a slot for content after the lead.
+  - The section after the timeline ("Before that"; was "Before Inter") keeps the software-since-2007 line, "Earlier web roles" and education. The Avenue Code, MadeinWeb and Daccord rows went, since the timeline has them. The page lead now reads "Newest first. Open an entry for its roles and the work."
+  - **The `roles` collection and `RoleRow` were removed,** being unused. Their owed placeholders moved into Inter&Co's entry so they stay visible: the Executive Tech Manager start date, the CORE manager years and one public proof from the Investments years (§13.2).
+- Lighthouse on Home: accessibility, best practices and SEO 100, performance 99; LCP 1.95s (the intro poster), CLS 0.
+
+## Writing as cards (2026-10-04)
+
+**Writing is a card grid like Projects (requested by Antonio):** one row of three on Home (the first three posts), and every post on the Blog page. The grid drops to two columns under a 52rem content column and one under 34rem. This replaces the post rows (`PostRow`, removed).
+
+- **Each card:** a 16:10 cover, the source (Medium, Gist) as a small label, the title clamped to two lines, a summary clamped to two lines, up to three tags as chips, then a footer with the date (calendar icon) and "Read more →" when the post has a link.
+- **Schema, per post:** `description` (optional), `tags` (three at most, enforced), and `cover` (optional image; the `pages` collection schema became `({ image }) => …` so the blog's posts can take one). `year` stays as the date text.
+- **Placeholders:** all four posts are still placeholders (title, year, link). Each now also has a visible `[PLACEHOLDER: one-line summary of the post]`, and a missing cover shows `[PLACEHOLDER: cover image]`. A post without `href` gets no "Read more".
+- Lighthouse on Home and Blog: accessibility, best practices and SEO 100, performance 99; CLS 0.
+
+## AI usage from tokscale (2026-10-04)
+
+**An AI usage section on Home (under GitHub Activity) and a full `/ai` page (requested by Antonio, modelled on a page he shared).** The data comes from tokscale, chosen after comparing it with Viberank, clawdboard, Token Tracker, a local-only script and Anthropic's usage API. Only tokscale publishes a per-user daily breakdown as public JSON. Anthropic's API sees only usage billed to a Console API account, and Antonio's Claude Code is a subscription.
+
+**Data: a committed snapshot of the public profile.**
+
+- `npx tokscale@latest submit`, run on Antonio's Mac, reads the local AI tool logs and uploads daily totals per tool and model to tokscale.ai/u/anettodev.
+- `npm run ai:refresh` (`scripts/fetch-ai-usage.mjs`) reads `tokscale.ai/api/users/anettodev`, which is public and needs no token, and rewrites `src/data/ai-usage.json`. The build never calls tokscale.
+- **Everything is summed from the daily records.** The API's `stats.activeDays` and `modelUsage` cover only its last-year chart window, while its token and cost totals cover the whole history. Mixing them gave 42 days and 6 models against 46 and 8, and model shares short of 100%.
+- **Days without token counts are left out.** Cursor's history from Feb 22 to Jun 11, 2025 has 2,190 requests over 79 days but no tokens or cost, as Cursor's records from then carry none. Keeping them would start the range in February while tokens start on May 17, and count messages from days the other totals skip.
+- `AI_USAGE_FILE=<graph.json> npm run ai:refresh` reads a local `tokscale graph --output` export instead, for an offline preview.
+- **Privacy.** The script keeps only what the page shows. The profile also lists the machine's MCP server names, the user id and devices; none of that reaches the site. The upload itself does publish the MCP server names on tokscale (no opt-out); Antonio accepted that. The device is named "Mac" through `TOKSCALE_DEVICE_NAME`.
+- **Keeping it current.** A launchd job on Antonio's Mac, `dev.anetto.tokscale-submit`, runs `tokscale@4.17.0 submit` daily at 22:00, or on wake if the Mac was asleep. It's pinned, so only the reviewed version runs unattended. It logs to `~/Library/Logs/tokscale-submit.log` and isn't part of the repo. Installed and test-run on 2026-10-04. Since Cursor is connected, each run also syncs Cursor's usage. The site still needs `ai:refresh` before each deploy, until the Phase 7 workflow runs it daily alongside `github:refresh`.
+- tokscale's `usage` and `cursor login` commands read the Claude Code and Cursor logins and aren't used.
+
+**What it shows.**
+
+- **Card (Home and /ai):** the date range and last sync, three totals, the year calendar and a footer link to the profile.
+  - The totals: API-equivalent cost with the average per active day, tokens with messages and active days, and the share of prompt tokens read from cache.
+  - The calendar is `ActivityCalendar`, now shared with GitHub Activity: GitHub's calendar markup, palette sweep and tooltip moved there unchanged (measured the same to the pixel). Levels are quartiles of the active days in the window. The tooltip reads "4.8M tokens on Sep 30, 2026 · $2.71".
+- **The card's chart switches between the heatmap and usage over time** (Antonio's request, modelled on tokscale's own chart). A "Heatmap | Over time" switch sits above the chart on Home and /ai. Heatmap is the default; the choice is remembered in local storage, and without JavaScript the switch hides and the heatmap shows.
+  - **Over time** (`UsageTrend.astro`): stacked areas of tokens per model over the last 7, 15, 30, 60, 90, 180 or 360 days, picked with segmented buttons that replaced the chart's caption (Antonio's request). 7 is the default and the choice is remembered. The spans are `CHART_RANGES` in `lib/ai-usage.ts`.
+    - Spans up to 90 days plot every day.
+    - 180 and 360 plot a 7-day average per week, since daily spikes would bury the shape. They cover whole weeks, at least the days asked for: 26 and 52 weeks.
+    - In each span the five models with the most tokens get bands in the intelligence palette, largest at the bottom, and the rest share "Other models". The leaders differ by span: the last 7 days are claude-opus-5-5, Sonnet 5.5 and Grok 4.7.
+  - All seven charts are drawn at build time as SVG, with no chart library, and the buttons show one (`scripts/ai-chart.ts`). The hover tooltip (`scripts/usage-trend.ts`) gives the date, "Daily" or "7-day average", each band's value and the total. Each chart is one image to assistive tech, labelled with its span; the legend is text.
+  - The snapshot keeps each day's tokens per model (`days[].models`) for it, about 35 KB read only at build time. The seven charts add about 5 KB of gzipped HTML to Home (now 30.4 KB) and /ai.
+  - **Astro 7's compiler misreads `value! / divisor` in frontmatter**: the non-null `!` followed by `/` starts a phantom regex. `astro check` then reports nonsense errors in the component's `<style>`. Write `(value ?? 0) / divisor` instead.
+- **The /ai page adds** the top six models by cost with bars (the rest in one "Other models" row), the token mix by type and a table of tools, then a note on cost.
+- **The three totals carry the intelligence palette** (Antonio's request): each tile has the lane cards' look at tile size, a 4px gradient border over a blurred glow of the same gradient. They use the same `--gradient-pink/-cyan/-violet` tokens in the lanes' order: cost, tokens, cache. The tiles' grid is isolated, so the glows sit behind the tiles but above the card.
+- **Costs are always "API-equivalent".** They're tokscale's estimates at public API prices, not what was paid. Every cost label says "API-equivalent", and the foot of the Models and Tools panels reads "Costs are tokscale's estimates at public API prices." (shortened and moved into both panels at Antonio's request). Showing them as spend would be a claim about Antonio that isn't true.
+- With no data, Home leaves the section out and /ai shows `[PLACEHOLDER: AI usage appears here after the first tokscale sync]`.
+- `/ai` is in the navigation island as "AI" (pt and es "IA"), between Projects and Blog (added at Antonio's request; it started outside the island). Home's "See the breakdown" links to it too. Its copy is UI text in the i18n files, since it describes the data rather than Antonio. The pt and es strings are drafts.
+- On narrow panels a model's name takes its own line above its cost and share; the stat tiles stack.
+- **Tools carry their maker's mark** (Antonio's request): Claude, Cursor, Google Gemini and Kimi from Simple Icons (CC0, simple-icons@16.34.0), added to `Icon.astro` beside the social marks. Each sits on a 28px chip in the text colour, so it follows the theme like the other marks; brand colours were skipped since Cursor's and Kimi's are black. A tool without a mark shows its initial. Marks with extra licence terms (GitHub Copilot's is MIT) aren't carried until a tool needs one.
+- **Share leads the Tools table** (Antonio's request). It's larger and bolder, with its header in the text colour, while Cost and Tokens are muted. It stays at every width: below a 22rem panel, Cost and Tokens move under the tool's name ("$2,874.85 · 4.53B tokens") and the table keeps two columns, Tool and Share. That replaced an earlier narrow-screen list, which buried the share.
+- **Models and Tools show a period, picked per panel** (Antonio's request). Each panel reads "Last [7] days", with 7, 15 or 30 days and 7 as the default.
+  - The picker sets the whole panel: each row's cost, tokens and share are for those days.
+  - Each share's ▲/▼ is the change in percentage points ("pp") against the previous period of the same length, e.g. the last 7 days against the 7 days before them.
+  - Rows used in the previous period but not this one are listed at $0.00 / 0% with their fall, so the changes add up to zero and the shift shows. Over 30 days, Kimi CLI ▼ 14.2 is why Claude Code and Cursor both rose. In Models such rows usually fall into "Other models", whose change is the sum of its models'. A period with no usage shows "No AI usage in these days".
+  - The pickers (`TrendWindow.astro`) are native `<select>`s inside one `<ai-trends>` (`scripts/ai-trends.ts`). Picking a period in either moves both and shows that period's rows, which carry `data-w`. The choice is remembered in local storage; without JavaScript the picker hides and the 7-day rows show.
+  - The script computes `periods[N]` for N in `periodDays: [7, 15, 30]`: cost, tokens, and the models and tools with `shareDelta`, from the daily per-tool and per-model records. The all-time `models` and `clients` lists stay in the snapshot.
+  - Moves under 0.05 points get no arrow. Up is green, down pink, in deeper shades in light mode for contrast. Hovering an arrow shows, and screen readers hear, "up 37.9 percentage points vs the previous 7 days".
+  - Token mix still covers all time.
+- **Tools carry their maker's mark** (Antonio's request): Claude, Cursor, Google Gemini and Kimi from Simple Icons (CC0, simple-icons@16.34.0), added to `Icon.astro` beside the social marks. Each sits on a 28px chip in the text colour, so it follows the theme like the other marks; brand colours were skipped since Cursor's and Kimi's are black. A tool without a mark shows its initial. Marks with extra licence terms (GitHub Copilot's is MIT) aren't carried until a tool needs one.
+- **Share leads the Tools table** (Antonio's request). It's larger and bolder, with its header in the text colour, while Cost and Tokens are muted. It stays at every width: below a 22rem panel, Cost and Tokens move under the tool's name ("$2,874.85 · 4.53B tokens") and the table keeps two columns, Tool and Share. That replaced an earlier narrow-screen list, which buried the share.
+- **Share arrows with a day picker** (Antonio's request), on both Tools and Models. Each share carries ▲/▼ and the percentage points ("pp") its share of all-time cost moved over the last 7, 15 or 30 days. That's its share now minus its share of the cost up to that many days ago.
+  - Each panel reads "Last [7] days", with 7 as the default. The pickers (`TrendWindow.astro`) are native `<select>`s inside one `<ai-trends>` (`scripts/ai-trends.ts`). Picking a window in either moves both and shows the arrows for it.
+  - "Other models" gets the sum of its models' changes, since shares add up.
+  - The choice is remembered in the browser's local storage, a per-viewer convenience only. Without JavaScript the picker hides and "7" shows as text.
+  - The script computes all three windows from the daily per-tool and per-model records: `clients[].shareDelta` and `models[].shareDelta` keyed by days, with `deltaWindows: [7, 15, 30]`.
+  - Moves under 0.05 points get no arrow. Up is green, down pink, in deeper shades in light mode for contrast.
+  - Hovering an arrow shows, and screen readers hear, "up 1.4 percentage points in the last 7 days".
+
+## "Book a call" on the identity card (2026-10-04)
+
+**A "Book a call" button closes the identity card, under the email (requested by Antonio).** It opens Calendly's scheduling popup for `calendly.com/anetto`, the calendar the Hugo site's `/contact` page offered through its Calendly shortcode. This adds to spec §16's "Contact is `mailto:`": the email stays, and Calendly is a second way in. There's still no `/contact/` page (§14 #4).
+
+- **Calendly loads on the first click, not with the page** (`scripts/book-call.ts`). Its widget script and stylesheet come from `assets.calendly.com` only when someone asks to book. Visitors who never click never contact Calendly, and the page carries none of its weight; Home's JavaScript is unchanged. The button reads as busy while the script loads.
+- **The button is a real link** to the Calendly page with `target="_blank"`. Without JavaScript, before the script runs, or if Calendly fails to load, it opens the page in a new tab. Modified clicks (new tab, new window) are left to the browser.
+- **Look:** a pill with a calendar icon and a **constant** intelligence-ring halo (Antonio's request). At rest it turns slowly (8s a turn at 70% opacity); on hover and focus it's brighter and faster (4s, full). With reduced motion it stays still. Its glow sits in the isolated `.book` wrapper, so it shows behind the pill.
+- **Accessible name:** "Book a call on Calendly", which includes the visible label. In pt it reads "Agendar uma conversa" and in es "Agendar una llamada" (drafts).
+- **The popup's backdrop is darker and blurred** (`body > .calendly-overlay` in `global.css`). Calendly's stock 40% grey let the island and the theme toggle show through as if live, beside Calendly's close button.
+- The popup itself is Calendly's white page, including its own cookie settings; colours that follow the site's theme need a paid Calendly plan. The card still fits short desktop viewports in its compact variant (measured at 1100×700).
+
+## Home trimmed to lanes, GitHub and Last Experiences (2026-10-04)
+
+**Home now runs: positioning, the three lanes, "Last Experiences", Tech Stack, then GitHub Activity last** (Antonio's request; Tech Stack was added and GitHub Activity moved to the end later the same day). This overrides spec §5.4's previews of Projects and Writing.
+
+- **Removed from Home:** the Projects cards, the Writing cards and the AI usage section. Each stays complete on its own page (Projects, Blog, `/ai`), all reachable from the island. The lanes still link to Experiences and Projects.
+- **"Experiences" became "Last Experiences"** (pt "Últimas experiências", es "Últimas experiencias", drafts). It's still the latest three companies, all collapsed, with the "{n} more" link and "All experiences".
+- **Leftovers removed:**
+  - the `previews.projects` and `previews.blog` copy and schema; the `pages` schema keeps only `previews.experiences`;
+  - AI usage's Home variant (its heading row and "See the breakdown" link, and the `ai.detailsLink` string). `AiUsage` is now just the /ai page's body.
+- Home's gzipped HTML went from 30.4 KB to 16.7 KB.
+
+## Tech Stack section (2026-10-04)
+
+**A Tech Stack section on Home, after Last Experiences, and on About, after the facts and before the personal line** (Antonio's request). The personal line stays last (§2).
+
+- **Compact one-line pills** (`TechStack.astro`), modelled on two references Antonio shared and then made quieter at his request: wider is fine, taller isn't.
+  - Each pill is 34px tall, as wide as its name, never wrapping inside (names keep their hyphens unbroken), and the pills flow across rows.
+  - Each has a 26px logo tile with a Simple Icons mark from `Icon.astro`, or the name's initial.
+  - Each page heads the section in its own style: Home's section heading with a hairline ("Tech Stack"), About's small label like the facts.
+  - Drafts: pt "Stack de tecnologia", es "Stack tecnológico".
+  - **A total sits after the title** (`CountBadge.astro`, formerly `TechCount`, Antonio's request; the Projects page's headings use it too): the number of technologies in a small pill-shaped circle, smaller on About's label. Screen readers hear "Tech Stack, 16 technologies" (pt "tecnologias", es "tecnologías"), not a bare number. It's hidden while the list is empty.
+- **The list lives in `lib/tech-stack.ts`** (`TECH_STACK`: a name, an optional icon and an optional colour), in display order. Names are proper nouns and aren't translated.
+- **Each pill can have its own colour** (`color: "#rrggbb"`, Antonio's request), kept discreet.
+  - The logo tile takes the full colour, with its mark in near-black or white, whichever contrasts more (WCAG relative luminance, computed at build time).
+  - The pill gets a 12% tint of the colour over the surface and a tinted border, so it still follows the theme.
+  - Without a colour, a pill takes the theme's own colours.
+  - The first full-colour backgrounds were too loud.
+- **A sample list is in place for Antonio to try** (his request): the tools his resume names, with brand colours where the tool has one. It's his to edit or confirm before shipping. Logos for Swift, fastlane, Bitrise, ReactiveX (RxSwift), LottieFiles and Subversion were added to `Icon.astro`. CocoaPods (CC BY-NC) and Git (CC BY) carry attribution licences in Simple Icons, so those pills show an initial on their brand colour.
+- **The list is Antonio's to supply.** The section shows `[PLACEHOLDER: the technologies to show]` until he does. The references showed a generic web stack, and the site makes no claims beyond the copy (spec rule), so nothing was filled in for him. Logos for his tools get added to `Icon.astro` from Simple Icons as the list arrives; Swift, Xcode, Fastlane, Bitrise, CocoaPods, ReactiveX, Lottie, Git and Subversion have one, while Objective-C, SwiftUI, TestFlight, Carthage, SPM and Tuist don't.
+
+## Bookmarks page from Raindrop (2026-10-04)
+
+**A `/bookmarks` page listing Antonio's public Raindrop.io bookmarks** (his request). It's in the island after Blog: About · Experiences · Projects · AI · Blog · Bookmarks (pt "Favoritos", es "Marcadores").
+
+- **Data: a committed snapshot, `src/data/bookmarks.json`, written by `npm run bookmarks:refresh`** (`scripts/fetch-raindrop.mjs`). The build never calls Raindrop.
+  - **No token.** The script reads what Raindrop already publishes. Antonio's public profile page (`anettodev.raindrop.page`) links each public collection as `/<slug>-<id>`.
+  - Each collection's details and bookmarks come from the unauthenticated endpoints Raindrop's own public pages use (`api.raindrop.io/v1/collection/<id>` and `/v1/raindrops/<id>?nested=true`).
+  - **Sub-collections count:** Antonio's public "Public" collection holds nothing itself; his bookmarks sit in its sub-collections (articles, github projects, tools, videos, websites). Without `nested=true` the page would show none. Each bookmark keeps the collection it sits in, so the chips name the sub-collections as Antonio wrote them in Raindrop. Items in a collection that isn't public are dropped.
+  - These aren't in Raindrop's documented REST API, which needs a token. If they change, the script fails loudly and the committed snapshot stays as it was. The token route (`/rest/v1` with `RAINDROP_TOKEN`) is the fallback if that ever happens.
+  - The profile page was unavailable until Antonio verified his Raindrop email.
+- **Only collections marked Public in Raindrop exist on those pages**, so what the site shows is decided in Raindrop. Antonio shared the embed iframe Raindrop offers (`…/public-75789843/embed`); it isn't used, because it's a third-party page that can't follow the site's theme (spec §6.5's rule for iframes).
+- **Kept per bookmark:** title, link, domain, a 180-character excerpt, tags, date and collection. Notes, highlights, covers and account details aren't kept.
+- **A compact list** (Antonio's choice over cover cards), newest first. Each row has three lines, rearranged at Antonio's request:
+  - a top line with the date pill and up to three hashtags on the left, and the site's icon and domain on the right (it wraps under them on narrow screens);
+  - the title linking out;
+  - a one-line excerpt.
+  - The date shows the year only when it isn't the snapshot's.
+  - **The date sits in a pill coloured by its day** (Antonio's request): same day, same colour. Each next day turns the hue by the golden angle (137.5°), so neighbouring days never look alike. It uses the same tint recipe as the timeline's skill tags, with a deeper stop in light mode; the text stays in the theme's colour for contrast.
+  - **Site icons** (Antonio's request; they replaced letter tiles). The refresh script downloads each domain's icon once into `public/bookmarks/icons/`, from DuckDuckGo's icon service and then Google's.
+  - The page serves those copies itself, so visitors never contact a third party. Icons for domains no longer listed are deleted on refresh, and a site with no icon gets a globe.
+  - Each icon sits on a small white backing, so dark marks like GitHub's still show in dark mode. The first set is 9 icons, about 40 KB.
+  - **Search, chips and pages** (Antonio's request), over the bookmarks already in the page. They're now the shared filtered-list pieces (see "All projects" below: `scripts/filter-list.ts` and the `List*` components):
+    - **Search:** a field that matches titles and descriptions as you type, ignoring case and accents.
+    - **Chips:** filter by collection, with counts, when there's more than one public collection.
+    - **Pages of 10, 25 or 50**, picked in a "Show [10] per page" dropdown beside the status line (10 by default; the browser remembers the choice in local storage). Previous and next, up to seven page numbers, and "Showing 1–10 of 13" in a polite live region. The numbers are the first, the last and the current with its neighbours, with "…" for the rest: `1 2 3 4 … 12`, `1 … 6 7 8 … 12`, `1 … 9 10 11 12`. Up to seven pages, every number shows. A new page scrolls back to the top of the list.
+    - **Sort toggle** (Antonio's request): a Date | Title switch beside the per-page picker. Date starts newest first, Title starts A–Z (case- and accent-insensitive, via `Intl.Collator`); pressing the active one again flips it (↓/↑, A–Z/Z–A). Ties fall back to newest first.
+      - The rows are moved in the list, so reading order matches the screen. Each button's accessible name says what it does: "Sort by title, A to Z".
+      - The browser remembers the choice in local storage.
+    - Search, chips and sort combine, and any of them resets to page 1. With no match a message shows.
+    - Without JavaScript the search, chips and pager hide, and every bookmark shows.
+  - There are no third-party images: no favicons or covers are loaded from other hosts.
+  - A footer gives the snapshot date and "View on Raindrop".
+- **Until the first refresh** the page shows `[PLACEHOLDER: public Raindrop bookmarks appear here after the first refresh]`. After a refresh that finds no public bookmarks, it says "No public bookmarks yet." with a link to Raindrop. First real refresh: 13 bookmarks in 5 sub-collections.
+- At cutover, the deploy workflow should run `bookmarks:refresh` alongside `github:refresh` and `ai:refresh`. It needs no secret.
+
+## Projects page: Pinned carousel and paged grid (2026-10-04)
+
+- **Order** (Antonio's request): header, GitHub Activity, then **Pinned**, then **All projects**.
+- **Pinned** lists the projects whose frontmatter has `pinned: true` (a new `pinned` field in the projects schema, default `false`). Nutria is pinned. The section is left out when nothing is pinned. It's a horizontal carousel (`ProjectCarousel.astro`, ProjectCards' `carousel` layout), reworked to Antonio's spec:
+  - **Layout:** two cards in view, or one and a bit on phones, snapping card by card.
+  - **No scrollbar:** it's hidden while JavaScript runs.
+  - **Arrows:** round glass arrows sit beside the row, left and right, 20px from it and centred on its height (Antonio's request, after a version that overlapped the card edges). Below a 40rem column they hide so the cards keep the width; swipe or the dots move it there.
+  - **Dots:** one per stop the row can rest at, which isn't one per card when two are in view. The current stop's dot is a dash in the text colour, black or white with the theme (Antonio's request); the others mix it half into the page, enough for the 3:1 controls need (`aria-current` marks the current one). Each dot is labelled "Show <project>". The dots are rebuilt when the width changes the number of stops.
+  - **Circular:** past the last stop wraps to the first, and back from the first goes to the last. Quick presses add up.
+  - **Autoplay every 5 s**, wrapping, in `scripts/project-carousel.ts`:
+    - **No pause button** (Antonio's call). One was added beside the dots and then removed at his request. WCAG 2.2.2 asks for a way to pause content that moves by itself for more than 5 s; hover, keyboard focus and reduced motion stop it here, but nothing stops it for good. Logged for the Phase 6 audit to weigh, like the intro's missing "Skip intro".
+    - **Waits** while the pointer is over the carousel, while keyboard focus is inside, while it's less than half on screen and while the tab is hidden. Moving it by hand (arrow, dot, swipe, wheel) restarts the 5 s.
+    - **Reduced motion:** for readers who prefer it, autoplay never runs and moves jump instead of gliding.
+  - **Single project:** when every card fits, as now with one pinned project, no control shows and nothing moves.
+  - **Without JavaScript** the row keeps its scrollbar and scrolls by hand, swipe or keyboard (it takes focus).
+- **All projects:** every project, pinned ones included, in ProjectCards' new `grid-3` layout: three columns from 44rem, two from 30rem and one below, with a smaller title. The dev-only "next entry" placeholder stays after the cards.
+  - **It works like Bookmarks** (Antonio's request):
+    - a search over titles and descriptions (ignoring case and accents);
+    - status chips with their dots and counts (only statuses in use);
+    - a "Stack [All ▾]" picker listing every technology any project names;
+    - a Title A–Z / Z–A sort;
+    - "Showing 1–9 of 14";
+    - "Show [9] per page" with 9, 18 or 36;
+    - the same windowed pager.
+  - **9 per page** (Antonio's choice), so a page fills three rows of three.
+  - **Starts A–Z.** Only a title sort was asked for, so the projects' own `order` no longer applies here; the Pinned carousel still follows it.
+  - The browser remembers the sort and page size per list (`anetto.projects-*`, like `anetto.bookmarks-*`).
+- **One filtered-list engine for both pages:**
+  - `scripts/filter-list.ts` (`<filter-list>`) replaced `bookmark-list.ts` and the short-lived `paged-list.ts`. It reads each `[data-item]`'s `data-title`, `data-date` and one `data-<filter>` per filter (several values joined by `|`), and searches the item's `[data-search]` parts.
+  - Filters are any `[data-filter]`: a chip group or a `<select>`. Sorting moves the items in the page, keeping a trailing non-item (the dev card) last.
+  - The toolbar markup and styles moved out of the Bookmarks page into `ListTools`, `ListChips` and `ListPick`.
+  - **Two rows, not three** (Antonio's request, "we have space to fit better"):
+    - Row 1 is the search, widening to fill, then the extra filters (Projects' Stack picker) and the sort toggle, all 40px tall.
+    - Row 2 is the chips on the left and "Showing 1–9 of 14 · Show [9] per page" on the right.
+    - Rows wrap on narrow screens. Where the chips fill row 2 (Bookmarks' five collections on desktop), the status and page size wrap under them, right-aligned.
+  - The generic words (All, "Showing…", "Show … per page", the sort words) moved from `bookmarks` to a top-level `list` i18n group.
+  - Bookmarks behaves as before (checked: chips, search, both sorts, page sizes, pages).
+- **Shared pager:** the windowed page numbers (`1 … 6 7 8 … 12`) moved from the Bookmarks script into `lib/page-list.ts` (`pageList`, `fillPages`). The previous/next markup moved into `components/Pager.astro`, and its strings into a top-level `pager` group. Bookmarks and Projects both use them, through `<filter-list>`.
+  - The pager hides when there's a single page, as now.
+  - Without JavaScript every project shows.
+- **Totals beside the headings** (Antonio's request): "Pinned" and "All projects" each show their project count in the same circle as Tech Stack. `TechCount` became `CountBadge`, which takes the number and its words (`projectsPage.count`, e.g. ", 1 project" for screen readers).
+- **Hover halo on every project card** (Antonio's request), in both sections. It's the intelligence ring that turns behind "Book a call" and the timeline's "more" link (`--intelligence-ring`, `halo-turn`, 4 s). It also shows while keyboard focus is inside a card (`:has(:focus-visible)`), and with reduced motion it stays still.
+  - It sits at z-index -1 in the cards' isolated container, behind every card's background, so it never tints a card.
+  - The card lost its `overflow: hidden` (it would clip its own halo); the buttons' row rounds its own bottom corners instead.
+  - A scroller clips what spills out of it, so the carousel row reaches 20px past the cards on every side (padding cancelled by a negative margin, plus matching `scroll-padding`). Cards still line up with the column edge at every stop; while the row moves, cards pass through that 20px margin.
+- **The BS in Computer Science is the timeline's last entry** (Antonio's request, 2026-10-04).
+  - It's a `companies` entry (`unicap.md`, order 5), so it renders like the jobs: logo, 2010-06 to 2015-06 with a "5 years" pill, the program link, a description quote and an "Activities and societies" list.
+  - The copy comes from the Hugo resume (`git show main:content/resume.md`), an allowed source. The logo is the Hugo site's `catolicapernambuco_logo.jpeg`.
+  - Fiscalize Aí's old domain is kept as plain text, not a link, since nothing confirms it's still the project's.
+  - The degree title is translated in pt ("Bacharelado em Ciência da Computação", the official name) and es; job titles still stay in English.
+  - The "Before that" list on Experiences had a "Computer Science, Universidade Católica de Pernambuco · 2015" row. It's gone, with its `before.education` schema field, so the degree shows once.
+- **"Before that" on Experiences, filled in** (Antonio's request, 2026-10-04):
+  - **Software since 2008, not 2007.** Antonio's correction; the earliest job is a 2008 internship. It overrides the spec's copy everywhere it appeared: the Home positioning line, About's description and body, and the Experiences lead, in all three languages.
+  - **Three figures, now at the top of the page** (moved at Antonio's request: under the header, above the timeline; a top-level `figures` field of the page, no longer under `before`). Small tiles with a palette bar on top (pink, cyan, violet), spanning the column, each with small pills under its label (Antonio's wording, 2026-10-04):
+    - "18+ years in Software Engineering", pills "web" and "<Apple mark> iOS";
+    - "15+ years on <Apple mark> iOS", pills "since iOS 4.3" and "Obj-C → Swift";
+    - "2+ years as SWE Manager", pill "Inter". It counts from May 2024, when Antonio became iOS manager of Inter's CORE Mobile team (his date). The same date fills Inter's "iOS Engineering Manager" position (`start: "2024-05"`, `current: true`, in his present tense).
+    - The counts are whole years from each figure's `since` to the build date, so they move up with each deploy.
+    - In a figure's `label` and `pills`, `{apple}` renders the Apple mark (Simple Icons 16.34.0, CC0, added to `Icon.astro`). Apple's trademark guidelines restrict use of its logo outside licensed uses; it's used here at Antonio's request, as a small inline mark beside "iOS".
+  - **The lead is one sentence**, "Software since 2008, web first, then mobile." (Antonio's request). The iOS sentence was dropped because the iOS card above says it, and the lead doesn't leave a lone last word when it wraps (`text-wrap: pretty`).
+  - **The earlier jobs replace "Earlier web roles"**: Naips Tecnologia (2012–2013), the PHP roles at Fishy, Cappen, Idealizza and Grupo Ser Educacional (2009–2012), and the Federal Police (SR/DPF/PE) internship (2008–2009).
+    - The wording comes from the Hugo resume, and Antonio confirmed the entries.
+    - Naips' resume link (`example.com/naips`) is not used; these rows have no links.
+    - The rows use the timeline's date and node columns, so years and dots line up with the entries above. They're on a dashed rail with hollow dots, and nothing opens. On narrow columns the years move above, like the timeline.
+- **Experiences header from Antonio's bio** (his request, 2026-10-04). It replaces "Inter, since October 2019." and "Newest first. Open an entry…".
+  - **Headline, Antonio's words:** "From Web Developer to iOS Specialist." with "Currently I’m a Mobile engineering leader." under it, on its own smaller, muted line.
+    - It's one `<h1>`, read as both sentences. A `\n` in a page title now does this in `PageHeader`.
+    - Both sentences at full display size would have run four or five lines.
+    - pt and es are drafts in sentence case.
+  - **Lead, Antonio's words:** "B.Sc. in Computer Science and I’ve been working across banking and finance, e-commerce, automotive, logistics, communications, education and IT consulting, including companies listed on NASDAQ and B3 or in the Global Fortune 500." His bio says "several" of those companies, hence "including".
+  - Two of the bio's facts were not used:
+    - "started in 2007" conflicts with his 2008 correction;
+    - "Software Specialist (Staff) in 2022" conflicts with the timeline's "iOS Dev Specialist II (Staff Engineer)" starting 2019-10. **Resolved (2026-10-05):** Antonio confirmed Staff Engineer from October 2019, so the bio's 2022 is wrong (see below).
+    - Both are flagged to him.
+- **Buttons get the intelligence halo on hover and keyboard focus** (his request; global `.button`, so About's buttons too). It's the "Book a call" ring at z-index -1 in `.button-row`, which is now isolated. The button turns solid `--surface` so the glow never sits behind its text. It's still with reduced motion. It replaces the old accent-border hover.
+- **Page headers fill the column** (Antonio's request, all pages via `PageHeader`):
+  - The headline and lead are 2px under their old sizes (`--text-h1` - 2px; 18px).
+  - The lead's 38rem cap is gone.
+  - The headline uses `text-wrap: pretty` instead of the site-wide `balance`, so lines run long ("From Web Developer to / iOS Specialist.") without leaving a lone last word.
+  - On Experiences, LinkedIn now comes before the resume, with the LinkedIn mark before its label. The resume buttons (Experiences and About) read "Resume" with a stroke PDF icon (`UiIcon` "pdf": a folded page over "PDF"). Screen readers still hear "(PDF)" through visually hidden text. `.button.with-icon` spaces an icon from its label.
+- **About headline, Antonio's words:** "I’m a technology executive manager who still practices the craft." It replaces "…technology executive at Inter who…". pt and es are drafts. The page's meta description still says "Technology executive at Inter…".
+- **What Antonio owns now (his facts, rewritten at his request in a softer, professional tone, 2026-10-04).** He is Executive Tech Manager since October 2026 (`start: "2026-10"`, which replaces the start-date placeholder) and leads the Core Mobile Platform team, "a group of 18 people". He asked not to use his "reporting to me" wording or "just started".
+  - **About:** "Today I’m Executive Tech Manager at [Inter](https://inter.co/), where I lead the Core Mobile Platform team, a group of 18 people. I guide our software engineering standards across features, the design system, architecture and performance."
+  - **Timeline:** the position follows its siblings' format, a highlight quote ("Leading the Core Mobile Platform team, a group of 18 people, and guiding its software engineering standards.") then a "Focus Areas" list: Features, Design System, Architecture, Performance.- **About's text fills the column too** (Antonio's request): the prose (40rem cap) and the closing personal line (38rem cap) now span the full content column, like the page headers.
+- **The CORE iOS team had eight engineers, and Antonio was its manager** (his correction). About now says "Before that I was the manager of the mobile CORE iOS team…, a team of eight iOS engineers", and Inter's "Leadership Role" list says "Led a team of 8 iOS engineers" (both were six).
+- **"Outside work" on About** (Antonio's request; spec §2 has a single closing line). It replaces "Outside work, I’m the father of twins." It first sat last, then moved at Antonio's request to right under About's text, before the facts and Tech Stack.
+  - **Content:** a label, his photo with the twins (the Hugo site's `theboys.jpeg`, now `src/assets/about/`, optimised by Astro to 200/400px, alt "Antonio with his twins"), and two lines condensed from his text:
+    - "I’m a proud father of twins, a computer scientist and a software developer."
+    - "I’m also an indie developer, building a few projects and apps of my own." Added at Antonio's request; "projects and apps" links to the locale's Projects page. The text supports `[label](href)` links.
+    - "Originally from Recife, Pernambuco, I now live in Belo Horizonte, Minas Gerais, Brazil" plus the flag.
+  - **The flag** is the site's SVG flag (`Flag`, `{br}` in the text), not the emoji he wrote (spec §9: flags are never emoji, which also don't render on Windows). There's one flag instead of two, since both cities are in Brazil.
+  - **Layout:** the photo beside the text, or above it on narrow columns. `personal` in the about schema is now `{ title, text[], photo, alt }`.
+- **About's text opens with Antonio's sentence** from his old About page, as its own first paragraph: "For over a decade, I have been committed to working in mobile app development, with a focus on the <Apple mark> iOS platform."
+  - It was first put in the Experiences intro by mistake and moved here at his correction.
+  - `{apple}` in About's Markdown renders the Apple mark: the page splits the rendered HTML on it.
+  - The opening line and "Today I’m…" are in full colour; the history paragraphs after them are muted.
+- **Nutria is no longer mentioned in About's text** (Antonio's request). The last paragraph ends at "…in Objective-C and then Swift." The Projects page still lists Nutria.
+- **About has no buttons at the bottom** (Antonio's request). "Experiences →" and "Resume" are gone, along with the about schema's `experiencesLink` and `resumeLink`; the page ends with the Tech Stack. The resume stays on Experiences (beside LinkedIn).
+- **Projects lead, Antonio's option C plus his additions:** "My indie side: apps and tools I build outside work, mostly for iOS, plus open-source contributions and hackathons." (The status sentence was dropped at his request.) The headline stays "I still ship." Open source and hackathons are mentioned in general terms only; no specific projects or events until he supplies them.
+- **Projects: GitHub Activity sits 90px under the header** (it was 210px; Antonio's request). A `flush` prop drops the section's top margin there, so the gap is the header's own, as with the Experiences figures. Home keeps the normal section spacing.
+- **AI page header, about Antonio's AI experience** (his request: "I have a good experience with many tools and providers").
+  - **Headline:** "My real usage, in the open." (Antonio's pick; it replaced "AI is part of how I build.", which had this as its sub-line).
+  - **Lead:** "I’ve worked with many AI tools and providers, and they’re now part of how I write software." then how the numbers are counted (tokscale, local session logs, synced daily). The list of tools and providers was dropped at his request; the panels below name them from the data.
+- **AI page panels: Tools & Providers beside Agents** (Antonio's request). Under Models, the row is now "Tools & Providers" (the Tools table, renamed; pt "Ferramentas e provedores", es "Herramientas y proveedores") on the left and **Agents** on the right. Agents replaces the Token mix panel, which is gone along with its strings.
+  - **Agents** are Claude Code's subagents (Workflow Subagent, Explore, Plan…), all time: name, with its tool under it; messages; tokens (the main column, most first). There's no cost column (Antonio's call). The numbers match tokscale's own Agents tab.
+  - **Source:** the public tokscale profile has no agents. `ai:refresh` copies them from tokscale's local app cache on the Mac (`~/.config/tokscale/cache/tui-data-cache.json`, which `npx tokscale@latest` updates when opened). Only name, tool, tokens and messages are kept. Without the cache (CI), the snapshot keeps its last agents, and the panel footer gives their date.
+  - **Privacy:** agent names are published as tokscale reports them. The built-in names are harmless, but a custom subagent's name (say, after an internal project) would show too; filter it in the script if that ever matters.
+- **Bookmarks: source line on top, warmer lead** (Antonio's request). "Updated {date} · View on Raindrop →" moved from the list's footer to its first line, above the search. The lead now reads "A public shelf of the links I’ve saved: articles, videos, tools, websites and GitHub projects worth a second look." (pt/es drafts). The kinds of links named match today's Raindrop collections, so update the sentence if those change.
+- **Medium stories on the Blog page** (Antonio's request).
+  - **Source:** `npm run blog:refresh` (`scripts/fetch-medium.mjs`) reads Medium's public RSS feed for @anettodev, with no token, into the snapshot `src/data/medium.json`. The build never calls Medium.
+  - **Kept per story:** title, link (tracking query removed), date, up to three tags, the first paragraph as an excerpt (≤200 characters), and the first image as cover. Medium's 1×1 stats pixel is skipped.
+  - **Covers** are downloaded into `src/assets/medium/` and optimised by Astro, so visitors load nothing from Medium. Covers of stories no longer listed are pruned.
+  - **The feed lists only the latest ten,** so each refresh merges into the snapshot by link: older stories stay once captured.
+  - **On the page:** stories show newest first as post cards ("Medium", the date in the reader's language, "Read more"). Once there's at least one, they replace the frontmatter's Medium placeholders; the Gist placeholders stay. A story without an image gets a quiet cover with the Medium mark, not a `[PLACEHOLDER]`.
+  - **Today the feed is empty** (no published stories on @anettodev), so the page still shows the placeholders.
+  - **Tested** on another author's public feed: 10 stories, their covers, dates and tags all rendered. That sample was deleted afterwards.
+  - At cutover, the Phase 7 workflow should run `blog:refresh` daily with the other refreshes; it needs no secret.
+- **Evernote notes on the Blog page, refreshed through Claude Code** (Antonio's pick, "option 1", 2026-10-04).
+  - **Why not a script on its own:** Evernote's classic API is deprecated and issues no keys (2026). Its MCP server (`https://mcp.evernote.com/mcp`, beta) speaks OAuth with dynamic client registration and refresh tokens, but its authorize step answers 400 ("Something went wrong") to every self-registered client, whatever the redirect URI (127.0.0.1, localhost, https), scope or `resource`. Known apps get in: the claude.ai connector worked.
+  - `scripts/evernote-notes.mjs` and `npm run notes:login` (read-only OAuth via `@modelcontextprotocol/sdk`) stay in case Evernote opens access; today they stop at that 400.
+  - **How notes are refreshed:**
+    1. In a Claude Code session with the claude.ai Evernote connector, ask Claude to refresh the notes.
+    2. Claude reads, read-only, the notes tagged **`anetto.dev`** (Antonio's tag) and saves them to an export file outside the repo.
+    3. `npm run notes:write -- <export.json>` (`scripts/write-notes.mjs`) turns that into `src/data/evernote.json`.
+    4. The build reads only the snapshot.
+  - **Safety in the writer:**
+    - Only notes carrying the tag are kept, whatever the export holds.
+    - Content becomes HTML through an allowlist (`sanitize-html`): headings from `<h2>`, paragraphs, lists, links (`rel="noopener"`, http/https/mailto only), emphasis, code, quotes, tables.
+    - Scripts, styles, iframes, forms and Evernote markup are dropped, and links whose address was removed become text. Images are kept only as described below.
+    - Markdown goes through `marked` first. Tested on a hostile sample: nothing unsafe survived, and an untagged note was left out.
+  - **On the site:** each note is a card on the Blog page (Antonio's choice), labelled "Evernote" and dated by its last update. Its cover is the note's first image, or the Evernote mark when it has none. Real posts (Medium and notes) come first, newest first; the placeholders follow. A card opens the note's own page, `/blog/<slug>/` (`pages/[...lang]/blog/[slug].astro`): "Note" label, title, "Updated {date}", tags, the cleaned text, and "← All writing".
+  - **Images inside notes** (Antonio's request):
+    - The export carries each attachment (`images: [{hash, data | file | url, alt}]`). An `<en-media>` or `<img>` in the note marks where it goes; an `https:` or `data:` image in the text works too.
+    - The writer converts each image once to WebP (at most 1600px wide, quality 80, flattened onto white, rotated per EXIF) and stores it in `src/assets/notes/<slug>/`. Astro optimises it further, so visitors load nothing from Evernote.
+    - The first image is the card's cover. Each image keeps the note's `alt` text (empty when the note gives none).
+    - On the note's page an image is never stretched: it shows at its own width, up to the column's.
+    - Images of notes no longer listed are pruned. A `javascript:` source, an empty file or one over 20 MB is dropped.
+  - **A note's language** (Antonio's request):
+    - Tag the note `lang-en`, `lang-pt` or `lang-es` in Evernote. Without that tag, the export's own `lang` is used, then English. `lang-*` tags aren't shown as tags.
+    - The note's page marks its content with that language (`<main lang="pt-BR">`, for example) when it differs from the page's locale. The note itself isn't translated: it shows as written in every locale.
+    - On the Blog page, a note in another language than the page's gets a small chip next to "Evernote" (PT, ES or EN, with the language's name for screen readers), and its title and summary carry the `lang` attribute.
+  - **Tested** with sample notes (pt and es, an attachment, an external image, a hostile `javascript:` image and an untagged note); the sample was removed afterwards.
+  - **Today:** no notes are tagged yet, so the snapshot is empty and the Blog page is unchanged.
+- **Public GitHub gists on the Blog page** (Antonio's request).
+  - **Source:** `npm run gists:refresh` (`scripts/fetch-gists.mjs`, also run by `npm run blog:refresh`) lists @anettodev's public gists through GitHub's REST API into the snapshot `src/data/gists.json`. No token is needed (60 requests an hour; one refresh makes one per 100 gists); `GITHUB_TOKEN` is sent when set (CI). The GitHub CLI's token is deliberately not used. The build never calls GitHub.
+  - **Privacy:** only gists GitHub marks as public are kept, whatever the API returns. Kept per gist: link, description, file names, languages and dates. Nothing from the files' contents or the account.
+  - **The snapshot is replaced on each refresh,** not merged: a gist deleted or made secret leaves the site with the next refresh.
+  - **On the page:** each gist is a card labelled "Gist", with the GitHub mark as its quiet cover. The card shows:
+    - **Title:** the gist's description, or its first file's name when it has none.
+    - **Summary:** its other file names. GitHub's default names (`gistfile1.txt`) are left out.
+    - **Tags:** its languages, up to three. GitHub's "Text" isn't a tag.
+    - **Date:** when it was created.
+  - Cards link to the gist on GitHub, mixed newest first with Medium stories and Evernote notes. Once there's at least one gist, the frontmatter's Gist placeholders go, like Medium's.
+  - **Today:** 15 public gists (2016–2025), all shown. Nothing hides one yet; to keep one off the site, make it secret on GitHub, or ask for an exclude list.
+  - At cutover, the Phase 7 workflow's daily `blog:refresh` covers gists too; it needs no secret.
+- **Blog page: search, source chips, sort and pages, like Projects** (Antonio's request, once gists brought it to 17 cards).
+  - The Blog page's cards (Medium, Evernote, Gist and the placeholders) run through the shared `<filter-list>`.
+  - **Toolbar:** search over titles, summaries and tags (accents ignored), then a Date ↓ / Title A–Z sort. Below them, source chips with each platform's mark and count ("All 17 · Medium 2 · Gist 15"; only sources in use, hidden when there's just one). Then "Showing 1–6 of 17" and "Show 6/12/18 per page" (Antonio's choice over Projects' 9/18/36; two rows of three to start). The pager sits under the cards.
+  - **It starts newest first, 6 per page.** Sort and page size are remembered per browser (`anetto.blog-*` in local storage). Without JavaScript the tools hide and every card shows.
+  - **Placeholders stay last** whichever way the list sorts: the engine now keeps items without a sort value (no date or title) at the end in both directions. Bookmarks and Projects always have the value, so they're unaffected.
+  - A source chip counts its placeholders too (Medium 2 today), since they're cards on the page.
+  - Long file names used as gist titles now wrap mid-word instead of being cut off.
+  - New strings: `blogPage` (search label and placeholder, no-match message, per-page name, chips' group name) in en/pt/es; the pt/es drafts await review.
+- **Blog page: no "All writing on Medium / All gists" links** (Antonio's request). The links under the list are gone, along with the `more` field in the `blog` schema and its entries in the en/pt/es copy. The list now ends with its pager. Each Medium and Gist card still links to the post itself.
+- **Blog page: Medium placeholders removed** (Antonio's request). The two "[PLACEHOLDER: Medium post title]" posts are gone from the en/pt/es copy. Medium stays wired up: once `blog:refresh` finds a story, it shows as a card; until then Medium has no cards. The two Gist placeholders stay in the copy, shown only if the gist snapshot is ever empty. With gists alone on the page today, the source chips hide (they need two sources) and return when a Medium story or Evernote note arrives.
+- **Test samples on the Blog page (temporary; Antonio's request, to be removed).** Three Medium stories and three Evernote notes, all titled "Sample:", "Amostra:" or "Muestra:", on Swift Concurrency, Swift packages, Instruments, code review (pt), Swift Testing (en) and SwiftUI accessibility (es).
+  - They were created locally, not in Antonio's accounts: the Evernote connector isn't available in this session, and publishing on Medium would notify his followers. They went through the real pipelines: a saved Medium RSS feed (`MEDIUM_FEED_FILE`) into `blog:refresh`'s script, and an Evernote export into `notes:write`. Covers and note images are generated art.
+  - Their Medium links (`medium.com/@anettodev/sample-…`) don't exist; "Read more" on those cards leads to Medium's 404.
+  - **Remove before cutover** (they were committed on the branch at Antonio's request; tracked in `PLAN.md`):
+    1. Drop the posts whose link contains `/sample-` from `src/data/medium.json`, and delete `src/assets/medium/sample-*.png`. A Medium refresh merges, so it won't remove them.
+    2. Run `npm run notes:write` with `{"notes":[]}`, which empties the notes snapshot and prunes `src/assets/notes/`.
+- **Evernote lines become paragraphs** (found with the samples). Evernote writes each line as a `<div>` (a blank line is `<div><br></div>`), which the cleaner used to drop, so a real note's lines would have run together on its page, and its card summary ran into the first heading. Now a div holding text becomes a `<p>`, one wrapping other blocks is unwrapped, and empty ones go. Tested with lines, blank lines, nested divs, a list and a link.
+- **Note images fill the text column** (found with the samples). The width came from the `sizes` hint (760px), so a 1400px image showed at 760px in the 900px column. Now CSS sets it: `min(100%, the image's own width)`. Large images fill the column, and a 24px icon stays 24px.
+- **Post cards: source in a pill with its mark; Evernote's green cover** (Antonio's request).
+  - The source line ("EVERNOTE", "MEDIUM", "GIST") is now a pill with the platform's mark (Evernote, Medium, GitHub) before the name, in the card label's type. The language chip (PT, ES) beside it is a matching pill.
+  - A note without an image gets Evernote's brand green (`#00a82d`) as its cover, with the mark in white. Medium and Gist covers without an image keep the quiet grey; `SOURCE_TINT` in `PostCards.astro` takes a colour per source if those should follow.
+- **One colour per source: Medium blue, Evernote green, Gist purple** (Antonio's request). `src/lib/sources.ts` holds each source's mark and colour; the chips and cards read it from there.
+  - **Source chips:** a soft tint of the colour with a coloured border, then solid with white text when pressed. "All" keeps its neutral style.
+  - **Covers without an image:** the source's colour behind its white mark. That's every gist today, a note without images, and any Medium story without one.
+  - **The colours:** `#2563eb` (blue), `#15803d` (green) and `#8250df` (purple), each at least 4.5:1 with white text. Evernote's own brand green (`#00a82d`), used on its cover until now, gives only 3.2:1, so it gave way to the deeper green. Both themes checked.
+  - **Card source pills** follow too (Antonio's request): the same tint and coloured border as an unpressed chip. The language pill beside it stays neutral.
+- **Card language shows as a flag** (Antonio's request). A post in another language than the page's shows a flag on its own (no pill, Antonio's follow-up) next to its source pill, not the "PT"/"ES"/"EN" code: Brazil for pt-BR, the US for en, Spain for es. It's the same `Flag` the language switcher uses. The language's name, in the page's language, stays for screen readers and as the hover title (spec §9 asks for a flag beside the name; here the name is in the accessible text and tooltip).
+- **Post cards: hover halo; cover and title link to the post** (Antonio's request).
+  - **Halo:** hovering a card (or focusing a link in it) shows the turning intelligence halo, as on the project cards: the same `::before` ring at z-index -1 in the isolated grid. The card lost its `overflow: hidden` so nothing clips the ring. With reduced motion the halo shows but doesn't turn.
+  - **Links:** a real post's cover and title now link to it, like "Read more". The title is the main link (underlined on hover). The cover link is a duplicate of it, so it's out of the tab order and hidden from screen readers: keyboard and screen-reader users meet the title and "Read more". Placeholders still have no links.
+- **Blog headline and lead** (Antonio's request for a stronger headline and a short description). "Selected writing." became **"Notes from the craft."** (echoing About's "…who still practices the craft"), with the lead "Articles on Medium, notes from Evernote and code snippets on GitHub, all in one place." pt: "Notas do ofício." / es: "Notas del oficio." (drafts to review).
+  - The `blog` schema now takes `lead`, as `projects` does.
+  - The meta description names all three sources: "Articles, notes and code snippets by Antonio Netto, from Medium, Evernote and GitHub Gists."
+  - The copy only describes what the page holds; it makes no claim about topics or frequency.
+- **Home: Tech Stack links to About** (Antonio's request). The section head now ends with "More about me →" (pt "Mais sobre mim", es "Más sobre mí") on the right, like Last Experiences' "All experiences →". It goes to About, which also shows the list. The label lives in `home.md` as `previews.tech.linkLabel`; the heading stays the shared `tech.title`.
+- **Home headline is a greeting** (Antonio's request: "a greeting… make it professional"). The three lines are now "Hello, I’m Antonio Netto." (full colour), "Executive Tech Manager at Inter." and "iOS specialist and indie developer."
+  - pt: "Olá, sou Antonio Netto." / "Executive Tech Manager no Inter." / "Especialista iOS e desenvolvedor indie." es: "Hola, soy Antonio Netto." / "Executive Tech Manager en Inter." / "Especialista en iOS y desarrollador indie." (drafts to review).
+  - This overrides spec §2's sentence. "Led the CORE mobile iOS team" left the headline; lane 02 ("CORE iOS") still says it. The meta description is unchanged.
+  - The `<h1>` is still the only one on Home. Now that it says the name, it drops the visually hidden "Antonio Netto." prefix; copy without the name gets it back automatically.
+- **Home headline: only the greeting, larger** (Antonio's follow-up). The two role lines are gone; the `<h1>` is just "Hello, I’m Antonio Netto." (pt "Olá, sou Antonio Netto.", es "Hola, soy Antonio Netto."). It's now set like the other pages' headlines (`--text-h1` − 2px, up to 78px) instead of the 34px lead size, and wraps in balanced lines on narrow screens. It fits on one line in the desktop column. The roles still show on the identity card and the three lanes below.
+- **Home: "Hello, I’m Antonio 👋" and three new lanes** (Antonio's request).
+  - **Greeting:** first name only, plus the waving hand (pt "Olá, sou Antonio 👋", es "Hola, soy Antonio 👋"). The `<h1>` keeps a visually hidden "Antonio Netto." first, so screen readers and search engines still get the full name. The emoji is the owner's choice; spec §9's no-emoji rule is about language flags.
+  - **The lanes** replace Now / Depth / Craft, so the Inter `[PLACEHOLDER]` and the "six iOS engineers" line are gone from Home. All copy comes from the site's own text (About, the Inter entry, the Nutria project):
+    1. **01 · Who: "About me"** (person icon) → About. "Over a decade in mobile app development, focused on iOS. A computer scientist, software developer and proud father of twins."
+    2. **02 · Now: "Inter"** (briefcase) → Experiences. "Executive Tech Manager. I lead the Core Mobile Platform team, a group of 18 people, and guide its engineering standards."
+    3. **03 · Latest: "Nutria"** (iPhone) → Projects. "My indie iOS app, in progress, built with Swift and SwiftUI." Nutria's own description is still a `[PLACEHOLDER]`, so this line only states its status and stack.
+  - The icons follow the new subjects: `user` (new in `UiIcon`), `briefcase`, `smartphone`; `layers` is no longer used on Home. pt/es drafts to review.
+  - Card 3 is written by hand: when a newer project ships, update it in `home.md`.
+- **Home: the 👋 waves; lane titles line up** (Antonio's request).
+  - **Wave:** the emoji in the greeting (wrapped in `.wave` wherever the copy has 👋) rocks once, 1.8 s, as the page appears. During the intro it waits, paused, and starts on the intro's reveal event (the one the lanes' entrance uses), not on page load under the intro card. It doesn't move with reduced motion. Measured: it started at the reveal, before the intro's cleanup.
+  - **Lanes:** title and text now start right under the icon row, and the link keeps to the bottom. Every card's title sits at the same height whatever its text's length (they were bottom-aligned, so a shorter text pushed its title down).
+- **Apple Music playlist under the identity card** (Antonio's request; option 1 of three, Apple's embed player).
+  - **Where:** `MusicPlayer.astro`, inside the identity card's sticky aside, so it floats with the card in the left column on every page, and sits under the card on narrow screens. Desktop windows under 700px tall hide it, so the sticky column never runs off the screen.
+  - **What:** Apple's embed (`embed.music.apple.com`, the compact 175px player), using Apple's own `allow`/`sandbox` attributes. Subscribers signed in to Apple Music hear full tracks; everyone else Apple's previews (90 s in a test).
+  - **Loading** (`scripts/music-player.ts`): the frame gets its address only after the page has loaded and the browser is idle, and on Home only once the intro reveals the page, so Apple's player never delays the first paint. It then fades in.
+  - **Theme:** the address carries `theme=dark|light` (Apple's option), swapped when the site's theme changes; that reloads the player, so a theme switch stops playback. Without JavaScript there's a "Listen on Apple Music" link.
+  - **Trade-off, as with Raindrop:** this loads Apple's page and scripts (MusicKit, fonts) for every visitor once it starts, with its own look, which Antonio chose over a custom player (option 2, API + previews) for speed.
+  - **The playlist:** `APPLE_MUSIC_PLAYLIST` in `src/lib/site.ts` is Antonio's public "BitsNBytes" (`music.apple.com/br/playlist/bitsnbytes/pl.u-e98lGaDHWJmxAd?l=en`), rewritten to the embed host. Empty would show `[PLACEHOLDER: Apple Music playlist link]`.
+  - **No scrolling** (`scrolling="no"`): at 175px Apple's playlist view overflows and showed scrollbars plus a white strip. The player shows the playlist and its first track; play starts the playlist.
+  - **Language:** Apple's player shows the storefront's language (Brazil: "Iniciar sessão") even with `l=en`. Don't change `l`: an unsupported value (`en-GB` tried) leaves the player on a grey, empty screen. That's also what Apple's "Today's Hits", used for a first test, showed.
+  - **Tested** with BitsNBytes in both themes: it loads after the page and switches with the theme.
+- **"My Playlist" title over the player** (Antonio's request): a small label (pt "Minha playlist", es "Mi playlist") above the Apple Music player, in the site's label style, also shown above the placeholder.
+- **The player is Apple's full 450px size** (Antonio's pick of three fixes). Apple's embed opens its own overlays (the ••• menu, sign-in, the sheet after a preview ends), laid out for its standard playlist height. At the compact 175px with scrolling off they were cut off over a blurred player, and the page can't restyle inside the frame.
+  - At 450px the overlays fit and about five tracks show, with Apple's play and "open in app" buttons.
+  - **The left column (card + player, ~1,030px) is now taller than most windows.** A small script in `IdentityCard.astro` turns its sticky top negative when it doesn't fit: it scrolls with the page until its bottom is 24px above the window's, then stays put, so the player stays in view while reading. A column that fits keeps the usual top. The earlier "hide under 700px tall" rule is gone; short windows work the same way.
+- **The playlist block waits for the intro** (Antonio's report: "My Playlist" showed during the intro). The whole block (title and player, or the placeholder) is now hidden until the player has its address, then fades in. On Home that's right after the intro reveals the page (measured: hidden until the reveal at 8.0 s, faded in by 8.6 s). Before, only the frame waited, so the title sat alone under the flying intro card.
+- **Playback checked** (Antonio heard no sound). In the test browser, signed out of Apple Music, pressing "Reproduzir" played the first track's preview: the timer ran from 0:04 to 0:19 of 1:30. Pausing brought up Apple's sign-in/trial sheet ("Reproduza e baixe milhões de músicas"). The frame's `allow="autoplay *; encrypted-media *"` and Apple's sandbox list are in place. Silence with a running timer is on the listening side (tab or site muted, output device), not the embed.
+- **Favicon and touch icons are the site's app-icon logo** (Antonio's request). They replace the old Hugo "ANETTO" circle. `npm run icons` (`scripts/make-icons.mjs`) makes them all from `src/assets/brand/logo-dark.png`; re-run it when that master changes.
+  - **Favicons** (`favicon.ico` with 16/32/48, `favicon-16x16.png`, `favicon-32x32.png`): a tighter crop (9% off each side, corners re-rounded), because the full icon's mark blurs at tab size.
+  - **`apple-touch-icon.png`** (180): the whole icon, square, with the corners filled in its background `#161e24` (iOS rounds it).
+  - **Android 192/512:** the whole icon with its rounded corners. They're still unused: there's no web manifest.
+  - The dark icon serves both themes: its own tile reads on light and dark browser chrome. `Base.astro` links the .ico (all three sizes) and both PNGs.
+- **Inter position dates** (Antonio's dates). The four roles now each carry their length pill:
+  - **iOS Dev Specialist II (Staff Engineer):** Oct 2019 – Apr 2021 ("1 year"; the timeline rounds down to whole years).
+  - **iOS Dev Specialist Master (Senior Staff Engineer):** Apr 2021 – May 2024 ("3 years"); it ended when he became iOS Engineering Manager.
+  - **iOS Engineering Manager:** from May 2024. **Executive Tech Manager:** from Oct 2026.
+  - Set in en/pt/es. This settles the bio's "Staff in 2022": it was October 2019.
+- **Length pills count months too** (Antonio's request). The timeline's pills (each company, each position, on Experiences and Home) read "1 year, 6 months" instead of rounding down to whole years. pt: "1 ano e 6 meses", es: "1 año y 6 meses".
+  - `Intl.DurationFormat` (long style) in `ExperienceTimeline`'s `lengthOf`. Zero parts drop out: "7 years", "5 months".
+  - Counted to the build date for current roles, as before.
+- **TL;DR button on Experiences, after Resume** (Antonio's request, modelled on akitaonrails.com's).
+  - **What it does:** opens an AI assistant in a new tab with a ready prompt (in the page's language): read the page's public address (`localizedUrl`, e.g. `https://anetto.dev/pt/experiences/`), summarize the career in five points plus a one-line conclusion, say what the summary leaves out, remind the visitor they can keep asking, and suggest a first follow-up question.
+  - Nothing runs on the site, there's no API key or cost, and nothing is sent until the visitor clicks.
+  - **Assistants:** the button opens Claude (`claude.ai/new?q=`). The arrow beside it opens a menu with Claude, ChatGPT (`chatgpt.com/?q=`) and Grok (`grok.com/?q=`). Akita's site hides that choice behind a right-click; here it's a visible split button, so touch screens get it too.
+  - **Build:** `TldrButton.astro` + `scripts/tldr-menu.ts`. The menu is a native `<details>` (works without JS); the script adds Escape, outside clicks and closing after a choice. The isolated `.button-row` is lifted (`z-index`) while the menu is open, or the figures below would cover it. The sparkles icon is Lucide's. Each link says, for screen readers and as a tooltip, that it opens in a new tab.
+  - **Until cutover the prompt's address doesn't exist yet:** `anetto.dev/experiences/` is a 404 on the live Hugo site (checked), so assistants can't read the page before the Astro site is deployed.
+  - pt/es prompts are drafts to review.
+- **TL;DR menu shows each assistant's mark** (Antonio's request): Claude, ChatGPT (OpenAI's mark) and Grok.
+  - **OpenAI's mark** left Simple Icons after v13, so like LinkedIn its path is `simple-icons@13.21.0`'s (CC0; OpenAI's brand page is its listed guideline).
+  - **Grok's mark** was never in Simple Icons. It comes from `@lobehub/icons-static-svg@1.95.1` (MIT) and needs the even-odd fill rule, which `Icon.astro` now applies per mark (`EVENODD`).
+  - They're used only to name the assistant a link opens. Brand guidelines, OpenAI's especially, restrict use of their logos, so don't spread them elsewhere.
+- **TL;DR menu: Cursor too** (Antonio's request). The menu now lists Claude, ChatGPT, Grok and Cursor. Cursor's documented web deeplink, `https://cursor.com/link/prompt?text=…` (the prompt goes in `text`, not `q`), opens a new chat in the Cursor app with the prompt filled in, so it needs Cursor installed. Its mark is the existing `cursor` icon.
+- **TL;DR on About, AI and each note's page too** (Antonio's request). The button sits in each page's header (a `.button-row` in `PageHeader`'s slot), as on Experiences.
+  - **The prompt is now a shared frame plus a per-page part** (i18n `tldr.prompt` + `tldr.pages`): what the page is ("Antonio Netto's About page", "…page about how he uses AI coding tools, with his real usage data", "a note by Antonio Netto, “{title}”") and what to summarize (who he is; tools, models, agents and usage; the note's 5 points and conclusion). Steps 2–4 (what you're missing, keep asking, a starter question) are shared.
+  - `TldrButton` now takes `kind`, the page's absolute `url` and, for notes, `title`. A note's address is built from `Astro.site` + the blog path + its slug.
+  - **Medium stories don't get one:** they open on medium.com, so the site has no page of its own for them. Only Evernote notes do (`/blog/<slug>/`).
+  - As on Experiences, the addresses only exist once the Astro site is live at anetto.dev.

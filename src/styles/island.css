@@ -154,10 +154,11 @@ site-island {
 }
 
 /*
- * Hover (and keyboard focus) turns the link into a small identity card: a
- * solid --surface chip with the brand halo glowing behind it (halo.css has
+ * Hover (and keyboard focus) gives the link a halo in the intelligence
+ * palette (the feature cards' pink, cyan and violet, §6.7) glowing behind a
+ * solid --surface chip, turning like the identity card's halo (halo.css has
  * the --halo-angle property and halo-turn). The text stays --fg on the solid
- * chip, so the halo's colours never touch its contrast; accent text over the
+ * chip, so the glow's colours never touch its contrast; accent text over the
  * glass could fall below 4.5:1.
  *
  * The glow's z-index -1 puts it in the island's stacking context: above the
@@ -168,13 +169,7 @@ site-island {
   inset: -1px;
   z-index: -1;
   border-radius: inherit;
-  background: conic-gradient(
-    from var(--halo-angle),
-    var(--halo-copper),
-    var(--halo-pearl),
-    var(--halo-blue),
-    var(--halo-copper)
-  );
+  background: conic-gradient(from var(--halo-angle), var(--intelligence-ring));
   filter: blur(8px);
   opacity: 0;
   transition: opacity 200ms ease;

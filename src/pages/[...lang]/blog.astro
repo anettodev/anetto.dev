@@ -1,11 +1,28 @@
 ---
+import ListChips from "../../components/ListChips.astro";
+import ListTools from "../../components/ListTools.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import PostRow from "../../components/PostRow.astro";
-import { localeStaticPaths, t } from "../../i18n";
-import type { Locale } from "../../i18n/locales";
+import Pager from "../../components/Pager.astro";
+import PostCards from "../../components/PostCards.astro";
+import type { ImageMetadata } from "astro";
+import evernote from "../../data/evernote.json";
+import gistSnapshot from "../../data/gists.json";
+import medium from "../../data/medium.json";
+import { localeStaticPaths, localizedPath, t } from "../../i18n";
+import { LANG_TAG, type Locale } from "../../i18n/locales";
 import Page from "../../layouts/Page.astro";
 import { getPage } from "../../lib/content";
+import { SOURCES } from "../../lib/sources";
 
+/*
+ * The Blog page: Medium stories, Evernote notes and public gists as one
+ * list of cards, newest first, with the placeholders of any source that
+ * has nothing yet after them. It works like the Projects page's "All
+ * projects" (the shared list components and scripts/filter-list.ts):
+ * a search over titles, summaries and tags, source chips (only sources in
+ * use), a Date / Title sort and pages of 6, 12 or 18 (Antonio's picks).
+ * Without JavaScript the tools hide and every post shows.
+ */
 export function getStaticPaths() {
   return localeStaticPaths();
 }
@@ -17,7 +34,133 @@ interface Props {
 const { locale } = Astro.props;
 const ui = t(locale);
 const blog = await getPage(locale, "blog");
-const { label, title, posts, more } = blog.data;
+const { label, title, lead, posts } = blog.data;
+
+/*
+ * Antonio's Medium stories, from the snapshot `npm run blog:refresh` writes
+ * (scripts/fetch-medium.mjs); the build never calls Medium. Newest first,
+ * each a card with its cover (saved in assets/medium/, optimised here), up
+ * to three tags, a short excerpt and its date. Medium has no placeholders
+ * (Antonio removed them): until there's a story, it simply has no cards.
+ */
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/medium/*",
+  { eager: true },
+);
+const dateFormat = new Intl.DateTimeFormat(LANG_TAG[locale], {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+/* The snapshot's shape, so an empty feed (no stories yet) still type-checks. */
+interface MediumStory {
+  title: string;
+  link: string;
+  date: string;
+  tags: string[];
+  excerpt: string;
+  cover: string | null;
+}
+const stories = (medium as { posts: MediumStory[] }).posts;
+const fromMedium = stories.map((post) => ({
+  title: post.title,
+  source: "Medium",
+  year: dateFormat.format(new Date(post.date)),
+  date: post.date,
+  href: post.link,
+  description: post.excerpt || undefined,
+  tags: post.tags,
+  cover: post.cover
+    ? covers[`../../assets/medium/${post.cover}`]?.default
+    : undefined,
+}));
+/*
+ * Antonio's Evernote notes tagged `anetto.dev`, from the snapshot
+ * `npm run notes:write` makes (scripts/write-notes.mjs); each opens as a page
+ * on the site, /blog/<slug>/ (pages/[...lang]/blog/[slug].astro).
+ */
+interface NoteSummary {
+  slug: string;
+  title: string;
+  lang: string;
+  updated: string | null;
+  tags: string[];
+  excerpt: string;
+  cover: string | null;
+}
+const notes = (evernote as { notes: NoteSummary[] }).notes;
+const noteImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/notes/**/*",
+  { eager: true },
+);
+const fromEvernote = notes.map((note) => ({
+  title: note.title,
+  source: "Evernote",
+  year: note.updated ? dateFormat.format(new Date(note.updated)) : "",
+  date: note.updated ?? undefined,
+  href: `${localizedPath(locale, "blog")}${note.slug}/`,
+  description: note.excerpt || undefined,
+  tags: note.tags,
+  cover: note.cover
+    ? noteImages[`../../assets/notes/${note.cover}`]?.default
+    : undefined,
+  lang: note.lang,
+}));
+/*
+ * Antonio's public GitHub gists, from the snapshot `npm run gists:refresh`
+ * writes (scripts/fetch-gists.mjs); the build never calls GitHub. Each card
+ * links to the gist: its description as title, its files (other than the
+ * one already in the title) as summary, its languages as tags, dated by
+ * creation. Once there's at least one, they replace the Gist placeholders.
+ */
+interface Gist {
+  title: string;
+  files: string[];
+  languages: string[];
+  created: string;
+  link: string;
+}
+const gists = (gistSnapshot as { gists: Gist[] }).gists;
+const fromGists = gists.map((gist) => ({
+  title: gist.title,
+  source: "Gist",
+  year: dateFormat.format(new Date(gist.created)),
+  date: gist.created,
+  href: gist.link,
+  description:
+    gist.files.filter((name) => name !== gist.title).join(", ") || undefined,
+  tags: gist.languages,
+  cover: undefined,
+}));
+
+/* Real posts first, newest first; the placeholders after them. */
+const dated = [
+  ...stories.map((post, index) => ({ post: fromMedium[index], at: post.date })),
+  ...notes.map((note, index) => ({
+    post: fromEvernote[index],
+    at: note.updated ?? "",
+  })),
+  ...gists.map((gist, index) => ({ post: fromGists[index], at: gist.created })),
+]
+  .sort((a, b) => b.at.localeCompare(a.at))
+  .flatMap(({ post }) => (post ? [post] : []));
+/* A source's placeholders give way once it has real posts. */
+const placeholders = posts.filter(
+  (post) =>
+    !(post.source === "Medium" && fromMedium.length > 0) &&
+    !(post.source === "Gist" && fromGists.length > 0),
+);
+const shown = [...dated, ...placeholders];
+
+/* The sources in use, in a fixed order, each with its mark, colour and count. */
+const sources = SOURCES.map((source) => ({
+  value: source.name,
+  label: source.name,
+  icon: source.icon,
+  color: source.color,
+  count: shown.filter((post) => post.source === source.name).length,
+})).filter((source) => source.count > 0);
 ---
 
 <Page
@@ -27,41 +170,58 @@ const { label, title, posts, more } = blog.data;
   description={blog.data.description}
   contentLang={blog.lang}
 >
-  <PageHeader label={label} title={title} />
+  <PageHeader label={label} title={title} lead={lead} />
 
-  <ul class="rows">
-    {posts.map((post) => (
-      <li>
-        <PostRow {...post} />
-      </li>
-    ))}
-  </ul>
-
-  <ul class="more">
-    {more.map((link) => (
-      <li>
-        <a class="more-link" href={link.href}>
-          {link.label}
-          <span aria-hidden="true">&nbsp;→</span>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <filter-list
+    class="list"
+    data-store="blog"
+    data-sort="date:desc"
+    data-per-page="6"
+    data-results={ui.list.results}
+    data-page-label={ui.pager.page}
+  >
+    {shown.length > 0 && (
+      <ListTools
+        locale={locale}
+        search={ui.blogPage.search}
+        sorts={["date", "title"]}
+        sort="date:desc"
+        perPage={[6, 12, 18]}
+        perPageLabel={ui.blogPage.perPage}
+      >
+        {sources.length > 1 && (
+          <ListChips
+            slot="chips"
+            filter="source"
+            label={ui.blogPage.sourceFilter}
+            total={shown.length}
+            items={sources}
+            locale={locale}
+          />
+        )}
+      </ListTools>
+    )}
+    <PostCards posts={shown} locale={locale} />
+    <p class="no-match muted" hidden>
+      {ui.blogPage.noMatch}
+    </p>
+    <Pager locale={locale} />
+  </filter-list>
 </Page>
 
+<script>
+  import "../../scripts/filter-list";
+</script>
+
 <style>
-  .rows {
-    border-top: 1px solid var(--line);
-  }
-
-  .rows li {
-    border-bottom: 1px solid var(--line);
-  }
-
-  .more {
+  .list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px 24px;
-    padding-top: 32px;
+    flex-direction: column;
+    gap: 24px;
+    scroll-margin-top: var(--nav-clearance);
+  }
+
+  .no-match {
+    font-size: var(--text-small);
   }
 </style>

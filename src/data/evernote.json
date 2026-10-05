@@ -1,0 +1,42 @@
+{
+  "fetchedAt": "2026-10-05",
+  "tag": "anetto.dev",
+  "notes": [
+    {
+      "slug": "amostra-checklist-de-code-review-para-ios",
+      "id": "sample-note-pt",
+      "title": "Amostra: checklist de code review para iOS",
+      "lang": "pt",
+      "created": "2026-09-28T12:00:00.000Z",
+      "updated": "2026-10-01T12:00:00.000Z",
+      "tags": ["code review", "iOS"],
+      "excerpt": "Uma lista curta para revisar pull requests em apps iOS.",
+      "cover": "amostra-checklist-de-code-review-para-ios/01-5284ed6133.webp",
+      "html": "<p>Uma lista curta para revisar pull requests em apps iOS.</p> <img data-asset=\"amostra-checklist-de-code-review-para-ios/01-5284ed6133.webp\" alt=\"Checklist de code review\"> <h2>Antes de abrir o diff</h2><ul><li>A descrição explica o porquê, não só o quê.</li><li>Mudanças de UI trazem prints ou vídeo.</li></ul><h2>No código</h2><ul><li>Nenhum trabalho pesado na main thread.</li><li>Textos novos estão localizados.</li><li>Acessibilidade: rótulos do VoiceOver e Dynamic Type.</li></ul>"
+    },
+    {
+      "slug": "sample-notes-on-swift-testing",
+      "id": "sample-note-en",
+      "title": "Sample: notes on Swift Testing",
+      "lang": "en",
+      "created": "2026-09-08T09:00:00.000Z",
+      "updated": "2026-09-10T09:00:00.000Z",
+      "tags": ["testing", "Swift"],
+      "excerpt": "Swift Testing replaces XCTest's family of assertions with two macros and plain functions.",
+      "cover": "sample-notes-on-swift-testing/01-01a8255ffc.webp",
+      "html": "<p>Swift Testing replaces XCTest's family of assertions with two macros and plain functions.</p>\n<p> <img data-asset=\"sample-notes-on-swift-testing/01-01a8255ffc.webp\" alt=\"Swift Testing at a glance\"> </p>\n<h2>The basics</h2>\n<pre><code>import Testing\n\n@Test func totalAddsItems() {\n  let cart = Cart(items: [.init(price: 300), .init(price: 450)])\n  #expect(cart.total == 750)\n}\n</code></pre>\n<ul>\n<li><code>#expect</code> records a failure and keeps going.</li>\n<li><code>#require</code> stops the test when a value is missing.</li>\n<li>Parameterised tests take <code>arguments:</code> instead of loops.</li>\n</ul>\n<p>More in <a href=\"https://developer.apple.com/documentation/testing\" rel=\"noopener\">Apple's documentation</a>.</p>\n"
+    },
+    {
+      "slug": "muestra-notas-sobre-accesibilidad-en-swiftui",
+      "id": "sample-note-es",
+      "title": "Muestra: notas sobre accesibilidad en SwiftUI",
+      "lang": "es",
+      "created": "2026-08-01T15:00:00.000Z",
+      "updated": "2026-08-05T15:00:00.000Z",
+      "tags": ["accesibilidad", "SwiftUI"],
+      "excerpt": "Comprobaciones rápidas antes de publicar una pantalla:",
+      "cover": null,
+      "html": "<p>Comprobaciones rápidas antes de publicar una pantalla:</p>\n<ul>\n<li>Cada botón con solo un icono tiene <code>accessibilityLabel</code>.</li>\n<li>El texto crece con Dynamic Type sin cortarse.</li>\n<li>Los elementos relacionados se agrupan con <code>accessibilityElement(children: .combine)</code>.</li>\n<li>El contraste se revisa en modo claro y oscuro.</li>\n</ul>\n<p>El Accessibility Inspector de Xcode ayuda a encontrar lo que falta.</p>\n"
+    }
+  ]
+}

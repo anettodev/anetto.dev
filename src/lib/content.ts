@@ -47,18 +47,6 @@ export async function getPage<P extends PageKey>(locale: Locale, page: P) {
   );
 }
 
-/** Inter roles in `lang`, newest first. */
-export async function getRoles(lang: Locale) {
-  const entries = await getCollection("roles", ({ id }) =>
-    id.startsWith(`${lang}/`),
-  );
-  return entries
-    .sort((a, b) => a.data.order - b.data.order)
-    .map((entry) => ({ id: entry.id, ...entry.data, html: bodyHtml(entry) }));
-}
-
-export type Role = Awaited<ReturnType<typeof getRoles>>[number];
-
 export async function getProjects(lang: Locale) {
   const entries = await getCollection("projects", ({ id }) =>
     id.startsWith(`${lang}/`),
@@ -69,3 +57,15 @@ export async function getProjects(lang: Locale) {
 }
 
 export type Project = Awaited<ReturnType<typeof getProjects>>[number];
+
+/** Employers in `lang`, newest first, with their Markdown rendered. */
+export async function getCompanies(lang: Locale) {
+  const entries = await getCollection("companies", ({ id }) =>
+    id.startsWith(`${lang}/`),
+  );
+  return entries
+    .sort((a, b) => a.data.order - b.data.order)
+    .map((entry) => ({ id: entry.id, ...entry.data, html: bodyHtml(entry) }));
+}
+
+export type Company = Awaited<ReturnType<typeof getCompanies>>[number];

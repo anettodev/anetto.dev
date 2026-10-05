@@ -29,7 +29,14 @@ interface Props {
 
 const { locale, route } = Astro.props;
 const ui = t(locale);
-const items = ["about", "experiences", "projects", "blog"] as const;
+const items = [
+  "about",
+  "experiences",
+  "projects",
+  "ai",
+  "blog",
+  "bookmarks",
+] as const;
 const themes = ["dark", "light"] as const;
 ---
 
@@ -49,7 +56,7 @@ const themes = ["dark", "light"] as const;
             preload="none"
             disablepictureinpicture
             disableRemotePlayback
-            poster={`/brand/logo-${theme}-poster.jpg`}
+            poster={`/brand/logo-${theme}-poster.webp`}
             width="60"
             height="60"
             aria-hidden="true"

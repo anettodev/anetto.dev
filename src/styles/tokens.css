@@ -20,6 +20,10 @@
   /* Text on an --accent fill; 9.25:1. */
   --on-accent: #0d0e10;
   --status: #e8c47a;
+  /* Project status dots: todo cyan, wip orange, done green. */
+  --status-todo: #7dd3fc;
+  --status-wip: #ff9d3c;
+  --status-done: #4ade80;
   --chip-glass: rgba(255, 255, 255, 0.08);
   --hairline: rgba(255, 255, 255, 0.2);
   --glass-bg: rgba(30, 32, 36, 0.55);
@@ -55,6 +59,9 @@
   /* 6.47:1 on --accent. */
   --on-accent: #ffffff;
   --status: #8a5a00;
+  --status-todo: #0891b2;
+  --status-wip: #e67700;
+  --status-done: #16a34a;
   --chip-glass: rgba(0, 0, 0, 0.06);
   --hairline: rgba(0, 0, 0, 0.15);
   --glass-bg: rgba(255, 255, 255, 0.55);
@@ -80,6 +87,12 @@
   --halo-copper: #e0793a;
   --halo-pearl: #f2f2f4;
   --halo-blue: #6e87e6;
+  /*
+   * The intelligence palette's stops (§6.7) as a ring, for hover halos:
+   * conic-gradient(from var(--halo-angle), var(--intelligence-ring)).
+   */
+  --intelligence-ring:
+    #ff3d77, #ff9d3c, #7dd3fc, #06b6d4, #4361ee, #e0aeff, #ff3d77;
   --gradient-pink: linear-gradient(
     137deg,
     #ff3d77 0%,

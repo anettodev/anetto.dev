@@ -1,9 +1,9 @@
 ---
 # Rascunho de tradução (pt-BR): revisar antes do lançamento (spec §9).
 page: about
-description: "Executivo de tecnologia no Inter que continua praticando o ofício. Especialista iOS desde 2011, engenheiro de software desde 2007, em Belo Horizonte."
+description: "Executivo de tecnologia no Inter que continua praticando o ofício. Especialista iOS desde 2011, engenheiro de software desde 2008, em Belo Horizonte."
 label: "Sobre"
-title: "Sou um executivo de tecnologia no Inter que continua praticando o ofício."
+title: "Sou um gestor executivo de tecnologia que continua praticando o ofício."
 facts:
   - label: "Formação"
     value: "Ciência da Computação, Universidade Católica de Pernambuco, 2015"
@@ -11,13 +11,20 @@ facts:
     value: "Português, inglês, espanhol"
   - label: "Moro em"
     value: "Belo Horizonte, natural do Recife"
-personal: "Fora do trabalho, sou pai de gêmeos."
-experiencesLink: "Experiências"
-resumeLink: "Currículo (PDF)"
+personal:
+  title: "Fora do trabalho"
+  text:
+    - "Sou pai orgulhoso de gêmeos, cientista da computação e desenvolvedor de software."
+    - "Também sou desenvolvedor indie, com alguns [projetos e apps](/pt/projects/) próprios."
+    - "Natural de Recife, Pernambuco, hoje moro em Belo Horizonte, Minas Gerais, Brasil {br}"
+  photo: "../../../assets/about/theboys.jpeg"
+  alt: "Antonio com os filhos gêmeos"
 ---
 
-Hoje sou Executive Tech Manager no Inter. [PLACEHOLDER: duas ou três frases sobre o que lidero hoje]
+Há mais de uma década me dedico ao desenvolvimento de apps mobile, com foco na plataforma {apple} iOS.
 
-Antes disso, liderei o time CORE de iOS mobile do Super App do Inter: padrões, code reviews, arquitetura e o release train, com seis engenheiros iOS. Continuo sendo especialista em iOS.
+Hoje sou Executive Tech Manager no [Inter](https://inter.co/), onde lidero o time Core Mobile Platform, um grupo de 18 pessoas. Conduzo nossos padrões de engenharia de software em features, design system, arquitetura e performance.
 
-Escrevo software desde 2007, primeiro para a web, depois para mobile, e para iOS desde 2011, em Objective-C e depois em Swift. O Nutria, meu app iOS indie, está em desenvolvimento.
+Antes disso, fui gestor do time CORE de iOS mobile do Super App do Inter, um time de oito engenheiros iOS: padrões, code reviews, arquitetura e o release train. Continuo sendo especialista em iOS.
+
+Escrevo software desde 2008, primeiro para a web, depois para mobile, e para iOS desde 2011, em Objective-C e depois em Swift.

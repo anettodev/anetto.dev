@@ -1,11 +1,17 @@
 ---
+import { Image } from "astro:assets";
 import Copy from "../../components/Copy.astro";
+import Flag from "../../components/Flag.astro";
+import Icon from "../../components/Icon.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import { localeStaticPaths, localizedPath, t } from "../../i18n";
+import TldrButton from "../../components/TldrButton.astro";
+import CountBadge from "../../components/CountBadge.astro";
+import TechStack from "../../components/TechStack.astro";
+import { localeStaticPaths, localizedUrl, t } from "../../i18n";
 import type { Locale } from "../../i18n/locales";
 import Page from "../../layouts/Page.astro";
 import { getPage } from "../../lib/content";
-import { LINKS } from "../../lib/site";
+import { TECH_STACK } from "../../lib/tech-stack";
 
 export function getStaticPaths() {
   return localeStaticPaths();
@@ -18,8 +24,7 @@ interface Props {
 const { locale } = Astro.props;
 const ui = t(locale);
 const about = await getPage(locale, "about");
-const { label, title, facts, personal, experiencesLink, resumeLink } =
-  about.data;
+const { label, title, facts, personal } = about.data;
 ---
 
 <Page
@@ -29,9 +34,60 @@ const { label, title, facts, personal, experiencesLink, resumeLink } =
   description={about.data.description}
   contentLang={about.lang}
 >
-  <PageHeader label={label} title={title} />
+  <PageHeader label={label} title={title}>
+    {/* An AI summary of this page (requested by Antonio). */}
+    <div class="button-row">
+      <TldrButton
+        locale={locale}
+        kind="about"
+        url={localizedUrl(locale, "about")}
+      />
+    </div>
+  </PageHeader>
 
-  <div class="prose" set:html={about.html} />
+  {/* "{apple}" in the Markdown is the Apple mark (requested by Antonio). */}
+  <div class="prose">
+    {about.html.split("{apple}").map((part, index) => (
+      <>
+        {index > 0 && (
+          <span class="brand">
+            <Icon name="apple" size={17} />
+          </span>
+        )}
+        <Fragment set:html={part} />
+      </>
+    ))}
+  </div>
+
+  {/* Right under the text (moved there by Antonio): a photo and two short lines. */}
+  <section class="personal" aria-labelledby="about-personal">
+    <h2 class="label" id="about-personal">
+      {personal.title}
+    </h2>
+    <div class="personal-body">
+      <Image
+        class="photo"
+        src={personal.photo}
+        alt={personal.alt}
+        widths={[200, 400]}
+        sizes="200px"
+      />
+      <div class="personal-text">
+        {personal.text.map((line) => (
+          <p>
+            {line
+              .split(/(\{br\}|\[[^\]]+\]\([^)]+\))/)
+              .filter(Boolean)
+              .map((part) => {
+                if (part === "{br}") return <Flag locale="pt" />;
+                const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+                return link ? <a href={link[2]}>{link[1]}</a> : part;
+              })}
+          </p>
+        ))}
+      </div>
+    </div>
+  </section>
 
   <dl class="facts">
     {facts.map((fact) => (
@@ -44,33 +100,42 @@ const { label, title, facts, personal, experiencesLink, resumeLink } =
     ))}
   </dl>
 
-  <p class="personal muted">
-    <Copy text={personal} />
-  </p>
-
-  <div class="button-row links">
-    <a class="button" href={localizedPath(locale, "experiences")}>
-      {experiencesLink}
-      <span aria-hidden="true">&nbsp;→</span>
-    </a>
-    <a class="button" href={LINKS.resume}>
-      {resumeLink}
-    </a>
-  </div>
+  {/* After the facts (requested by Antonio). */}
+  <section class="tech" aria-labelledby="about-tech">
+    <h2 class="label" id="about-tech">
+      {ui.tech.title}
+      <CountBadge
+        count={TECH_STACK.length}
+        words={ui.tech.count}
+        locale={locale}
+        small
+      />
+    </h2>
+    <TechStack locale={locale} labelledBy="about-tech" />
+  </section>
 </Page>
 
 <style>
-  /* Now / CORE / since 2007 (§5.4). The first paragraph is the present, in full color. */
+  /*
+   * Opening line / now / CORE / since 2008 (§5.4). The full column wide
+   * (requested by Antonio).
+   */
   .prose {
     display: flex;
     flex-direction: column;
     gap: 28px;
-    max-width: 40rem;
     font-size: clamp(1.0625rem, 0.993rem + 0.286vw, 1.25rem); /* 17 → 20 */
     line-height: 1.65;
   }
 
-  .prose :global(p:not(:first-child)) {
+  .prose :global(.brand) {
+    display: inline-block;
+    margin-right: 3px;
+    vertical-align: -2px;
+  }
+
+  /* The opening line and the present in full colour; the history after, muted. */
+  .prose :global(p:nth-child(n + 3)) {
     color: var(--muted);
   }
 
@@ -119,13 +184,60 @@ const { label, title, facts, personal, experiencesLink, resumeLink } =
     }
   }
 
-  /* Personal life is one line, last (§2). */
+  .tech {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Outside work, under the text: the photo beside two short lines. */
   .personal {
-    max-width: 38rem;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     margin-top: calc(var(--space-section) * 0.6);
   }
 
-  .links {
-    margin-top: 40px;
+  .personal-body {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+  }
+
+  .personal-body :global(.photo) {
+    width: 160px;
+    height: 160px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    object-fit: cover;
+  }
+
+  .personal-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .personal-text p:not(:first-child) {
+    color: var(--muted);
+  }
+
+  /* The flag sits on the text's baseline, like an emoji would. */
+  .personal-text :global(.flag) {
+    display: inline-block;
+    margin-left: 4px;
+    vertical-align: -2px;
+  }
+
+  /* Narrow columns: the photo over the text. */
+  @container (max-width: 30rem) {
+    .personal-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>

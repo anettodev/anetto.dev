@@ -1,0 +1,278 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+import PageHeader from "../../../components/PageHeader.astro";
+import TldrButton from "../../../components/TldrButton.astro";
+import evernote from "../../../data/evernote.json";
+import { localeStaticPaths, localizedPath, t } from "../../../i18n";
+import { LANG_TAG, LOCALES, type Locale } from "../../../i18n/locales";
+import Page from "../../../layouts/Page.astro";
+
+/*
+ * One of Antonio's Evernote notes (requested by Antonio), from the snapshot
+ * `npm run notes:write` makes (scripts/write-notes.mjs). Its HTML was cleaned
+ * there through an allowlist (headings from <h2>, paragraphs, lists, links,
+ * emphasis, code, quotes, tables), so it's set as is; its images come back
+ * here as optimised <Image>s. The page's content is marked with the note's
+ * language. The Blog page lists the notes as cards linking here.
+ */
+interface Note {
+  slug: string;
+  title: string;
+  lang: string;
+  updated: string | null;
+  tags: string[];
+  excerpt: string;
+  html: string;
+}
+
+export function getStaticPaths() {
+  const notes = (evernote as { notes: Note[] }).notes;
+  return localeStaticPaths().flatMap((path) =>
+    notes.map((note) => ({
+      params: { ...path.params, slug: note.slug },
+      props: { ...path.props, note },
+    })),
+  );
+}
+
+interface Props {
+  locale: Locale;
+  note: Note;
+}
+
+const { locale, note } = Astro.props;
+const ui = t(locale);
+const dateFormat = new Intl.DateTimeFormat(LANG_TAG[locale], {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+/* The note's language marks its content (<main lang>) when it isn't the page's. */
+const noteLang = (LOCALES as readonly string[]).includes(note.lang)
+  ? (note.lang as Locale)
+  : locale;
+
+/*
+ * Its images: the writer left <img data-asset="<slug>/<file>" alt="…"> where
+ * each was; those become optimised <Image>s, the HTML around them is set
+ * as is.
+ */
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "../../../assets/notes/**/*",
+  { eager: true },
+);
+const unescape = (text: string) =>
+  text
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&");
+const parts = note.html
+  .split(/(<img data-asset="[^"]+" alt="[^"]*">)/)
+  .map((part) => {
+    const match = part.match(/^<img data-asset="([^"]+)" alt="([^"]*)">$/);
+    const image = match && images[`../../../assets/notes/${match[1]}`]?.default;
+    return image
+      ? { image, alt: unescape(match[2] ?? "") }
+      : { html: match ? "" : part };
+  });
+
+/*
+ * An image fills the text column (900px at most) unless it's narrower:
+ * a small one keeps its own size. The width is set in CSS from --natural,
+ * not left to `sizes`, which only picks the file.
+ */
+const widthsOf = (image: ImageMetadata) => [
+  ...[480, 960, 1440].filter((width) => width < image.width),
+  image.width,
+];
+const sizesOf = (image: ImageMetadata) =>
+  `min(100vw, ${Math.min(image.width, 900)}px)`;
+
+/* The note's public address, which the TL;DR's assistant reads. */
+const noteUrl = new URL(
+  `${localizedPath(locale, "blog")}${note.slug}/`,
+  Astro.site ?? "https://anetto.dev",
+).href;
+
+const updated = note.updated
+  ? ui.post.updated.replace("{date}", dateFormat.format(new Date(note.updated)))
+  : undefined;
+---
+
+<Page
+  locale={locale}
+  route="blog"
+  title={note.title}
+  description={note.excerpt}
+  contentLang={noteLang}
+>
+  <PageHeader label={ui.post.note} title={note.title} lead={updated}>
+    {/* An AI summary of this note (requested by Antonio). */}
+    <div class="button-row">
+      <TldrButton
+        locale={locale}
+        kind="post"
+        url={noteUrl}
+        title={note.title}
+      />
+    </div>
+  </PageHeader>
+
+  {note.tags.length > 0 && (
+    <ul class="note-tags">
+      {note.tags.map((tag) => (
+        <li>{tag}</li>
+      ))}
+    </ul>
+  )}
+
+  <article class="note">
+    {parts.map((part) =>
+      "image" in part && part.image ? (
+        <Image
+          class="note-image"
+          src={part.image}
+          alt={part.alt}
+          widths={widthsOf(part.image)}
+          sizes={sizesOf(part.image)}
+          style={`--natural: ${part.image.width}px`}
+        />
+      ) : (
+        <Fragment set:html={part.html} />
+      ),
+    )}
+  </article>
+
+  <p class="note-foot">
+    <a class="more-link" href={localizedPath(locale, "blog")}>
+      <span aria-hidden="true">←&nbsp;</span>
+      {ui.post.back}
+    </a>
+  </p>
+</Page>
+
+<style>
+  .note-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 32px;
+  }
+
+  .note-tags li {
+    padding: 2px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-small);
+  }
+
+  /* The note's own markup (cleaned in scripts/write-notes.mjs). */
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-size: clamp(1.0625rem, 0.993rem + 0.286vw, 1.1875rem);
+    line-height: 1.7;
+  }
+
+  .note :global(h2) {
+    margin-top: 16px;
+    font-size: 1.625rem;
+  }
+
+  .note :global(h3) {
+    margin-top: 8px;
+    font-size: 1.3125rem;
+  }
+
+  .note :global(h4) {
+    font-size: 1.125rem;
+  }
+
+  .note :global(ul),
+  .note :global(ol) {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 1.4em;
+  }
+
+  .note :global(ul) {
+    list-style: disc;
+  }
+
+  .note :global(ol) {
+    list-style: decimal;
+  }
+
+  .note :global(a) {
+    color: var(--fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .note :global(blockquote) {
+    padding: 4px 0 4px 18px;
+    border-left: 3px solid var(--line-strong);
+    color: var(--muted);
+  }
+
+  .note :global(code) {
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--chip);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  .note :global(pre) {
+    overflow-x: auto;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+
+  .note :global(pre code) {
+    padding: 0;
+    background: none;
+  }
+
+  .note :global(table) {
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+
+  .note :global(th),
+  .note :global(td) {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    text-align: left;
+  }
+
+  .note :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  /* A note's image: the column's width, or its own when narrower; rounded like the cards. */
+  .note :global(.note-image) {
+    display: block;
+    width: min(100%, var(--natural));
+    height: auto;
+    margin: 8px 0;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  .note-foot {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+</style>

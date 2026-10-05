@@ -1,4 +1,8 @@
-/** Project status words (spec §4: shipping / in progress / past). */
-export const PROJECT_STATUSES = ["shipping", "in-progress", "past"] as const;
+/**
+ * Project statuses (requested by Antonio; replaces spec §4's shipping / in
+ * progress / past). Card dots: todo cyan, wip orange, done green
+ * (--status-todo, --status-wip, --status-done in tokens.css).
+ */
+export const PROJECT_STATUSES = ["todo", "wip", "done"] as const;
 
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];

@@ -7,7 +7,7 @@ import UiIcon from "./UiIcon.astro";
  * gradient, over a blurred glow of the same gradient. Used for Home's lanes.
  */
 interface Props {
-  icon: "briefcase" | "layers" | "smartphone";
+  icon: "user" | "briefcase" | "layers" | "smartphone";
   gradient: "pink" | "cyan" | "violet";
   /** 0-based position; staggers the entrance by 0.1s steps (§8.6). */
   index: number;
@@ -73,7 +73,6 @@ const style = `--card-gradient: var(--gradient-${gradient}); --stagger: ${(index
     display: flex;
     flex: 1;
     flex-direction: column;
-    justify-content: space-between;
     gap: 24px;
     min-height: 260px;
     padding: 28px;
@@ -142,8 +141,20 @@ const style = `--card-gradient: var(--gradient-${gradient}); --stagger: ${(index
     line-height: 1.6;
   }
 
+  /*
+   * Title and text start right under the icon row, so every card's title
+   * sits at the same height whatever the text's length (requested by
+   * Antonio); the link keeps to the bottom.
+   */
+  .bottom {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
   .more-link {
-    margin-top: 6px;
+    margin-top: auto;
+    padding-top: 16px;
   }
 
   /* Hidden until scrolled into view, only when the entrance script can run. */

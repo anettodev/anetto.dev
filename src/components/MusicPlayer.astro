@@ -1,0 +1,116 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import { APPLE_MUSIC_PLAYLIST } from "../lib/site";
+import Copy from "./Copy.astro";
+
+/*
+ * Antonio's Apple Music playlist, floating under the identity card in the
+ * left column (requested by Antonio): Apple's own embed player at its
+ * standard playlist height, 450px. Apple lays out its own sheets (the •••
+ * menu, sign-in, the one after a preview ends) for that height; the
+ * compact 175px player cut them off (Antonio chose the full size). The
+ * frame itself doesn't scroll. Subscribers signed in to Apple Music hear
+ * full tracks, everyone else Apple's previews (90 s for BitsNBytes' first
+ * track). scripts/music-player.ts gives the frame its
+ * address after the page has loaded (on Home, once the intro reveals it),
+ * so Apple's player never delays the first paint, and in the site's theme,
+ * swapping it when the theme changes. Without JavaScript: a plain link.
+ * No playlist set: a [PLACEHOLDER].
+ */
+interface Props {
+  locale: Locale;
+}
+
+const ui = t(Astro.props.locale);
+/* music.apple.com/<storefront>/playlist/… → embed.music.apple.com/<storefront>/playlist/… */
+const embed = APPLE_MUSIC_PLAYLIST.replace(
+  "://music.apple.com/",
+  "://embed.music.apple.com/",
+);
+---
+
+<div class="music">
+  {/* Its title (requested by Antonio), in the site's small-label style. */}
+  <p class="label music-title">{ui.music.heading}</p>
+  {APPLE_MUSIC_PLAYLIST ? (
+    <music-player data-src={embed}>
+      <iframe
+        title={ui.music.title}
+        height="450"
+        scrolling="no"
+        allow="autoplay *; encrypted-media *; clipboard-write"
+        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+      />
+      <noscript>
+        <a class="more-link" href={APPLE_MUSIC_PLAYLIST}>
+          {ui.music.listen}
+          <span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </noscript>
+    </music-player>
+  ) : (
+    <p class="music-placeholder">
+      <Copy text={ui.music.placeholder} />
+    </p>
+  )}
+</div>
+
+<script>
+  import "../scripts/music-player";
+</script>
+
+<style>
+  .music {
+    margin-top: 24px;
+  }
+
+  .music-title {
+    margin: 0 0 10px 4px;
+  }
+
+  music-player {
+    display: block;
+  }
+
+  /* Rounded like the identity card's panel; the frame's own corners are clipped. */
+  iframe {
+    display: block;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius-panel);
+    background: transparent;
+  }
+
+  /*
+   * Until the frame has its address, the whole block (title included) keeps
+   * its room but stays out of sight, then fades in. On Home that's after
+   * the intro reveals the page; during the intro the placeholder waits too,
+   * so nothing shows under the flying card.
+   */
+  .music {
+    transition: opacity 400ms ease;
+  }
+
+  .music:has(music-player:not(.is-on)),
+  :global(:root[data-intro="play"]) .music:not(:has(.is-on)) {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .music-placeholder {
+    padding: 16px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-panel);
+    font-size: var(--text-small);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .music {
+      transition: none;
+    }
+  }
+</style>

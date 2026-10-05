@@ -1,12 +1,14 @@
 ---
+import ExperienceTimeline from "../../components/ExperienceTimeline.astro";
 import FeatureCard from "../../components/FeatureCard.astro";
-import PostRow from "../../components/PostRow.astro";
-import ProjectEntry from "../../components/ProjectEntry.astro";
-import RoleRow from "../../components/RoleRow.astro";
-import { localeStaticPaths, localizedPath } from "../../i18n";
+import GitHubActivity from "../../components/GitHubActivity.astro";
+import CountBadge from "../../components/CountBadge.astro";
+import TechStack from "../../components/TechStack.astro";
+import { localeStaticPaths, localizedPath, t } from "../../i18n";
 import type { Locale } from "../../i18n/locales";
 import Page from "../../layouts/Page.astro";
-import { getPage, getProjects, getRoles } from "../../lib/content";
+import { getCompanies, getPage } from "../../lib/content";
+import { TECH_STACK } from "../../lib/tech-stack";
 import { PERSON } from "../../lib/site";
 
 export function getStaticPaths() {
@@ -20,17 +22,17 @@ interface Props {
 const { locale } = Astro.props;
 const home = await getPage(locale, "home");
 const { positioning, lanes, previews } = home.data;
-const [roles, projects, blog] = await Promise.all([
-  getRoles(home.lang),
-  getProjects(home.lang),
-  getPage(locale, "blog"),
-]);
-const featured = projects[0];
+const companies = await getCompanies(home.lang);
+const ui = t(locale);
 
-/* Lanes render as feature cards (§6.7, decision #7): one gradient and icon each. */
+/*
+ * Lanes render as feature cards (§6.7, decision #7): one gradient and icon
+ * each. Antonio's lanes: about him (a person), his current role (a
+ * briefcase), his latest project (an iPhone: Nutria is an iOS app).
+ */
 const LANE_LOOK = [
-  { icon: "briefcase", gradient: "pink" },
-  { icon: "layers", gradient: "cyan" },
+  { icon: "user", gradient: "pink" },
+  { icon: "briefcase", gradient: "cyan" },
   { icon: "smartphone", gradient: "violet" },
 ] as const;
 ---
@@ -42,12 +44,23 @@ const LANE_LOOK = [
   contentLang={home.lang}
   intro
 >
-  <!-- The name is the visible headline of the identity card; screen readers get it here too. -->
+  <!--
+    The greeting says the name (requested by Antonio). Copy without it would
+    get the name as a visually hidden prefix, so screen readers still hear it.
+  -->
   <h1 class="positioning">
-    <span class="visually-hidden">{PERSON.name}. </span>
+    {!positioning.join(" ").includes(PERSON.name) && (
+      <span class="visually-hidden">{PERSON.name}. </span>
+    )}
     {positioning.map((clause, index) => (
       <>
-        <span class:list={["clause", { muted: index > 0 }]}>{clause}</span>{" "}
+        <span class:list={["clause", { muted: index > 0 }]}>
+          {clause
+            .split(/(👋)/u)
+            .map((part) =>
+              part === "👋" ? <span class="wave">{part}</span> : part,
+            )}
+        </span>{" "}
       </>
     ))}
   </h1>
@@ -74,61 +87,107 @@ const LANE_LOOK = [
         <span aria-hidden="true">&nbsp;→</span>
       </a>
     </div>
-    <ul class="rows">
-      {roles.map((role) => (
-        <li>
-          <RoleRow role={role} variant="compact" />
-        </li>
-      ))}
-    </ul>
+    {/* The latest three employers (requested by Antonio); the rest are on Experiences. */}
+    <ExperienceTimeline
+      companies={companies.slice(0, 3)}
+      locale={locale}
+      openFirst={false}
+      more={{
+        count: companies.length - 3,
+        href: localizedPath(locale, "experiences"),
+      }}
+    />
   </section>
 
-  {featured && (
-    <section class="preview" aria-labelledby="preview-projects">
-      <div class="preview-head">
-        <h2 id="preview-projects">{previews.projects.title}</h2>
-        <a class="more-link" href={localizedPath(locale, "projects")}>
-          {previews.projects.linkLabel}
-          <span aria-hidden="true">&nbsp;→</span>
-        </a>
-      </div>
-      <ProjectEntry
-        project={featured}
-        locale={locale}
-        variant="compact"
-        headingLevel={3}
-      />
-    </section>
-  )}
-
-  <section class="preview" aria-labelledby="preview-blog">
+  {/* After Last Experiences (requested by Antonio); also on About. */}
+  <section class="preview" aria-labelledby="preview-tech">
     <div class="preview-head">
-      <h2 id="preview-blog">{previews.blog.title}</h2>
-      <a class="more-link" href={localizedPath(locale, "blog")}>
-        {previews.blog.linkLabel}
+      <h2 id="preview-tech">
+        {ui.tech.title}
+        <CountBadge
+          count={TECH_STACK.length}
+          words={ui.tech.count}
+          locale={locale}
+        />
+      </h2>
+      {/* To About, which shows the list too (requested by Antonio). */}
+      <a class="more-link" href={localizedPath(locale, "about")}>
+        {previews.tech.linkLabel}
         <span aria-hidden="true">&nbsp;→</span>
       </a>
     </div>
-    <ul class="rows">
-      {blog.data.posts.slice(0, 2).map((post) => (
-        <li>
-          <PostRow {...post} />
-        </li>
-      ))}
-    </ul>
+    <TechStack locale={locale} labelledBy="preview-tech" />
   </section>
+
+  {/* The last section on Home (requested by Antonio). */}
+  <GitHubActivity locale={locale} />
 </Page>
 
+<script>
+  import { INTRO_REVEAL_EVENT } from "../../scripts/prefs";
+
+  /* The wave starts when the intro reveals the page (see .wave below). */
+  document.addEventListener(
+    INTRO_REVEAL_EVENT,
+    () => document.querySelector(".wave")?.classList.add("is-on"),
+    { once: true },
+  );
+</script>
+
 <style>
-  /* Stacked positioning sentence (§5.4): 34px semibold, first clause full color. */
+  /* Just the greeting (Antonio's change), as large as the other pages' headlines. */
   .positioning {
-    font-size: var(--text-lead);
+    font-size: calc(var(--text-h1) - 2px);
     letter-spacing: -0.02em;
-    line-height: 1.2;
+    line-height: 1.05;
+    text-wrap: balance;
   }
 
   .clause {
     display: block;
+  }
+
+  /*
+   * The greeting's 👋 waves once as the page appears (requested by Antonio).
+   * During Home's intro the page sits under the intro card, so the wave
+   * waits, paused, until the intro reveals the page (the script below adds
+   * .is-on). Not at all with reduced motion.
+   */
+  .wave {
+    display: inline-block;
+    transform-origin: 70% 70%;
+    animation: wave 1.8s ease-in-out 0.4s both;
+  }
+
+  :global(:root[data-intro="play"]) .wave:not(.is-on) {
+    animation-play-state: paused;
+  }
+
+  @keyframes wave {
+    0%,
+    60%,
+    100% {
+      transform: rotate(0deg);
+    }
+    10%,
+    30% {
+      transform: rotate(14deg);
+    }
+    20% {
+      transform: rotate(-8deg);
+    }
+    40% {
+      transform: rotate(-4deg);
+    }
+    50% {
+      transform: rotate(10deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wave {
+      animation: none;
+    }
   }
 
   .lanes {
@@ -174,11 +233,9 @@ const LANE_LOOK = [
     font-size: var(--text-h2);
   }
 
-  .rows > li + li {
-    border-top: 1px solid var(--line);
-  }
-
-  .preview :global(.project) {
-    padding-top: 32px;
+  .preview > :global(.timeline),
+  .preview > :global(.tech-grid),
+  .preview > :global(.tech-empty) {
+    margin-top: 32px;
   }
 </style>
