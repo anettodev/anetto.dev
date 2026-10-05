@@ -19,6 +19,7 @@
     "bookmarks:refresh": "node scripts/fetch-raindrop.mjs && prettier --write src/data/bookmarks.json",
     "blog:refresh": "node scripts/fetch-medium.mjs && node scripts/fetch-gists.mjs && prettier --write src/data/medium.json src/data/gists.json",
     "gists:refresh": "node scripts/fetch-gists.mjs && prettier --write src/data/gists.json",
+    "music:refresh": "node scripts/fetch-playlist.mjs && prettier --write src/data/playlist.json",
     "notes:login": "node scripts/evernote-notes.mjs login",
     "notes:write": "node scripts/write-notes.mjs",
     "icons": "node scripts/make-icons.mjs"

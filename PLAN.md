@@ -8,6 +8,22 @@ Ground rules carried from the spec:
 - Do not deploy, change DNS or touch hosting without Antonio's explicit approval in chat.
 - Commit only when asked.
 
+## Where we stopped (2026-10-05)
+
+Last work, all committed on `revamp/astro`:
+
+- **Under the identity card, two collapsed frosted-glass containers, only one open at a time:**
+  - **Spotify podcasts** (on top) run on mock data. They show in dev only, and wiring them up is below.
+  - **The Apple Music playlist "BitsNBytes"** loads Apple's player only when opened and unloads it when closed.
+- **Smaller additions:**
+  - TL;DR buttons on Experiences, About, AI and note pages;
+  - favicons from the app-icon logo;
+  - Blog source colours, pills and flags;
+  - a greeting headline on Home with three lanes;
+  - years-and-months length pills on the timeline.
+
+Next session, in order: remove the test samples, fill the placeholders, wire up Spotify (needs Antonio's Premium and app), re-run QA, then Phase 7 once approved.
+
 ## 1. Before cutover
 
 ### Content
@@ -33,6 +49,36 @@ Ground rules carried from the spec:
 - [ ] **Antonio, on real devices:** VoiceOver on macOS and iOS Safari; a mid-range Android phone (glass and mesh cost); Apple Music playback while signed in.
 - [ ] **Decision #9:** three.js on Projects, yes or no.
 
+### Wire up the Spotify podcasts (the container is built, with mock data)
+
+The "Spotify Podcasts" container above the playlist (podcasts first since Antonio swapped them) (`PodcastsPlayer.astro`, `scripts/podcasts-player.ts`) runs on **mock data**: five "Sample:" shows in `src/data/podcasts.json` (`"mock": true`) and generated covers `src/assets/podcasts/sample-*.png`. While `mock` is true, it shows only in `npm run dev`; production builds leave it out, and its player is a `[PLACEHOLDER]`.
+
+Antonio's part (never paste keys or tokens in chat):
+
+- [ ] Have **Spotify Premium**. Since Feb 2026 it's required to own a Development Mode app, which is limited to one client ID and 5 users.
+- [ ] Follow the podcasts to show in Spotify (Your Library → Podcasts).
+- [ ] Create an app at <https://developer.spotify.com/dashboard>:
+  - name it e.g. "anetto.dev podcasts" and choose **Web API**;
+  - add the redirect URI **`http://127.0.0.1:8791/callback`** (Spotify takes loopback IPs, not `localhost`);
+  - keep its **Client ID** and **Client secret** for the env vars below.
+- [ ] Set them yourself in your shell (and later as GitHub Actions secrets): `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`.
+
+The build side (a future session):
+
+- [ ] **Test one call first.** Since the 2026 changes, Development Mode apps have reported 403s even with Premium.
+- [ ] **`npm run podcasts:login`** (new `scripts/fetch-spotify-shows.mjs login`): a one-time browser sign-in, Authorization Code flow with the client secret, scope `user-library-read` only (read-only). It saves the refresh token to `~/.config/anetto-dev/spotify.json` (0600) and prints nothing secret.
+  - The client-secret flow is chosen over PKCE because PKCE refresh tokens can rotate, which would break unattended daily runs.
+  - For CI, Antonio copies the token into the `SPOTIFY_REFRESH_TOKEN` secret himself.
+- [ ] **`npm run podcasts:refresh`:**
+  - get an access token from the refresh token, then page through `GET https://api.spotify.com/v1/me/shows?limit=50`;
+  - keep only `id`, `name`, `publisher`, `external_urls.spotify` (as `link`) and the smallest image ≥ 160px;
+  - download the covers to `src/assets/podcasts/<id>.jpg` and prune unlisted ones, including the `sample-*` covers;
+  - write `src/data/podcasts.json` **without** `mock`;
+  - skip any show in a new `PODCASTS_HIDDEN` list (show IDs) in `src/lib/site.ts`, for shows to keep off the site.
+  - The component already reads exactly this shape: `{ fetchedAt, source, shows: [{ id, name, publisher, link, cover }] }`.
+- [ ] Check About in dev: the real shows, Spotify's embed per show (`open.spotify.com/embed/show/<id>`, `theme=0` in dark). Then check a production build, where the container now appears.
+- [ ] Add `podcasts:refresh` to the Phase 7 daily refresh, with the three `SPOTIFY_*` secrets.
+
 ## 2. Phase 7: deploy and cutover (needs Antonio's explicit approval)
 
 - [ ] **Deploy workflow:** GitHub Actions builds Astro and deploys to GitHub Pages, replacing `hugo.yml` and `super-linter.yml`.
@@ -41,6 +87,8 @@ Ground rules carried from the spec:
   - `ai:refresh`, which keeps the agents already in the snapshot because tokscale's cache only exists on Antonio's Mac
   - `bookmarks:refresh`
   - `blog:refresh` (Medium + gists)
+  - `music:refresh` (the playlist bar's title and cover)
+  - `podcasts:refresh`, once wired (needs the `SPOTIFY_*` secrets)
   - Commit the snapshots, then build.
 - [ ] **Redirects from Hugo URLs** (§4): `/resume/`, `/timeline/`, `/gist/`, `/tags/`, `/categories/`, `/sideprojects/`, `/contact/` and the RSS feed at `/index.xml`.
 - [ ] **Custom domain:** confirm how GitHub Pages gets `anetto.dev` (a `CNAME` file in `public/` or the Pages setting). No DNS change without approval.
@@ -65,4 +113,5 @@ Ground rules carried from the spec:
 | `npm run bookmarks:refresh`            | public Raindrop bookmarks                                      |
 | `npm run blog:refresh`                 | Medium stories + public gists (`gists:refresh` alone)          |
 | `npm run notes:write -- <export.json>` | Evernote notes snapshot from an export                         |
+| `npm run music:refresh`                | Apple Music playlist title + cover for the collapsed bar       |
 | `npm run icons`                        | favicons and touch icons from `src/assets/brand/logo-dark.png` |

@@ -1,51 +1,58 @@
-import { INTRO_REVEAL_EVENT } from "./prefs";
+import { closeOthers, showWhenRevealed, unload } from "./side-media";
 import { currentTheme, THEME_EVENT } from "./theme";
 
 /*
- * <music-player>: Apple Music's embed frame under the identity card
- * (MusicPlayer.astro). The frame gets its address only once the page has
- * loaded and the browser is idle (on Home, once the intro reveals the
- * page), so Apple's player never competes with the page's first paint. The
- * address carries the site's theme (`theme=dark|light`, Apple's own option)
- * and is swapped when the theme changes, which reloads the player.
+ * <music-player>: the collapsed Apple Music bar under the identity card
+ * (MusicPlayer.astro). Apple's embed frame gets its address when the bar
+ * opens, so Apple's player (MusicKit, fonts) loads only for visitors who
+ * want it, and loses it when the bar closes, so nothing plays out of sight
+ * (the page can't pause Apple's player itself). Opening it closes the
+ * podcasts container (one open at a time). The address carries the site's
+ * theme (`theme=dark|light`, Apple's own option) and is swapped when the
+ * theme changes, which reloads the player.
  */
-/* Safari has no requestIdleCallback: a short timeout instead. */
-const whenIdle = (callback: () => void) => {
-  if (typeof requestIdleCallback === "function") {
-    requestIdleCallback(callback, { timeout: 2000 });
-  } else {
-    setTimeout(callback, 200);
-  }
-};
-
 class MusicPlayer extends HTMLElement {
+  #details: HTMLDetailsElement | null = null;
+
   connectedCallback() {
-    const start = () =>
-      whenIdle(() => {
-        this.#load();
-        document.addEventListener(THEME_EVENT, this.#load);
-      });
-    if (document.documentElement.dataset.intro === "play") {
-      document.addEventListener(INTRO_REVEAL_EVENT, start, { once: true });
-    } else if (document.readyState === "complete") {
-      start();
-    } else {
-      window.addEventListener("load", start, { once: true });
-    }
+    this.#details = this.querySelector("details");
+    this.#details?.addEventListener("toggle", this.#onToggle);
+    document.addEventListener(THEME_EVENT, this.#onTheme);
+    showWhenRevealed(this);
   }
 
   disconnectedCallback() {
-    document.removeEventListener(THEME_EVENT, this.#load);
+    this.#details?.removeEventListener("toggle", this.#onToggle);
+    document.removeEventListener(THEME_EVENT, this.#onTheme);
   }
 
-  #load = () => {
+  #onToggle = () => {
+    if (!this.#details) return;
+    if (this.#details.open) {
+      closeOthers(this.#details);
+      this.#load();
+    } else {
+      this.classList.remove("is-loaded");
+      unload(this.querySelector("iframe"));
+    }
+  };
+
+  #onTheme = () => {
+    if (this.#details?.open) this.#load();
+  };
+
+  #load() {
     const iframe = this.querySelector("iframe");
     if (!iframe || !this.dataset.src) return;
     const src = new URL(this.dataset.src);
     src.searchParams.set("theme", currentTheme());
-    if (iframe.src !== src.href) iframe.src = src.href;
-    this.classList.add("is-on");
-  };
+    if (iframe.src === src.href) return;
+    this.classList.remove("is-loaded");
+    iframe.addEventListener("load", () => this.classList.add("is-loaded"), {
+      once: true,
+    });
+    iframe.src = src.href;
+  }
 }
 
 if (!customElements.get("music-player")) {

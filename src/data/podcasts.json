@@ -1,0 +1,42 @@
+{
+  "fetchedAt": "2026-10-05",
+  "source": "spotify",
+  "mock": true,
+  "shows": [
+    {
+      "id": "sample-1",
+      "name": "Sample: Swift Weekly",
+      "publisher": "Sample Publisher",
+      "link": "https://open.spotify.com/show/sample-1",
+      "cover": "sample-1.png"
+    },
+    {
+      "id": "sample-2",
+      "name": "Sample: Engineering Leadership",
+      "publisher": "Sample Publisher",
+      "link": "https://open.spotify.com/show/sample-2",
+      "cover": "sample-2.png"
+    },
+    {
+      "id": "sample-3",
+      "name": "Sample: Design Systems Talk",
+      "publisher": "Sample Publisher",
+      "link": "https://open.spotify.com/show/sample-3",
+      "cover": "sample-3.png"
+    },
+    {
+      "id": "sample-4",
+      "name": "Sample: Mobile Dev Chat",
+      "publisher": "Sample Publisher",
+      "link": "https://open.spotify.com/show/sample-4",
+      "cover": "sample-4.png"
+    },
+    {
+      "id": "sample-5",
+      "name": "Sample: Product Minds",
+      "publisher": "Sample Publisher",
+      "link": "https://open.spotify.com/show/sample-5",
+      "cover": "sample-5.png"
+    }
+  ]
+}

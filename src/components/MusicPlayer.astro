@@ -1,22 +1,34 @@
 ---
+import "../styles/media-bar.css";
+
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+import playlist from "../data/playlist.json";
 import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
 import { APPLE_MUSIC_PLAYLIST } from "../lib/site";
 import Copy from "./Copy.astro";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
 
 /*
- * Antonio's Apple Music playlist, floating under the identity card in the
- * left column (requested by Antonio): Apple's own embed player at its
- * standard playlist height, 450px. Apple lays out its own sheets (the •••
- * menu, sign-in, the one after a preview ends) for that height; the
- * compact 175px player cut them off (Antonio chose the full size). The
- * frame itself doesn't scroll. Subscribers signed in to Apple Music hear
- * full tracks, everyone else Apple's previews (90 s for BitsNBytes' first
- * track). scripts/music-player.ts gives the frame its
- * address after the page has loaded (on Home, once the intro reveals it),
- * so Apple's player never delays the first paint, and in the site's theme,
- * swapping it when the theme changes. Without JavaScript: a plain link.
- * No playlist set: a [PLACEHOLDER].
+ * Antonio's Apple Music playlist under the identity card, in the same
+ * sticky column (requested by Antonio). It starts collapsed: a discreet
+ * frosted-glass container (styles/media-bar.css, shared with the podcasts
+ * above it) with a small " Music Playlist" label on top, then a bar with
+ * the playlist's cover and title and a down arrow. Tapping it pulls the
+ * player down: Apple's own embed at its standard 450px, the height its
+ * sheets (••• menu, sign-in, after-preview) are laid out for. Only one of
+ * the column's containers is open at a time (`name="side-media"`).
+ *
+ * Title and cover come from the snapshot `npm run music:refresh` writes
+ * (scripts/fetch-playlist.mjs), so the collapsed bar loads nothing from
+ * Apple. scripts/music-player.ts gives the frame its address each time the
+ * bar opens, in the site's theme, and unloads it when the bar closes (so
+ * it never plays out of sight). Subscribers signed in to Apple Music hear
+ * full tracks, everyone else Apple's previews. Without JavaScript the bar
+ * opens to a plain link. No playlist set: a [PLACEHOLDER].
  */
 interface Props {
   locale: Locale;
@@ -28,29 +40,70 @@ const embed = APPLE_MUSIC_PLAYLIST.replace(
   "://music.apple.com/",
   "://embed.music.apple.com/",
 );
+/* The snapshot only counts while it describes the configured playlist. */
+const snapshot =
+  (playlist as { link?: string }).link === APPLE_MUSIC_PLAYLIST
+    ? (playlist as { title: string; cover: string | null })
+    : null;
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/music/*",
+  { eager: true },
+);
+const cover = snapshot?.cover
+  ? covers[`../assets/music/${snapshot.cover}`]?.default
+  : undefined;
+const title = snapshot?.title ?? ui.music.heading;
 ---
 
-<div class="music">
-  {/* Its title (requested by Antonio), in the site's small-label style. */}
-  <p class="label music-title">{ui.music.heading}</p>
+<div class="media music">
   {APPLE_MUSIC_PLAYLIST ? (
     <music-player data-src={embed}>
-      <iframe
-        title={ui.music.title}
-        height="450"
-        scrolling="no"
-        allow="autoplay *; encrypted-media *; clipboard-write"
-        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-      />
-      <noscript>
-        <a class="more-link" href={APPLE_MUSIC_PLAYLIST}>
-          {ui.music.listen}
-          <span aria-hidden="true">&nbsp;→</span>
-        </a>
-      </noscript>
+      <div class="media-glass">
+        <p class="media-label">
+          <Icon name="apple" size={11} />
+          <span class="visually-hidden">Apple </span>Music Playlist
+        </p>
+        <details class="media-details" name="side-media">
+          <summary class="media-bar">
+            {cover && (
+              <Image
+                class="media-cover"
+                src={cover}
+                alt=""
+                width={40}
+                height={40}
+                densities={[1, 2]}
+              />
+            )}
+            <span class="media-text">
+              <span class="visually-hidden">{ui.music.heading}: </span>
+              <span class="media-name">{title}</span>
+              <span class="visually-hidden">, Apple Music</span>
+            </span>
+            <span class="media-arrow" aria-hidden="true">
+              <UiIcon name="chevron" size={16} strokeWidth={2} />
+            </span>
+          </summary>
+          <div class="media-panel">
+            <iframe
+              title={ui.music.title}
+              height="450"
+              scrolling="no"
+              allow="autoplay *; encrypted-media *; clipboard-write"
+              sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+            />
+            <noscript>
+              <a class="more-link" href={APPLE_MUSIC_PLAYLIST}>
+                {ui.music.listen}
+                <span aria-hidden="true">&nbsp;→</span>
+              </a>
+            </noscript>
+          </div>
+        </details>
+      </div>
     </music-player>
   ) : (
-    <p class="music-placeholder">
+    <p class="media-placeholder">
       <Copy text={ui.music.placeholder} />
     </p>
   )}
@@ -61,55 +114,29 @@ const embed = APPLE_MUSIC_PLAYLIST.replace(
 </script>
 
 <style>
-  .music {
-    margin-top: 24px;
-  }
-
-  .music-title {
-    margin: 0 0 10px 4px;
-  }
-
   music-player {
     display: block;
   }
 
-  /* Rounded like the identity card's panel; the frame's own corners are clipped. */
   iframe {
     display: block;
     width: 100%;
     height: 450px;
     overflow: hidden;
     border: 0;
-    border-radius: var(--radius-panel);
+    border-radius: 16px;
     background: transparent;
-  }
-
-  /*
-   * Until the frame has its address, the whole block (title included) keeps
-   * its room but stays out of sight, then fades in. On Home that's after
-   * the intro reveals the page; during the intro the placeholder waits too,
-   * so nothing shows under the flying card.
-   */
-  .music {
+    opacity: 0;
     transition: opacity 400ms ease;
   }
 
-  .music:has(music-player:not(.is-on)),
-  :global(:root[data-intro="play"]) .music:not(:has(.is-on)) {
-    visibility: hidden;
-    opacity: 0;
-  }
-
-  .music-placeholder {
-    padding: 16px;
-    border: 1px dashed var(--line-strong);
-    border-radius: var(--radius-panel);
-    font-size: var(--text-small);
-    text-align: center;
+  /* Faded in once Apple's player has loaded (the script adds .is-loaded). */
+  music-player.is-loaded iframe {
+    opacity: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .music {
+    iframe {
       transition: none;
     }
   }

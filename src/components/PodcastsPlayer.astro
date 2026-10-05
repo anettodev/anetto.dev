@@ -1,0 +1,330 @@
+---
+import "../styles/media-bar.css";
+
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+import podcasts from "../data/podcasts.json";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import Copy from "./Copy.astro";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Antonio's podcasts under the identity card, above the Apple Music
+ * playlist (requested by Antonio), the same idea: a collapsed frosted-glass container (styles/media-bar.css)
+ * with a small "Spotify Podcasts" label, then a bar with a few show covers,
+ * "My Podcasts", the show count and a down arrow. Opening it (which closes
+ * the playlist: one open at a time) lists the shows; picking one swaps the
+ * list for Spotify's embed player of that show, with a way back. Closing it
+ * or going back unloads the player, so nothing plays out of sight.
+ *
+ * The shows come from the snapshot src/data/podcasts.json, covers from
+ * src/assets/podcasts/. Today it's MOCK data ("Sample:" shows, `mock: true`)
+ * until `npm run podcasts:refresh` is wired to Spotify (see PLAN.md, "Wire
+ * up the Spotify podcasts"); while mock, the player is a [PLACEHOLDER] and
+ * the container is left out of production builds, so made-up shows never
+ * go live.
+ */
+interface Props {
+  locale: Locale;
+}
+
+interface Show {
+  id: string;
+  name: string;
+  publisher: string;
+  link: string;
+  cover: string | null;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const data = podcasts as { mock?: boolean; shows: Show[] };
+const mock = data.mock === true;
+const shown = data.shows.length > 0 && (!mock || import.meta.env.DEV);
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/podcasts/*",
+  { eager: true },
+);
+const shows = data.shows.map((show) => ({
+  ...show,
+  image: show.cover
+    ? covers[`../assets/podcasts/${show.cover}`]?.default
+    : undefined,
+}));
+const count = ui.podcasts.count[
+  new Intl.PluralRules(LANG_TAG[locale]).select(shows.length) === "one"
+    ? "one"
+    : "other"
+].replace("{n}", String(shows.length));
+---
+
+{shown && (
+  <div class="media podcasts">
+    <podcasts-player
+      data-mock={mock ? "" : undefined}
+      data-title={ui.podcasts.player}
+    >
+      <div class="media-glass">
+        <p class="media-label">
+          <Icon name="spotify" size={11} />
+          <span class="visually-hidden">Spotify </span>
+          {ui.podcasts.label}
+        </p>
+        <details class="media-details" name="side-media">
+          <summary class="media-bar">
+            <span class="pod-stack" aria-hidden="true">
+              {shows
+                .slice(0, 3)
+                .map((show) =>
+                  show.image ? (
+                    <Image
+                      class="pod-stack-cover"
+                      src={show.image}
+                      alt=""
+                      width={32}
+                      height={32}
+                      densities={[1, 2]}
+                    />
+                  ) : (
+                    <span class="pod-stack-cover" />
+                  ),
+                )}
+            </span>
+            <span class="media-text">
+              <span class="media-name">{ui.podcasts.title}</span>
+              <span class="pod-count muted">{count}</span>
+            </span>
+            <span class="media-arrow" aria-hidden="true">
+              <UiIcon name="chevron" size={16} strokeWidth={2} />
+            </span>
+          </summary>
+          <div class="media-panel">
+            <ul class="pod-list">
+              {shows.map((show) => (
+                <li>
+                  <button
+                    type="button"
+                    class="pod-row"
+                    data-id={show.id}
+                    data-name={show.name}
+                  >
+                    {show.image ? (
+                      <Image
+                        class="pod-cover"
+                        src={show.image}
+                        alt=""
+                        width={36}
+                        height={36}
+                        densities={[1, 2]}
+                      />
+                    ) : (
+                      <span class="pod-cover" />
+                    )}
+                    <span class="pod-meta">
+                      <span class="pod-name">{show.name}</span>
+                      <span class="pod-publisher muted">{show.publisher}</span>
+                    </span>
+                    <span class="pod-go" aria-hidden="true">
+                      <UiIcon name="chevron" size={14} strokeWidth={2} />
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div class="pod-player" hidden>
+              <button type="button" class="pod-back">
+                <UiIcon name="chevron" size={14} strokeWidth={2} />
+                {ui.podcasts.back}
+              </button>
+              {mock ? (
+                <p class="media-placeholder">
+                  <Copy text={ui.podcasts.mock} />
+                </p>
+              ) : (
+                <iframe
+                  title={ui.podcasts.player.replace(
+                    "{show}",
+                    ui.podcasts.title,
+                  )}
+                  height="352"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                />
+              )}
+            </div>
+            <noscript>
+              <ul class="pod-links">
+                {shows.map((show) => (
+                  <li>
+                    <a href={show.link}>
+                      {show.name}
+                      <span class="visually-hidden">
+                        {" "}
+                        ({ui.podcasts.listen})
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </noscript>
+          </div>
+        </details>
+      </div>
+    </podcasts-player>
+  </div>
+)}
+
+<script>
+  import "../scripts/podcasts-player";
+</script>
+
+<style>
+  podcasts-player {
+    display: block;
+  }
+
+  /* A few covers, overlapping, where the playlist bar has its one cover. */
+  .pod-stack {
+    display: flex;
+    flex: none;
+    padding-left: 4px;
+  }
+
+  .pod-stack :global(.pod-stack-cover) {
+    width: 32px;
+    height: 32px;
+    margin-left: -12px;
+    border: 2px solid var(--surface);
+    border-radius: 8px;
+    background: var(--chip);
+    object-fit: cover;
+  }
+
+  .pod-stack :global(.pod-stack-cover:first-child) {
+    margin-left: 0;
+  }
+
+  .pod-count {
+    display: block;
+    font-size: 0.75rem;
+  }
+
+  .pod-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pod-list[hidden] {
+    display: none;
+  }
+
+  .pod-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    min-height: var(--touch);
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pod-row:is(:hover, :focus-visible) {
+    background: var(--chip-glass);
+  }
+
+  .pod-row:focus-visible,
+  .pod-back:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .pod-row :global(.pod-cover) {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--chip);
+    object-fit: cover;
+  }
+
+  .pod-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pod-name,
+  .pod-publisher {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pod-name {
+    font-size: var(--text-small);
+    font-weight: 500;
+  }
+
+  .pod-publisher {
+    font-size: 0.75rem;
+  }
+
+  /* A right-pointing chevron: the shared one, turned. */
+  .pod-go {
+    display: grid;
+    flex: none;
+    color: var(--muted);
+    transform: rotate(-90deg);
+  }
+
+  .pod-player {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pod-player[hidden] {
+    display: none;
+  }
+
+  .pod-back {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    align-self: flex-start;
+    min-height: 32px;
+    padding: 0 10px 0 4px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+
+  .pod-back:hover {
+    color: var(--fg);
+  }
+
+  .pod-back :global(svg) {
+    transform: rotate(90deg);
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 352px;
+    border: 0;
+    border-radius: 12px;
+  }
+</style>

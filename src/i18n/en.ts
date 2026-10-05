@@ -223,6 +223,15 @@ export default {
       },
     },
   },
+  podcasts: {
+    label: "Podcasts",
+    title: "My Podcasts",
+    count: { one: "{n} show", other: "{n} shows" },
+    back: "All podcasts",
+    player: "Spotify player: {show}",
+    listen: "Listen on Spotify",
+    mock: "[PLACEHOLDER: Spotify player, once podcasts:refresh is wired up]",
+  },
   music: {
     heading: "My Playlist",
     title: "Apple Music playlist",
