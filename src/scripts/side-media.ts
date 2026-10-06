@@ -2,7 +2,7 @@ import { INTRO_REVEAL_EVENT } from "./prefs";
 
 /*
  * Shared by the containers under the identity card (music-player.ts,
- * podcasts-player.ts; styles/media-bar.css).
+ * media-list.ts; styles/media-bar.css).
  */
 
 /** Shows a container (.is-on): at once, or on Home once the intro reveals the page. */

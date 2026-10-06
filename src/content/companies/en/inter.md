@@ -56,8 +56,6 @@ positions:
 
 > Activities related to the iOS software architecture and app development for the Investments area. iOS Dev Master for the Investments area and the iOS Chapter lead in a team with +18 iOS devs.
 
-[PLACEHOLDER: one public proof from the Investments years]
-
 ##### Main Tech Skills
 
 `Objective-C and Swift (ViewCode UIKit and SwiftUI)` `MVVM-C and Domain Driven Design architecture` `RxSwift, Swinject, Charts, Kingfisher, Lottie` `SPM, Cocoapods, Carthage` `Tuist and Buck (build tool)` `Git & git submodule` `Unit/UI tests` `Code review and code conflict solving` `Build deploy using Fastlane, Bitrise and TestFlight` `Analysis of Viability and Requirements Analysis`

@@ -6,14 +6,16 @@ import IdentityCardBody from "./IdentityCardBody.astro";
 import IntroCard from "./IntroCard.astro";
 import MusicPlayer from "./MusicPlayer.astro";
 import PodcastsPlayer from "./PodcastsPlayer.astro";
+import VideosPlayer from "./VideosPlayer.astro";
 
 /*
  * Docked identity card (spec §5.2) with its halo (§6.6). Sticky in the left
  * column from 900px up; at the top of the page, scrolling away, below that.
  * On Home it is wrapped by the intro card, which flips into it once per
  * session (§8.1) and carries the halo while it travels. Under the card,
- * in the same sticky column, Antonio's podcasts (PodcastsPlayer), then his
- * Apple Music playlist (MusicPlayer), one open at a time.
+ * in the same sticky column, Antonio's YouTube playlist (VideosPlayer),
+ * his podcasts (PodcastsPlayer) and his Apple Music playlist (MusicPlayer),
+ * in his order, one open at a time.
  */
 interface Props {
   locale: Locale;
@@ -34,6 +36,7 @@ const { locale, intro = false } = Astro.props;
       <IdentityCardBody locale={locale} />
     </div>
   )}
+  <VideosPlayer locale={locale} />
   <PodcastsPlayer locale={locale} />
   <MusicPlayer locale={locale} />
 </aside>

@@ -57,8 +57,6 @@ positions:
 
 > Actividades de arquitectura de software iOS y desarrollo de la app en el área de Inversiones. iOS Dev Master del área de Inversiones y líder del chapter iOS en un equipo de más de 18 devs iOS.
 
-[PLACEHOLDER: una prueba pública de los años en Inversiones]
-
 ##### Principales habilidades técnicas
 
 `Objective-C y Swift (ViewCode UIKit y SwiftUI)` `Arquitectura MVVM-C y Domain Driven Design` `RxSwift, Swinject, Charts, Kingfisher, Lottie` `SPM, Cocoapods, Carthage` `Tuist y Buck (herramientas de build)` `Git y git submodule` `Pruebas unitarias y de UI` `Code review y resolución de conflictos de código` `Despliegue de builds con Fastlane, Bitrise y TestFlight` `Análisis de viabilidad y análisis de requisitos`

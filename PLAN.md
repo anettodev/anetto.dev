@@ -32,7 +32,6 @@ Next session, in order: remove the test samples, fill the placeholders, re-run Q
   - Drop the posts whose link contains `/sample-` from `src/data/medium.json`, and delete `src/assets/medium/sample-*.png`. A Medium refresh merges into the snapshot, so it won't remove them.
   - Run `npm run notes:write` with an export of `{"notes":[]}`. That empties `src/data/evernote.json` and prunes `src/assets/notes/`.
 - [ ] **Fill the remaining placeholders**, only with Antonio's facts:
-  - "one public proof from the Investments years" (Home lanes / Experiences timeline);
   - Nutria's cover image and its one-line description (`src/content/projects/*/nutria.md`). The Home lane "03 · Latest" is hand-written and should be updated to match.
 - [ ] **Tech Stack list** (`src/lib/tech-stack.ts`). It's a sample from the Hugo resume, kept until Antonio confirms or replaces it.
 - [ ] **Review the pt-BR and es drafts.** Every content file marked with the "draft" YAML comment, the i18n strings, and the TL;DR prompts (`tldr.prompt`, `tldr.pages`). Remove each file's draft comment once it's approved.
@@ -81,6 +80,31 @@ The build side:
 - [x] **GitHub Actions secrets set** (2026-10-06) on `anettodev/anetto.dev`: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`, copied from the Keychain and the sign-in file without reaching the screen. The Keychain stays the source of truth: after resetting the client secret, or after a new `podcasts:login`, update the matching secret too.
 - [ ] **Phase 7:** add `podcasts:refresh` to the daily refresh (below).
 
+### YouTube playlist (done and committed 2026-10-06)
+
+A third container under the identity card, now the first of the three (`VideosPlayer.astro`, Antonio's order: videos, podcasts, playlist), lists the videos of one YouTube playlist like the podcasts list. It shows `YOUTUBE_PLAYLIST_TITLE` on the bar ("anettodev playlist"; empty shows the playlist's own title), a 64×36 thumbnail per video and four and a half rows before scrolling. Picking a video plays it in YouTube's privacy-enhanced player (`youtube-nocookie.com`, 16:9) within the playlist, and "Playlist on YouTube" opens it there. The first `youtube:refresh` (2026-10-06) read Antonio's public playlist "anettodev" (5 videos), so the container now ships in production builds. An empty snapshot keeps it hidden.
+
+Antonio's part (never paste keys in chat):
+
+- [x] Create a Google Cloud project at <https://console.cloud.google.com/>, then enable **YouTube Data API v3** in **APIs & Services → Library**.
+- [x] Create an **API key** in **APIs & Services → Credentials**, and restrict it to YouTube Data API v3. Leave its **application restriction at None**: a website restriction makes Google refuse the script's calls ("Requests from referer <empty> are blocked").
+- [x] Store it in the Keychain: `read -rs TOK && security add-generic-password -U -s shell-env -a YOUTUBE_API_KEY -w "$TOK" && unset TOK`. Then add `YOUTUBE_API_KEY` to `load_shell_secrets` in `~/.zsh.keychain.zsh`.
+- [x] Choose the playlist; it must be **Public or Unlisted**. Put its link in `YOUTUBE_PLAYLIST` (`src/lib/site.ts`).
+
+The build side:
+
+- [x] **`npm run youtube:refresh`** (`scripts/fetch-youtube-playlist.mjs`):
+  - reads the playlist and up to 50 of its videos (YouTube Data API v3, about 1 quota unit per 50 videos of the free 10,000 a day), with the key sent in the `X-goog-api-key` header, never in an address;
+  - leaves out private and deleted videos;
+  - downloads each 320×180 thumbnail to `src/assets/youtube/`, pruning the rest;
+  - writes `src/data/youtube.json`.
+  - YouTube's tokenless playlist feeds (`/feeds/videos.xml`) answer 404 since 2026, hence the key.
+  - Tested against a mocked API: a link with `&si=`, paging, private and deleted videos, a missing key, an empty setting, an unknown playlist, an exhausted quota. Then run against the real API on 2026-10-06.
+- [x] **One list component** (`MediaList.astro`, `scripts/media-list.ts`) now runs both the podcasts and the videos. Podcasts behaved as before in the browser.
+- [x] **First real run:** 5 videos and thumbnails. All five play in the embedded player (checked side by side in the browser), and the production build ships the container on all 31 pages.
+- [x] **Committed** the YouTube container, the shared list and the snapshot.
+- [ ] **Phase 7:** add `youtube:refresh` to the daily refresh with a `YOUTUBE_API_KEY` secret: `printf %s "$(security find-generic-password -w -s shell-env -a YOUTUBE_API_KEY)" | gh secret set YOUTUBE_API_KEY`.
+
 ## 2. Phase 7: deploy and cutover (needs Antonio's explicit approval)
 
 - [ ] **Deploy workflow:** GitHub Actions builds Astro and deploys to GitHub Pages, replacing `hugo.yml` and `super-linter.yml`.
@@ -91,6 +115,7 @@ The build side:
   - `blog:refresh` (Medium + gists)
   - `music:refresh` (the playlist bar's title and cover)
   - `podcasts:refresh` with the three `SPOTIFY_*` secrets (already set). Let it fail without blocking the deploy, so the site keeps the last committed shows (e.g. if the refresh token is revoked or Premium lapses).
+  - `youtube:refresh` with the `YOUTUBE_API_KEY` secret, also without blocking the deploy.
   - Commit the snapshots, then build.
 - [ ] **Redirects from Hugo URLs** (§4): `/resume/`, `/timeline/`, `/gist/`, `/tags/`, `/categories/`, `/sideprojects/`, `/contact/` and the RSS feed at `/index.xml`.
 - [ ] **Custom domain:** confirm how GitHub Pages gets `anetto.dev` (a `CNAME` file in `public/` or the Pages setting). No DNS change without approval.
@@ -118,4 +143,5 @@ The build side:
 | `npm run music:refresh`                | Apple Music playlist title + cover for the collapsed bar       |
 | `npm run podcasts:login`               | one-time read-only Spotify sign-in (+ one test call)           |
 | `npm run podcasts:refresh`             | followed Spotify shows + covers for the podcasts container     |
+| `npm run youtube:refresh`              | YouTube playlist videos + thumbnails for the videos container  |
 | `npm run icons`                        | favicons and touch icons from `src/assets/brand/logo-dark.png` |

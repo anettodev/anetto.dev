@@ -49,6 +49,21 @@ export const PODCASTS_SHOWN: readonly string[] = [
   "1oMIHOXsrLFENAeM743g93", // Data Hackers
 ];
 
+/**
+ * The YouTube playlist under the identity card, the first container there
+ * (requested by Antonio): its link (youtube.com/playlist?list=…) or ID. It
+ * must be Public or Unlisted. `npm run youtube:refresh` reads it; until
+ * then, or while this is empty, the container stays hidden.
+ */
+export const YOUTUBE_PLAYLIST =
+  "https://www.youtube.com/playlist?list=PLVcHTu88gH6E";
+
+/**
+ * The name the videos bar shows (requested by Antonio), in every language.
+ * Empty shows the playlist's own title on YouTube.
+ */
+export const YOUTUBE_PLAYLIST_TITLE = "anettodev playlist";
+
 export const LINKS = {
   /** Interim: the resume the Hugo site links today, until a current PDF is supplied (§13.1). */
   resume: "https://drive.proton.me/urls/ERWQ9A0XPR#U0bUIrcLBRHR",

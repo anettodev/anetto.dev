@@ -22,6 +22,7 @@
     "music:refresh": "node scripts/fetch-playlist.mjs && prettier --write src/data/playlist.json",
     "podcasts:login": "node scripts/fetch-spotify-shows.mjs login",
     "podcasts:refresh": "node scripts/fetch-spotify-shows.mjs refresh && prettier --write src/data/podcasts.json",
+    "youtube:refresh": "node scripts/fetch-youtube-playlist.mjs && prettier --write src/data/youtube.json",
     "notes:login": "node scripts/evernote-notes.mjs login",
     "notes:write": "node scripts/write-notes.mjs",
     "icons": "node scripts/make-icons.mjs"

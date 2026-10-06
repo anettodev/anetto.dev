@@ -1,7 +1,8 @@
 /*
  * The collapsible frosted-glass containers under the identity card, in the
- * same sticky column: Antonio's podcasts (PodcastsPlayer), then his Apple
- * Music playlist (MusicPlayer). Each is a small label on top, then a bar that
+ * same sticky column: Antonio's YouTube playlist (VideosPlayer), his podcasts
+ * (PodcastsPlayer) and his Apple Music playlist (MusicPlayer); the two
+ * lists share MediaList. Each is a small label on top, then a bar that
  * pulls a player down. Their <details> share `name="side-media"`, so only
  * one is open at a time. The glass is the island's recipe (.island-glass in
  * island.css). Global, so every class starts with `media-`.

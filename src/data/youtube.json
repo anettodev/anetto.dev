@@ -1,0 +1,47 @@
+{
+  "fetchedAt": "2026-10-05",
+  "source": "youtube",
+  "playlist": {
+    "id": "PLVcHTu88gH6E",
+    "title": "anettodev",
+    "channel": "Antonio Netto",
+    "link": "https://www.youtube.com/playlist?list=PLVcHTu88gH6E"
+  },
+  "videos": [
+    {
+      "id": "uJKt432tWM4",
+      "title": "Why Apple *Really* Waited 10 Years to Make a Foldable Phone | Interview with John Ternus & Joz",
+      "channel": "Tom’s Guide",
+      "link": "https://www.youtube.com/watch?v=uJKt432tWM4&list=PLVcHTu88gH6E",
+      "thumb": "uJKt432tWM4.jpg"
+    },
+    {
+      "id": "h00uDeTYdLA",
+      "title": "I Watched Every iPhone Duo Developer Video. Here’s What Matters.",
+      "channel": "Bitrig",
+      "link": "https://www.youtube.com/watch?v=h00uDeTYdLA&list=PLVcHTu88gH6E",
+      "thumb": "h00uDeTYdLA.jpg"
+    },
+    {
+      "id": "M6mYodf0dJM",
+      "title": "mattpocock/skills: A complete AI Coding workflow, end-to-end",
+      "channel": "Matt Pocock",
+      "link": "https://www.youtube.com/watch?v=M6mYodf0dJM&list=PLVcHTu88gH6E",
+      "thumb": "M6mYodf0dJM.jpg"
+    },
+    {
+      "id": "zjkBMFhNj_g",
+      "title": "[1hr Talk] Intro to Large Language Models",
+      "channel": "Andrej Karpathy",
+      "link": "https://www.youtube.com/watch?v=zjkBMFhNj_g&list=PLVcHTu88gH6E",
+      "thumb": "zjkBMFhNj_g.jpg"
+    },
+    {
+      "id": "VMj-3S1tku0",
+      "title": "The spelled-out intro to neural networks and backpropagation: building micrograd",
+      "channel": "Andrej Karpathy",
+      "link": "https://www.youtube.com/watch?v=VMj-3S1tku0&list=PLVcHTu88gH6E",
+      "thumb": "VMj-3S1tku0.jpg"
+    }
+  ]
+}
