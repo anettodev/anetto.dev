@@ -225,11 +225,12 @@ export default {
   },
   podcasts: {
     label: "Podcasts",
-    title: "My Podcasts",
+    title: "Podcasts List",
     count: { one: "{n} show", other: "{n} shows" },
     back: "All podcasts",
     player: "Spotify player: {show}",
     listen: "Listen on Spotify",
+    episodes: "All episodes on Spotify",
     mock: "[PLACEHOLDER: Spotify player, once podcasts:refresh is wired up]",
   },
   music: {

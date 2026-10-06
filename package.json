@@ -20,6 +20,8 @@
     "blog:refresh": "node scripts/fetch-medium.mjs && node scripts/fetch-gists.mjs && prettier --write src/data/medium.json src/data/gists.json",
     "gists:refresh": "node scripts/fetch-gists.mjs && prettier --write src/data/gists.json",
     "music:refresh": "node scripts/fetch-playlist.mjs && prettier --write src/data/playlist.json",
+    "podcasts:login": "node scripts/fetch-spotify-shows.mjs login",
+    "podcasts:refresh": "node scripts/fetch-spotify-shows.mjs refresh && prettier --write src/data/podcasts.json",
     "notes:login": "node scripts/evernote-notes.mjs login",
     "notes:write": "node scripts/write-notes.mjs",
     "icons": "node scripts/make-icons.mjs"

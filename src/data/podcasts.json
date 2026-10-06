@@ -1,42 +1,48 @@
 {
   "fetchedAt": "2026-10-05",
   "source": "spotify",
-  "mock": true,
   "shows": [
     {
-      "id": "sample-1",
-      "name": "Sample: Swift Weekly",
-      "publisher": "Sample Publisher",
-      "link": "https://open.spotify.com/show/sample-1",
-      "cover": "sample-1.png"
+      "id": "0MX9PyeCzDhdlyRv6slwIX",
+      "name": "The Peterman Pod",
+      "publisher": "Ryan Peterman",
+      "link": "https://open.spotify.com/show/0MX9PyeCzDhdlyRv6slwIX",
+      "cover": "0MX9PyeCzDhdlyRv6slwIX.jpg"
     },
     {
-      "id": "sample-2",
-      "name": "Sample: Engineering Leadership",
-      "publisher": "Sample Publisher",
-      "link": "https://open.spotify.com/show/sample-2",
-      "cover": "sample-2.png"
+      "id": "2p0Vx75OmfsXktyLBuLuSf",
+      "name": "Hipsters Ponto Tech",
+      "publisher": "Alura - Hipsters Network",
+      "link": "https://open.spotify.com/show/2p0Vx75OmfsXktyLBuLuSf",
+      "cover": "2p0Vx75OmfsXktyLBuLuSf.jpg"
     },
     {
-      "id": "sample-3",
-      "name": "Sample: Design Systems Talk",
-      "publisher": "Sample Publisher",
-      "link": "https://open.spotify.com/show/sample-3",
-      "cover": "sample-3.png"
+      "id": "2jz0gSreoUqQVxLKNprjZ9",
+      "name": "escovando bits",
+      "publisher": "Codecon",
+      "link": "https://open.spotify.com/show/2jz0gSreoUqQVxLKNprjZ9",
+      "cover": "2jz0gSreoUqQVxLKNprjZ9.jpg"
     },
     {
-      "id": "sample-4",
-      "name": "Sample: Mobile Dev Chat",
-      "publisher": "Sample Publisher",
-      "link": "https://open.spotify.com/show/sample-4",
-      "cover": "sample-4.png"
+      "id": "64tJx8PtMF1cQT9UUflGgZ",
+      "name": "Palestras Filosóficas Nova Acrópole",
+      "publisher": "Palestras Filosóficas Nova Acrópole",
+      "link": "https://open.spotify.com/show/64tJx8PtMF1cQT9UUflGgZ",
+      "cover": "64tJx8PtMF1cQT9UUflGgZ.jpg"
     },
     {
-      "id": "sample-5",
-      "name": "Sample: Product Minds",
-      "publisher": "Sample Publisher",
-      "link": "https://open.spotify.com/show/sample-5",
-      "cover": "sample-5.png"
+      "id": "2MAi0BvDc6GTFvKFPXnkCL",
+      "name": "Lex Fridman Podcast",
+      "publisher": "Lex Fridman",
+      "link": "https://open.spotify.com/show/2MAi0BvDc6GTFvKFPXnkCL",
+      "cover": "2MAi0BvDc6GTFvKFPXnkCL.jpg"
+    },
+    {
+      "id": "1oMIHOXsrLFENAeM743g93",
+      "name": "Data Hackers",
+      "publisher": "Data Hackers",
+      "link": "https://open.spotify.com/show/1oMIHOXsrLFENAeM743g93",
+      "cover": "1oMIHOXsrLFENAeM743g93.jpg"
     }
   ]
 }

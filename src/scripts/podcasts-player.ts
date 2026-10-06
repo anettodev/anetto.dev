@@ -6,7 +6,8 @@ import { currentTheme, THEME_EVENT } from "./theme";
  * (PodcastsPlayer.astro). Opening it closes the playlist (one open at a
  * time) and shows the list of shows; picking one swaps the list for
  * Spotify's embed of that show (`open.spotify.com/embed/show/<id>`, dark
- * with `theme=0` in the site's dark theme), with a back button. Going back
+ * with `theme=0` in the site's dark theme), with a back button and a link
+ * to the show on Spotify, whose player shows only the newest episode. Going back
  * or closing the container unloads the player, so nothing plays out of
  * sight. While the data is mock, the player is a placeholder.
  */
@@ -60,6 +61,8 @@ class PodcastsPlayer extends HTMLElement {
     this.#showId = row.dataset.id ?? "";
     if (this.#list) this.#list.hidden = true;
     if (this.#player) this.#player.hidden = false;
+    const more = this.querySelector<HTMLAnchorElement>(".pod-more");
+    if (more && row.dataset.link) more.href = row.dataset.link;
     this.#load();
     this.querySelector<HTMLButtonElement>(".pod-back")?.focus();
   }

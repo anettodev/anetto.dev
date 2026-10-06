@@ -15,17 +15,18 @@ import UiIcon from "./UiIcon.astro";
  * Antonio's podcasts under the identity card, above the Apple Music
  * playlist (requested by Antonio), the same idea: a collapsed frosted-glass container (styles/media-bar.css)
  * with a small "Spotify Podcasts" label, then a bar with a few show covers,
- * "My Podcasts", the show count and a down arrow. Opening it (which closes
+ * "Podcasts List", the show count and a down arrow. Opening it (which closes
  * the playlist: one open at a time) lists the shows; picking one swaps the
  * list for Spotify's embed player of that show, with a way back. Closing it
  * or going back unloads the player, so nothing plays out of sight.
  *
  * The shows come from the snapshot src/data/podcasts.json, covers from
- * src/assets/podcasts/. Today it's MOCK data ("Sample:" shows, `mock: true`)
- * until `npm run podcasts:refresh` is wired to Spotify (see PLAN.md, "Wire
- * up the Spotify podcasts"); while mock, the player is a [PLACEHOLDER] and
- * the container is left out of production builds, so made-up shows never
- * go live.
+ * src/assets/podcasts/, written by `npm run podcasts:refresh` from the shows
+ * Antonio follows on Spotify. Until its first run it's MOCK data ("Sample:"
+ * shows, `mock: true`; see PLAN.md, "Wire up the Spotify podcasts"); while
+ * mock, the player is a [PLACEHOLDER] and the container is left out of
+ * production builds, so made-up shows never go live. A show without a
+ * publisher gets no line under its name.
  */
 interface Props {
   locale: Locale;
@@ -110,6 +111,7 @@ const count = ui.podcasts.count[
                     class="pod-row"
                     data-id={show.id}
                     data-name={show.name}
+                    data-link={show.link}
                   >
                     {show.image ? (
                       <Image
@@ -125,7 +127,11 @@ const count = ui.podcasts.count[
                     )}
                     <span class="pod-meta">
                       <span class="pod-name">{show.name}</span>
-                      <span class="pod-publisher muted">{show.publisher}</span>
+                      {show.publisher && (
+                        <span class="pod-publisher muted">
+                          {show.publisher}
+                        </span>
+                      )}
                     </span>
                     <span class="pod-go" aria-hidden="true">
                       <UiIcon name="chevron" size={14} strokeWidth={2} />
@@ -144,14 +150,21 @@ const count = ui.podcasts.count[
                   <Copy text={ui.podcasts.mock} />
                 </p>
               ) : (
-                <iframe
-                  title={ui.podcasts.player.replace(
-                    "{show}",
-                    ui.podcasts.title,
-                  )}
-                  height="352"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                />
+                <>
+                  <iframe
+                    title={ui.podcasts.player.replace(
+                      "{show}",
+                      ui.podcasts.title,
+                    )}
+                    height="352"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  />
+                  {/* Spotify's player shows only the newest episode, at any size. */}
+                  <a class="pod-more" href={shows[0]?.link}>
+                    {ui.podcasts.episodes}
+                    <UiIcon name="external" size={12} strokeWidth={2} />
+                  </a>
+                </>
               )}
             </div>
             <noscript>
@@ -211,10 +224,23 @@ const count = ui.podcasts.count[
     font-size: 0.75rem;
   }
 
+  /*
+   * Four rows and half of a fifth, then the list scrolls inside the
+   * container (requested by Antonio), so it doesn't grow with every show.
+   * The half row says there's more where scrollbars stay hidden (macOS).
+   * A row is 55px at the default text size: the 36px cover, or two lines
+   * of text, plus padding.
+   */
   .pod-list {
+    --pod-row: 3.45rem;
+
     display: flex;
     flex-direction: column;
     gap: 2px;
+    max-height: calc(var(--pod-row) * 4.5 + 8px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
   .pod-list[hidden] {
@@ -314,6 +340,23 @@ const count = ui.podcasts.count[
 
   .pod-back:hover {
     color: var(--fg);
+  }
+
+  .pod-more {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    align-self: center;
+    min-height: 32px;
+    padding: 0 4px;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    text-decoration: none;
+  }
+
+  .pod-more:hover {
+    color: var(--fg);
+    text-decoration: underline;
   }
 
   .pod-back :global(svg) {

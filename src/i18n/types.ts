@@ -214,7 +214,8 @@ export interface UIStrings {
   /**
    * The podcasts container under the playlist (Spotify): its label, the
    * bar's title and show count, the list's back button, the player frame's
-   * name ({show}), the no-JS link and the placeholder while the data is mock.
+   * name ({show}), the no-JS link, the link to the picked show on Spotify
+   * (its other episodes) and the placeholder while the data is mock.
    */
   podcasts: {
     label: string;
@@ -223,6 +224,7 @@ export interface UIStrings {
     back: string;
     player: string;
     listen: string;
+    episodes: string;
     mock: string;
   };
   /** The Apple Music player under the identity card: its title, its frame's name, the no-JS link and the placeholder. */

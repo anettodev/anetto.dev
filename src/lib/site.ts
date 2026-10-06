@@ -33,6 +33,22 @@ export const CALENDLY_URL = "https://calendly.com/anetto";
 export const APPLE_MUSIC_PLAYLIST =
   "https://music.apple.com/br/playlist/bitsnbytes/pl.u-e98lGaDHWJmxAd?l=en";
 
+/**
+ * The Spotify podcasts on the site, in this order (requested by Antonio:
+ * only the shows listed here appear, so following a new one on Spotify
+ * doesn't add it). Each entry is a show's link (Share → Copy link to show)
+ * or its ID, the part after open.spotify.com/show/. `npm run
+ * podcasts:refresh` reads them, and prints followed shows not listed here.
+ */
+export const PODCASTS_SHOWN: readonly string[] = [
+  "0MX9PyeCzDhdlyRv6slwIX", // The Peterman Pod
+  "2p0Vx75OmfsXktyLBuLuSf", // Hipsters Ponto Tech
+  "2jz0gSreoUqQVxLKNprjZ9", // escovando bits
+  "64tJx8PtMF1cQT9UUflGgZ", // Palestras Filosóficas Nova Acrópole
+  "2MAi0BvDc6GTFvKFPXnkCL", // Lex Fridman Podcast
+  "1oMIHOXsrLFENAeM743g93", // Data Hackers
+];
+
 export const LINKS = {
   /** Interim: the resume the Hugo site links today, until a current PDF is supplied (§13.1). */
   resume: "https://drive.proton.me/urls/ERWQ9A0XPR#U0bUIrcLBRHR",
