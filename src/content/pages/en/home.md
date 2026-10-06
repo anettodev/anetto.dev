@@ -18,8 +18,8 @@ lanes:
     linkLabel: "Experiences"
   - number: "03"
     label: "Latest"
-    title: "Nutria"
-    text: "My indie iOS app, in progress, built with Swift and SwiftUI."
+    title: "Frutalia"
+    text: "My indie iOS app, live on the App Store: photograph a piece of fruit, get a small celebration."
     route: projects
     linkLabel: "Projects"
 previews:

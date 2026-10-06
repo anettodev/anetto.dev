@@ -1,6 +1,6 @@
 ---
 page: projects
-description: "Indie iOS and software engineering by Antonio Netto. Nutria, an iOS app, is in progress."
+description: "Indie iOS and software engineering by Antonio Netto. Frutalia and Nutrx, two iOS apps on the App Store."
 label: "Projects"
 title: "I still ship."
 lead: "My indie side: apps and tools I build outside work, mostly for iOS, plus open-source contributions and hackathons."

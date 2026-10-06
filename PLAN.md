@@ -31,8 +31,7 @@ Next session, in order: remove the test samples, fill the placeholders, re-run Q
 - [ ] **Remove the test samples.** Three Medium stories ("Sample: …") and three Evernote notes ("Sample:", "Amostra:", "Muestra:") were added to try the Blog page, and committed on the branch at Antonio's request.
   - Drop the posts whose link contains `/sample-` from `src/data/medium.json`, and delete `src/assets/medium/sample-*.png`. A Medium refresh merges into the snapshot, so it won't remove them.
   - Run `npm run notes:write` with an export of `{"notes":[]}`. That empties `src/data/evernote.json` and prunes `src/assets/notes/`.
-- [ ] **Fill the remaining placeholders**, only with Antonio's facts:
-  - Nutria's cover image and its one-line description (`src/content/projects/*/nutria.md`). The Home lane "03 · Latest" is hand-written and should be updated to match.
+- [x] **Fill the remaining placeholders.** Done on 2026-10-06. The Investments proof was removed at Antonio's request. Nutria turned out to be Nutrx, now shipped, with its cover, description and links. The Home lane "03 · Latest" shows Frutalia, the newest shipped project. Only the dev-only "next entry" card on Projects keeps a `[PLACEHOLDER]`, by design.
 - [ ] **Tech Stack list** (`src/lib/tech-stack.ts`). It's a sample from the Hugo resume, kept until Antonio confirms or replaces it.
 - [ ] **Review the pt-BR and es drafts.** Every content file marked with the "draft" YAML comment, the i18n strings, and the TL;DR prompts (`tldr.prompt`, `tldr.pages`). Remove each file's draft comment once it's approved.
 - [ ] **Open questions for Antonio:**
