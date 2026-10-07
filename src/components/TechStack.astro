@@ -1,14 +1,15 @@
 ---
 import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
-import { TECH_STACK } from "../lib/tech-stack";
+import { TECH_STACK, type TechGroup, type TechItem } from "../lib/tech-stack";
 import Copy from "./Copy.astro";
 import Icon from "./Icon.astro";
 
 /*
- * Tech Stack (requested by Antonio): compact one-line pills, each a logo
- * tile (or the name's initial) and the technology's name, from
- * lib/tech-stack.ts.
+ * Tech Stack (requested by Antonio): compact one-line pills, each the
+ * technology's logo tile, when Icon.astro has its mark, and its name, from
+ * lib/tech-stack.ts. Without a mark, just the name: no initial in its place
+ * (Antonio's call).
  * The page gives the section its heading, in its own style (Home's section
  * head, About's label). With no list yet it shows a [PLACEHOLDER].
  */
@@ -37,8 +38,25 @@ const luminance = (hex: string) => {
 };
 const contrast = (a: number, b: number) =>
   (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-const styleOf = (color?: string) => {
-  if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
+/*
+ * A pill without a brand colour is coloured by its group (Antonio asked for
+ * colour on every pill), in the hashtags' hues (styles/hashtags.css), at a
+ * middle lightness that tints well on both themes. A logo tile on it
+ * would take the near-black ink, which contrasts more with that lightness.
+ */
+const GROUP_HUE: Record<TechGroup, number> = {
+  language: 350,
+  apple: 255,
+  library: 300,
+  tool: 200,
+  pattern: 60,
+};
+const styleOf = ({ color, group }: TechItem) => {
+  if (!color || !/^#[0-9a-f]{6}$/i.test(color)) {
+    return group
+      ? `--pill-bg: oklch(0.7 0.15 ${GROUP_HUE[group]}); --pill-ink: ${INK_DARK}`
+      : undefined;
+  }
   const bg = luminance(color);
   const ink =
     contrast(bg, luminance(INK_DARK)) >= contrast(bg, luminance(INK_LIGHT))
@@ -52,16 +70,17 @@ const styleOf = (color?: string) => {
   <ul class="tech-grid" aria-labelledby={labelledBy}>
     {TECH_STACK.map((item) => (
       <li
-        class:list={["tech-pill", { tinted: Boolean(styleOf(item.color)) }]}
-        style={styleOf(item.color)}
+        class:list={[
+          "tech-pill",
+          { tinted: Boolean(styleOf(item)), "with-mark": item.icon },
+        ]}
+        style={styleOf(item)}
       >
-        <span class="tech-mark" aria-hidden="true">
-          {item.icon ? (
+        {item.icon && (
+          <span class="tech-mark" aria-hidden="true">
             <Icon name={item.icon} size={14} />
-          ) : (
-            item.name.charAt(0).toUpperCase()
-          )}
-        </span>
+          </span>
+        )}
         {/* Non-breaking hyphens: "Objective-C" never splits at its hyphen. */}
         <span class="tech-name">{item.name.replaceAll("-", "\u2011")}</span>
       </li>
@@ -89,7 +108,7 @@ const styleOf = (color?: string) => {
     gap: 8px;
     align-items: center;
     height: 34px;
-    padding: 0 12px 0 4px;
+    padding: 0 12px;
     border: 1px solid var(--line);
     border-radius: 10px;
     background: var(--surface);
@@ -97,6 +116,11 @@ const styleOf = (color?: string) => {
     font-size: 0.875rem;
     font-weight: 500;
     white-space: nowrap;
+  }
+
+  /* The logo tile sits close to the pill's edge. */
+  .tech-pill.with-mark {
+    padding-left: 4px;
   }
 
   /*

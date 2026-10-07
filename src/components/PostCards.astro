@@ -6,6 +6,8 @@ import { LANG_TAG, LOCALES, type Locale } from "../i18n/locales";
 import type { PageData } from "../lib/content";
 import Copy from "./Copy.astro";
 import Flag from "./Flag.astro";
+import Hashtag from "./Hashtag.astro";
+import { tagHues } from "../lib/tag-hues";
 import { sourceOf } from "../lib/sources";
 import Icon from "./Icon.astro";
 import UiIcon from "./UiIcon.astro";
@@ -66,6 +68,8 @@ const Heading = `h${headingLevel}` as "h2" | "h3";
     const source = sourceOf(post.source);
     const mark = source?.icon;
     const tint = !post.cover && post.href ? source?.color : undefined;
+    /* Its tags' colours (lib/tag-hues.ts). */
+    const hues = tagHues(post.tags);
     const lang = langs[index];
     /*
      * A real post's cover links to it too: a duplicate of the title link,
@@ -139,7 +143,7 @@ const Heading = `h${headingLevel}` as "h2" | "h3";
           {post.tags.length > 0 && (
             <ul class="post-tags" data-search>
               {post.tags.map((tag) => (
-                <li>{tag}</li>
+                <Hashtag tag={tag} hue={hues.get(tag)} />
               ))}
             </ul>
           )}
@@ -353,10 +357,8 @@ const Heading = `h${headingLevel}` as "h2" | "h3";
     gap: 6px;
   }
 
-  .post-tags li {
-    padding: 3px 10px;
-    border-radius: var(--radius-pill);
-    background: var(--chip);
+  /* Coloured hashtags (Hashtag.astro), a size down on a card. */
+  .post-tags :global(.hashtag) {
     font-size: 0.8125rem;
   }
 

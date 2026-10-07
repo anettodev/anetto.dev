@@ -3,8 +3,14 @@ import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 
 import PageHeader from "../../../components/PageHeader.astro";
+import ListenButton from "../../../components/ListenButton.astro";
+import ShareButton from "../../../components/ShareButton.astro";
 import TldrButton from "../../../components/TldrButton.astro";
+import UiIcon from "../../../components/UiIcon.astro";
 import evernote from "../../../data/evernote.json";
+import Hashtag from "../../../components/Hashtag.astro";
+import { tagHues } from "../../../lib/tag-hues";
+import notesAudio from "../../../data/notes-audio.json";
 import { localeStaticPaths, localizedPath, t } from "../../../i18n";
 import { LANG_TAG, LOCALES, type Locale } from "../../../i18n/locales";
 import Page from "../../../layouts/Page.astro";
@@ -43,6 +49,23 @@ interface Props {
 }
 
 const { locale, note } = Astro.props;
+
+/*
+ * "Next note" in the foot (requested by Antonio): the note after this one
+ * in the Blog's default order (newest update first), so reading on goes
+ * back in time. The oldest note has none.
+ */
+/* The note's recording in Antonio's cloned voice, when `npm run notes:audio` made one. */
+const audio = (
+  notesAudio as {
+    notes: Record<string, { file: string; duration: number; marks: number[] }>;
+  }
+).notes[note.slug];
+
+const byUpdate = [...(evernote as { notes: Note[] }).notes].sort((a, b) =>
+  (b.updated ?? "").localeCompare(a.updated ?? ""),
+);
+const next = byUpdate[byUpdate.findIndex(({ slug }) => slug === note.slug) + 1];
 const ui = t(locale);
 const dateFormat = new Intl.DateTimeFormat(LANG_TAG[locale], {
   month: "short",
@@ -71,7 +94,42 @@ const unescape = (text: string) =>
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&");
-const parts = note.html
+
+/*
+ * "On this page" (requested by Antonio, after akitaonrails.com): the note's
+ * headings get ids here (the cleaner drops attributes), and its <h2>s and
+ * <h3>s make a summary beside the note, shown from two of them up.
+ */
+const slugify = (text: string) =>
+  text
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "section";
+// Ids the page already uses: the skip link's target and the summary's.
+const usedIds = new Set(["main", "top", "note-toc"]);
+const toc: { id: string; text: string; level: 2 | 3 }[] = [];
+const html = note.html.replace(
+  /<(h[234])>([\s\S]*?)<\/\1>/g,
+  (_, tag: string, inner: string) => {
+    const text = unescape(inner.replace(/<[^>]+>/g, "")).trim();
+    const base = slugify(text);
+    let id = base;
+    for (let n = 2; usedIds.has(id); n++) id = `${base}-${n}`;
+    usedIds.add(id);
+    if (tag !== "h4") toc.push({ id, text, level: tag === "h2" ? 2 : 3 });
+    return `<${tag} id="${id}">${inner}</${tag}>`;
+  },
+);
+const showToc = toc.length >= 2;
+
+/* The note's tags, coloured (lib/tag-hues.ts). */
+const noteTagHues = tagHues(note.tags);
+/* The page's own words in it, when the note is in another language. */
+const uiLang = noteLang === locale ? undefined : LANG_TAG[locale];
+
+const parts = html
   .split(/(<img data-asset="[^"]+" alt="[^"]*">)/)
   .map((part) => {
     const match = part.match(/^<img data-asset="([^"]+)" alt="([^"]*)">$/);
@@ -114,46 +172,121 @@ const updated = note.updated
   <PageHeader label={ui.post.note} title={note.title} lead={updated}>
     {/* An AI summary of this note (requested by Antonio). */}
     <div class="button-row">
+      {/*
+        Listen first (Antonio's order): his recorded voice, or the visitor's
+        device. Then TL;DR and Share.
+      */}
+      <ListenButton locale={locale} lang={LANG_TAG[noteLang]} audio={audio} />
       <TldrButton
         locale={locale}
         kind="post"
         url={noteUrl}
         title={note.title}
       />
+      {/* Share this note (requested by Antonio): the share sheet, or a copied link. */}
+      <ShareButton locale={locale} url={noteUrl} title={note.title} />
     </div>
   </PageHeader>
 
   {note.tags.length > 0 && (
     <ul class="note-tags">
       {note.tags.map((tag) => (
-        <li>{tag}</li>
+        <Hashtag tag={tag} hue={noteTagHues.get(tag)} />
       ))}
     </ul>
   )}
 
-  <article class="note">
-    {parts.map((part) =>
-      "image" in part && part.image ? (
-        <Image
-          class="note-image"
-          src={part.image}
-          alt={part.alt}
-          widths={widthsOf(part.image)}
-          sizes={sizesOf(part.image)}
-          style={`--natural: ${part.image.width}px`}
-        />
-      ) : (
-        <Fragment set:html={part.html} />
-      ),
-    )}
-  </article>
+  <div class:list={["note-body", { "has-toc": showToc }]}>
+    <article class="note" data-listen>
+      {parts.map((part) =>
+        "image" in part && part.image ? (
+          <Image
+            class="note-image"
+            src={part.image}
+            alt={part.alt}
+            widths={widthsOf(part.image)}
+            sizes={sizesOf(part.image)}
+            style={`--natural: ${part.image.width}px`}
+          />
+        ) : (
+          <Fragment set:html={part.html} />
+        ),
+      )}
+    </article>
 
-  <p class="note-foot">
+    {showToc && (
+      <nav class="toc" aria-labelledby="note-toc" lang={uiLang}>
+        <details class="toc-details">
+          <summary id="note-toc" class="toc-title" title={ui.post.toc}>
+            <span class="toc-icon" aria-hidden="true">
+              <UiIcon name="toc" size={16} strokeWidth={2} />
+            </span>
+            <span class="toc-label">{ui.post.toc}</span>
+            <span class="toc-chevron" aria-hidden="true">
+              <UiIcon name="chevron" size={14} strokeWidth={2} />
+            </span>
+          </summary>
+          <ol class="toc-list" lang={uiLang && LANG_TAG[noteLang]}>
+            {toc.map((entry) => (
+              <li class:list={["toc-entry", { "toc-sub": entry.level === 3 }]}>
+                <a href={`#${entry.id}`}>{entry.text}</a>
+              </li>
+            ))}
+          </ol>
+          <a class="toc-top" href="#main">
+            {ui.post.top}
+            <span aria-hidden="true">&nbsp;↑</span>
+          </a>
+        </details>
+        <script is:inline>
+          // Open from the start where the summary sits beside the note (the
+          // same 860px as the CSS), unless the reader collapsed it before
+          // (remembered by scripts/note-toc.ts); below that it stays a
+          // closed box.
+          {
+            let collapsed = false;
+            try {
+              collapsed = localStorage.getItem("note-toc") === "collapsed";
+            } catch {
+              // Storage blocked: open it as usual.
+            }
+            if (
+              !collapsed &&
+              (document.querySelector("main")?.clientWidth ?? 0) >= 860
+            ) {
+              document.currentScript.previousElementSibling.open = true;
+            }
+          }
+        </script>
+      </nav>
+    )}
+  </div>
+
+  <nav class="note-foot" aria-label={ui.post.more}>
     <a class="more-link" href={localizedPath(locale, "blog")}>
       <span aria-hidden="true">←&nbsp;</span>
       {ui.post.back}
     </a>
-  </p>
+    {next && (
+      <a
+        class="note-next"
+        href={`${localizedPath(locale, "blog")}${next.slug}/`}
+      >
+        <span class="note-next-label">{ui.post.next}</span>
+        <span
+          class="note-next-title"
+          lang={
+            next.lang === locale
+              ? undefined
+              : (LANG_TAG[next.lang as Locale] ?? next.lang)
+          }
+        >
+          {next.title}
+          <span aria-hidden="true">&nbsp;→</span>
+        </span>
+      </a>
+    )}
+  </nav>
 </Page>
 
 <style>
@@ -162,13 +295,6 @@ const updated = note.updated
     flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 32px;
-  }
-
-  .note-tags li {
-    padding: 2px 10px;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-pill);
-    font-size: var(--text-small);
   }
 
   /* The note's own markup (cleaned in scripts/write-notes.mjs). */
@@ -270,9 +396,331 @@ const updated = note.updated
     border-radius: 16px;
   }
 
+  /* "All writing" on the left, the next note on the right (below it on narrow screens). */
   .note-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 32px;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 48px;
     padding-top: 24px;
     border-top: 1px solid var(--line);
   }
+
+  .note-next {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-width: min(100%, 26rem);
+    margin-left: auto;
+    color: var(--fg);
+    text-align: right;
+    text-decoration: none;
+  }
+
+  .note-next-label {
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .note-next-title {
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  .note-next:hover .note-next-title {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .note-next:focus-visible {
+    border-radius: 8px;
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  /* Anchored headings clear the floating island. */
+  .note :global(:is(h2, h3, h4)) {
+    scroll-margin-top: var(--nav-clearance);
+  }
+
+  /*
+   * "On this page". Narrow: a closed box above the note that slides open.
+   * From an 860px content column: a sticky column on the right whose
+   * summary is a pill; collapsing it (remembered per browser by
+   * scripts/note-toc.ts) shrinks the column to a round 40px button and the
+   * note widens into the space, all animated (requested by Antonio). The
+   * script adds .is-ready after the first paint, so nothing animates on load.
+   */
+  .note-body {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .toc {
+    order: -1;
+  }
+
+  .toc-details {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+  }
+
+  .toc-title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-height: var(--touch);
+    padding: 0 16px;
+    font-size: var(--text-small);
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .toc-title::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-icon,
+  .toc-chevron {
+    display: grid;
+    flex: none;
+    place-items: center;
+    color: var(--muted);
+  }
+
+  .toc-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
+  .toc-chevron {
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .toc-details[open] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Inset, so the sticky column (which clips sideways) never cuts it. */
+  .toc-title:focus-visible,
+  .toc a:focus-visible {
+    border-radius: 8px;
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .toc-list {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 12px;
+  }
+
+  .toc-entry a {
+    display: block;
+    padding: 5px 0 5px 12px;
+    border-left: 2px solid var(--line);
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+
+  .toc-sub a {
+    padding-left: 24px;
+  }
+
+  .toc-entry a:hover {
+    color: var(--fg);
+  }
+
+  /* The section being read (set by scripts/note-toc.ts). */
+  .toc-entry a[aria-current] {
+    border-left-color: var(--accent);
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  .toc-top {
+    display: inline-block;
+    margin: 0 16px 14px;
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-decoration: none;
+  }
+
+  .toc-top:hover {
+    color: var(--fg);
+  }
+
+  /* Narrow: the box's content slides down where browsers can animate it. */
+  @supports (interpolate-size: allow-keywords) {
+    .toc-details {
+      interpolate-size: allow-keywords;
+    }
+
+    .is-ready .toc-details::details-content {
+      height: 0;
+      overflow: clip;
+      transition:
+        height 380ms var(--ease-out),
+        content-visibility 380ms allow-discrete;
+    }
+
+    .is-ready .toc-details[open]::details-content {
+      height: auto;
+    }
+  }
+
+  @container (min-width: 860px) {
+    .note-body.has-toc {
+      --toc-width: 13.5rem;
+      --toc-gap: 48px;
+      --toc-spring: cubic-bezier(0.34, 1.32, 0.5, 1);
+
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--toc-width);
+      column-gap: var(--toc-gap);
+      align-items: start;
+    }
+
+    /* Collapsed: a round button, and the note takes the room. */
+    .note-body.has-toc:has(.toc-details:not([open])) {
+      --toc-width: 2.5rem;
+      --toc-gap: 24px;
+    }
+
+    .note-body.has-toc.is-ready {
+      transition:
+        grid-template-columns 620ms var(--toc-spring),
+        column-gap 620ms var(--toc-spring);
+    }
+
+    .toc {
+      position: sticky;
+      top: var(--nav-clearance);
+      order: 0;
+      max-height: calc(100dvh - var(--nav-clearance) - 24px);
+      /* No sideways scroll: a subpixel overflow would draw a scrollbar. */
+      overflow: hidden auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+
+    /* Beside the note it's a quiet column; its summary is a pill. */
+    .toc-details {
+      border: 0;
+      background: none;
+    }
+
+    .toc-title {
+      gap: 8px;
+      height: 40px;
+      min-height: 0;
+      margin-bottom: 12px;
+      padding: 0 12px 0 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .toc-title:hover {
+      border-color: var(--line-strong);
+      color: var(--fg);
+    }
+
+    .toc-title:focus-visible {
+      border-radius: var(--radius-pill);
+    }
+
+    /* The list keeps its width while the column moves: it's clipped, never rewrapped. */
+    .toc-list,
+    .toc-top {
+      width: 13.5rem;
+    }
+
+    .toc-list {
+      padding: 0 0 12px;
+    }
+
+    .toc-top {
+      margin: 0;
+    }
+
+    /* Collapsed: just the icon, centred in the circle. */
+    .toc-details:not([open]) .toc-title {
+      gap: 0;
+      margin-bottom: 0;
+      padding: 0 0 0 11px;
+    }
+
+    .toc-details:not([open]) :is(.toc-label, .toc-chevron) {
+      opacity: 0;
+      translate: 10px 0;
+    }
+
+    .is-ready .toc-title {
+      transition:
+        padding 620ms var(--toc-spring),
+        gap 620ms var(--toc-spring),
+        margin 620ms var(--toc-spring),
+        border-color 200ms,
+        color 200ms;
+    }
+
+    .is-ready :is(.toc-label, .toc-chevron) {
+      transition:
+        opacity 260ms var(--ease-out),
+        translate 420ms var(--toc-spring),
+        transform 300ms var(--ease-out);
+    }
+
+    .is-ready .toc-details[open] :is(.toc-label, .toc-chevron) {
+      transition-delay: 140ms;
+    }
+
+    /* The list fades and slides in from the right instead of dropping down. */
+    @supports selector(::details-content) {
+      .is-ready .toc-details::details-content {
+        height: auto;
+        overflow: visible;
+        opacity: 0;
+        translate: 24px 0;
+        transition:
+          opacity 300ms var(--ease-out),
+          translate 520ms var(--toc-spring),
+          content-visibility 520ms allow-discrete;
+      }
+
+      .is-ready .toc-details[open]::details-content {
+        opacity: 1;
+        translate: 0 0;
+        transition-delay: 120ms;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .note-body.has-toc.is-ready,
+    .is-ready .toc-title,
+    .is-ready :is(.toc-label, .toc-chevron),
+    .toc-chevron,
+    .is-ready .toc-details::details-content {
+      transition: none;
+    }
+  }
 </style>
+
+<script>
+  import "../../../scripts/note-toc";
+</script>

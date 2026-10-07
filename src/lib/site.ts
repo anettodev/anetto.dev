@@ -64,6 +64,19 @@ export const YOUTUBE_PLAYLIST =
  */
 export const YOUTUBE_PLAYLIST_TITLE = "anettodev playlist";
 
+/**
+ * The ElevenLabs voice that reads Antonio's notes (his Instant Voice Clone):
+ * its Voice ID, which isn't a secret. `npm run notes:audio` uses it; empty
+ * leaves every note to the visitor's device voice.
+ */
+export const NOTES_VOICE_ID = "AloJubJl8XlsJISJOwQW";
+
+/**
+ * Site pages recorded in that voice, in every language (requested by
+ * Antonio): `npm run pages:audio` reads their built `data-listen` text.
+ */
+export const VOICE_PAGES: readonly string[] = ["about"];
+
 export const LINKS = {
   /** Interim: the resume the Hugo site links today, until a current PDF is supplied (§13.1). */
   resume: "https://drive.proton.me/urls/ERWQ9A0XPR#U0bUIrcLBRHR",

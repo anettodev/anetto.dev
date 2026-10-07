@@ -116,6 +116,11 @@ const buttons = (project: Project) =>
                 href={action.href}
                 aria-label={`${action.label}: ${project.title}`}
               >
+                {/* What the link opens, before its name (requested by Antonio). */}
+                {action.kind === "appStore" && <Icon name="apple" size={15} />}
+                {action.kind === "website" && (
+                  <UiIcon name="globe" size={15} strokeWidth={1.75} />
+                )}
                 {action.label}
                 {action.kind === "source" ? (
                   <Icon name="github" size={16} />

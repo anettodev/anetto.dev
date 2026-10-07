@@ -3,12 +3,14 @@ import { Image } from "astro:assets";
 import Copy from "../../components/Copy.astro";
 import Flag from "../../components/Flag.astro";
 import Icon from "../../components/Icon.astro";
+import ListenButton from "../../components/ListenButton.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import TldrButton from "../../components/TldrButton.astro";
 import CountBadge from "../../components/CountBadge.astro";
 import TechStack from "../../components/TechStack.astro";
 import { localeStaticPaths, localizedUrl, t } from "../../i18n";
-import type { Locale } from "../../i18n/locales";
+import { LANG_TAG, type Locale } from "../../i18n/locales";
+import pagesAudio from "../../data/pages-audio.json";
 import Page from "../../layouts/Page.astro";
 import { getPage } from "../../lib/content";
 import { TECH_STACK } from "../../lib/tech-stack";
@@ -25,6 +27,15 @@ const { locale } = Astro.props;
 const ui = t(locale);
 const about = await getPage(locale, "about");
 const { label, title, facts, personal } = about.data;
+/* This language's recording in Antonio's voice (npm run pages:audio). */
+const audio = (
+  pagesAudio as {
+    pages: Record<
+      string,
+      Record<string, { file: string; duration: number; marks: number[] }>
+    >;
+  }
+).pages.about?.[locale];
 ---
 
 <Page
@@ -37,6 +48,8 @@ const { label, title, facts, personal } = about.data;
   <PageHeader label={label} title={title}>
     {/* An AI summary of this page (requested by Antonio). */}
     <div class="button-row">
+      {/* Listen first, in Antonio's voice and this page's language (requested by Antonio). */}
+      <ListenButton locale={locale} lang={LANG_TAG[about.lang]} audio={audio} />
       <TldrButton
         locale={locale}
         kind="about"
@@ -46,7 +59,7 @@ const { label, title, facts, personal } = about.data;
   </PageHeader>
 
   {/* "{apple}" in the Markdown is the Apple mark (requested by Antonio). */}
-  <div class="prose">
+  <div class="prose" data-listen>
     {about.html.split("{apple}").map((part, index) => (
       <>
         {index > 0 && (
@@ -60,7 +73,7 @@ const { label, title, facts, personal } = about.data;
   </div>
 
   {/* Right under the text (moved there by Antonio): a photo and two short lines. */}
-  <section class="personal" aria-labelledby="about-personal">
+  <section class="personal" aria-labelledby="about-personal" data-listen>
     <h2 class="label" id="about-personal">
       {personal.title}
     </h2>

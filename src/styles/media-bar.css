@@ -11,8 +11,23 @@
   margin-top: 24px;
 }
 
-.media + .media {
+/* `~`, not `+`: MediaList's <script> sits after the first list, between two containers. */
+.media ~ .media {
   margin-top: 12px;
+}
+
+/* "Recommendations" (pt "Recomendações"): the section title over the three, in the page's label style. */
+.media-group {
+  margin-top: 24px;
+}
+
+.media-heading {
+  margin: 0;
+  padding-inline: 14px;
+}
+
+.media-heading + .media {
+  margin-top: 8px;
 }
 
 .media-glass {
@@ -124,7 +139,8 @@
 }
 
 /* During Home's intro the column holds only the flying card. */
-:root[data-intro="play"] .media:not(:has(.is-on)) {
+:root[data-intro="play"] .media:not(:has(.is-on)),
+:root[data-intro="play"] .media-group:not(:has(.is-on)) .media-heading {
   visibility: hidden;
 }
 

@@ -25,6 +25,8 @@
     "youtube:refresh": "node scripts/fetch-youtube-playlist.mjs && prettier --write src/data/youtube.json",
     "notes:login": "node scripts/evernote-notes.mjs login",
     "notes:write": "node scripts/write-notes.mjs",
+    "notes:audio": "node scripts/notes-audio.mjs && prettier --write src/data/notes-audio.json",
+    "pages:audio": "astro build && node scripts/pages-audio.mjs && prettier --write src/data/pages-audio.json",
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {

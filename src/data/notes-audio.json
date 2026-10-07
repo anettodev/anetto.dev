@@ -1,0 +1,27 @@
+{
+  "model": "eleven_multilingual_v2",
+  "voice": "AloJubJl8XlsJISJOwQW",
+  "notes": {
+    "amostra-checklist-de-code-review-para-ios": {
+      "hash": "1ead0ed93f4e3fe6",
+      "file": "/audio/notes/amostra-checklist-de-code-review-para-ios.mp3",
+      "duration": 23.8,
+      "chars": 329,
+      "marks": [0, 3.74, 7.88, 9.33, 12.33, 15.14, 15.79, 18.08, 20.07]
+    },
+    "sample-notes-on-swift-testing": {
+      "hash": "edb2fe14efe7da01",
+      "file": "/audio/notes/sample-notes-on-swift-testing.mp3",
+      "duration": 19.4,
+      "chars": 302,
+      "marks": [0, 2.15, 8.05, 8.82, 11.59, 14.4, 17.76]
+    },
+    "muestra-notas-sobre-accesibilidad-en-swiftui": {
+      "hash": "24c37dc10d05e42e",
+      "file": "/audio/notes/muestra-notas-sobre-accesibilidad-en-swiftui.mp3",
+      "duration": 28.4,
+      "chars": 394,
+      "marks": [0, 3.4, 6.83, 10.84, 14.12, 20.09, 23.84]
+    }
+  }
+}

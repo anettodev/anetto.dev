@@ -248,6 +248,10 @@ export interface UIStrings {
     listen: string;
     placeholder: string;
   };
+  /** The section title over the containers under the identity card (videos, podcasts, music). */
+  media: {
+    heading: string;
+  };
   /** Tech Stack (Home and About): the heading, and the placeholder until there's a list. */
   tech: {
     title: string;
@@ -269,9 +273,32 @@ export interface UIStrings {
   /** Post cards: the link to the full post. */
   /**
    * Writing: the card link, and a note page's label, its link back to the
-   * Blog and its date line ({date} is formatted).
+   * Blog, its date line ({date} is formatted), and the "On this page"
+   * summary (toc) with its back-to-top link (top), and the Share button:
+   * its label, its tooltip and the word shown once the link is copied.
    */
-  post: { readMore: string; note: string; back: string; updated: string };
+  post: {
+    readMore: string;
+    note: string;
+    back: string;
+    updated: string;
+    toc: string;
+    top: string;
+    /** The foot's link to the next note, and the foot's name for screen readers. */
+    next: string;
+    more: string;
+    share: { label: string; hint: string; copied: string };
+    /** The Listen player: its button states, the stop and speed buttons, and its tooltip (voice: when the note has Antonio's recording). */
+    listen: {
+      label: string;
+      pause: string;
+      resume: string;
+      stop: string;
+      speed: string;
+      hint: string;
+      voice: string;
+    };
+  };
   /** Project cards: buttons, the stack list's name and the cover placeholder word. */
   project: {
     appStore: string;

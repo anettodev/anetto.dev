@@ -1,6 +1,7 @@
 ---
 import "../styles/halo.css";
 
+import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
 import IdentityCardBody from "./IdentityCardBody.astro";
 import IntroCard from "./IntroCard.astro";
@@ -15,7 +16,8 @@ import VideosPlayer from "./VideosPlayer.astro";
  * session (§8.1) and carries the halo while it travels. Under the card,
  * in the same sticky column, Antonio's YouTube playlist (VideosPlayer),
  * his podcasts (PodcastsPlayer) and his Apple Music playlist (MusicPlayer),
- * in his order, one open at a time.
+ * in his order, one open at a time, under a "Recommendations" title
+ * (requested by Antonio).
  */
 interface Props {
   locale: Locale;
@@ -23,6 +25,7 @@ interface Props {
 }
 
 const { locale, intro = false } = Astro.props;
+const ui = t(locale);
 ---
 
 <aside class="identity" aria-labelledby="identity-name">
@@ -36,9 +39,14 @@ const { locale, intro = false } = Astro.props;
       <IdentityCardBody locale={locale} />
     </div>
   )}
-  <VideosPlayer locale={locale} />
-  <PodcastsPlayer locale={locale} />
-  <MusicPlayer locale={locale} />
+  <section class="media-group" aria-labelledby="media-heading">
+    <p class="label media-heading" id="media-heading">
+      {ui.media.heading}
+    </p>
+    <VideosPlayer locale={locale} />
+    <PodcastsPlayer locale={locale} />
+    <MusicPlayer locale={locale} />
+  </section>
 </aside>
 
 <script>

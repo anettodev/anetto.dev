@@ -254,6 +254,9 @@ export default {
     listen: "Escuchar en Apple Music",
     placeholder: "[PLACEHOLDER: enlace de la playlist en Apple Music]",
   },
+  media: {
+    heading: "Recomendaciones",
+  },
   tech: {
     title: "Stack tecnológico",
     empty: "[PLACEHOLDER: las tecnologías a mostrar]",
@@ -271,6 +274,24 @@ export default {
     note: "Nota",
     back: "Todos los textos",
     updated: "Actualizado el {date}",
+    toc: "En esta página",
+    top: "Volver arriba",
+    next: "Siguiente nota",
+    more: "Más notas",
+    share: {
+      label: "Compartir",
+      hint: "Compartir esta página",
+      copied: "Enlace copiado",
+    },
+    listen: {
+      label: "Escuchar",
+      pause: "Pausar",
+      resume: "Continuar",
+      stop: "Detener",
+      speed: "Velocidad de lectura",
+      hint: "Escuchar esta página, con la voz de tu dispositivo",
+      voice: "Escuchar con la voz de Antonio, generada por IA",
+    },
   },
   project: {
     appStore: "App Store",

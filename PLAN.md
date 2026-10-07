@@ -130,6 +130,28 @@ The build side:
 - [ ] Watch the daily refresh runs.
 - [ ] AI agents and Evernote notes stay manual: run `ai:refresh` on the Mac, and refresh notes in a Claude Code session.
 
+## 4. Notes read in Antonio's own voice (ElevenLabs, wired up 2026-10-06)
+
+Notes have a free **Listen** button today (2026-10-06): the visitor's device reads them with the browser's speech synthesis, so the voice differs per device. The next step is a natural voice, ideally Antonio's own, generated once per note and language when notes are written, then played by the same player.
+
+- [x] **Chose ElevenLabs** (Instant Voice Cloning on the Starter plan). The alternatives below stay for reference:
+- [ ] **Compare cloned-voice text-to-speech** (optional, later) on one real note in Portuguese, English and Spanish, judging quality, Portuguese accent, price and terms:
+  - **ElevenLabs:** Instant Voice Cloning (a minute or so of audio) or Professional Voice Cloning (more audio, closer match). About $0.04–0.08 per 1K characters (about a minute of speech) in September 2026.
+  - **Cartesia:** fast voice cloning, usually cheaper.
+  - **Local open-source** (F5-TTS, XTTS-v2): free on the Mac, more variable quality, especially in Portuguese.
+  - Not these: OpenAI **Whisper** is speech-to-text (the opposite direction); OpenAI's text-to-speech (`gpt-4o-mini-tts`, about $0.015 per audio minute) has no voice cloning; **Suno** makes music, not narration.
+- [x] **Record a clean sample** of Antonio's voice (quiet room, a few minutes of natural reading) for the chosen provider. Check its terms on voice ownership and on deleting the clone.
+- [x] **`npm run notes:audio`** (`scripts/notes-audio.mjs`, after `notes:write`; Prettier formats its snapshot) generates one MP3 per note (`public/audio/notes/<slug>.mp3`, 64 kbps) with the passage timings, skipping unchanged notes (a hash) and pruning removed ones. `--dry-run` shows the characters (credits) first. Voice: `NOTES_VOICE_ID` in `src/lib/site.ts`. Key: `ELEVENLABS_API_KEY`, in the Keychain only (limited to text-to-speech). The three samples were generated on 2026-10-06 (1,028 credits).
+- [x] **The Listen player plays it:** the same buttons, a time readout, and the highlight following the timings. The tooltip says the voice is AI-generated. It falls back to the device voice when there is no recording or it fails.
+- [ ] **Listen to the samples and judge the clone** (Antonio). If it's off, re-record the sample or try Professional Voice Cloning, then `npm run notes:audio -- --force`.
+- [ ] **Seeking** in the recording (click or drag the progress line, arrow keys): not built yet.
+- [x] **Opt-in per note** (`notes:audio -- --add <slug>`, `--remove <slug>`): no recording by default.
+- [x] **Constant halo** on Listen for notes recorded in Antonio's voice.
+- [x] **About is read in Antonio's voice, in each language** (2026-10-06): Listen comes first in its header, and each locale plays its own recording (`/about` English, `/pt/about` Portuguese, `/es/about` Spanish). `npm run pages:audio` (`scripts/pages-audio.mjs`) builds the site, reads each built page's title and `data-listen` text (About's text and "Outside work"; not the facts or the tech stack), and records what changed into `public/audio/pages/<page>-<locale>.mp3` and `src/data/pages-audio.json`. The pages are `VOICE_PAGES` in `src/lib/site.ts`. The first recording cost 2,857 credits (about 1 minute per language).
+- [ ] **When an About text changes, run `npm run pages:audio`** (with the key from the Keychain), or that language keeps the old recording. Each re-recorded language costs about 950 credits. The Portuguese and Spanish texts are still drafts, so settle them first.
+- [x] **`/publish-notes`** Claude Code command (local, in `.claude/commands/`): refresh the notes from Evernote, ask which new notes to record, check the site, then commit and push after confirmations.
+- [ ] **After removing the samples and writing real notes,** run `/publish-notes` (recordings cost about 1,000 credits per minute of speech).
+
 ## Manual commands, for reference
 
 | Command                                | What it refreshes                                              |
@@ -143,4 +165,6 @@ The build side:
 | `npm run podcasts:login`               | one-time read-only Spotify sign-in (+ one test call)           |
 | `npm run podcasts:refresh`             | followed Spotify shows + covers for the podcasts container     |
 | `npm run youtube:refresh`              | YouTube playlist videos + thumbnails for the videos container  |
+| `npm run notes:audio`                  | recordings of opted-in notes in Antonio's voice (credits)      |
+| `npm run pages:audio`                  | About's recordings in each language, after a build (credits)   |
 | `npm run icons`                        | favicons and touch icons from `src/assets/brand/logo-dark.png` |

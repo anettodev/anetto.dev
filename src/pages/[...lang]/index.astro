@@ -23,6 +23,13 @@ const { locale } = Astro.props;
 const home = await getPage(locale, "home");
 const { positioning, lanes, previews } = home.data;
 const companies = await getCompanies(home.lang);
+/*
+ * Home shows the latest three employers; its "N more experiences" link
+ * counts everything else on the Experiences page (requested by Antonio):
+ * the rest of the timeline plus the "Before that" rows.
+ */
+const { before } = (await getPage(locale, "experiences")).data;
+const moreExperiences = companies.length - 3 + before.rows.length;
 const ui = t(locale);
 
 /*
@@ -93,7 +100,7 @@ const LANE_LOOK = [
       locale={locale}
       openFirst={false}
       more={{
-        count: companies.length - 3,
+        count: moreExperiences,
         href: localizedPath(locale, "experiences"),
       }}
     />

@@ -253,6 +253,9 @@ export default {
     listen: "Ouvir no Apple Music",
     placeholder: "[PLACEHOLDER: link da playlist no Apple Music]",
   },
+  media: {
+    heading: "Recomendações",
+  },
   tech: {
     title: "Stack de tecnologia",
     empty: "[PLACEHOLDER: as tecnologias a mostrar]",
@@ -270,6 +273,24 @@ export default {
     note: "Nota",
     back: "Todos os textos",
     updated: "Atualizado em {date}",
+    toc: "Nesta página",
+    top: "Voltar ao topo",
+    next: "Próxima nota",
+    more: "Mais notas",
+    share: {
+      label: "Compartilhar",
+      hint: "Compartilhar esta página",
+      copied: "Link copiado",
+    },
+    listen: {
+      label: "Ouvir",
+      pause: "Pausar",
+      resume: "Continuar",
+      stop: "Parar",
+      speed: "Velocidade da leitura",
+      hint: "Ouvir esta página, na voz do seu dispositivo",
+      voice: "Ouvir na voz do Antonio, gerada por IA",
+    },
   },
   project: {
     appStore: "App Store",
