@@ -18,6 +18,11 @@ interface Props {
   locale: Locale;
   /** Omit for pages without localized twins (404): no canonical or hreflang. */
   route?: RouteKey | undefined;
+  /**
+   * A page under the route, e.g. a note's slug under `blog`: its canonical,
+   * og:url and hreflang alternates are its own, not the route's index.
+   */
+  subpath?: string | undefined;
   /** Page name; the site name is appended. Omit on Home. */
   title?: string | undefined;
   description?: string | undefined;
@@ -25,7 +30,14 @@ interface Props {
   intro?: boolean | undefined;
 }
 
-const { locale, route, title, description, intro = false } = Astro.props;
+const {
+  locale,
+  route,
+  subpath,
+  title,
+  description,
+  intro = false,
+} = Astro.props;
 const ui = t(locale);
 const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
 ---
@@ -100,7 +112,9 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
     <meta property="og:site_name" content={ui.siteName} />
     <meta property="og:title" content={pageTitle} />
     {description && <meta property="og:description" content={description} />}
-    {route && <meta property="og:url" content={localizedUrl(locale, route)} />}
+    {route && (
+      <meta property="og:url" content={localizedUrl(locale, route, subpath)} />
+    )}
     <meta property="og:locale" content={OG_LOCALE[locale]} />
     {LOCALES.filter((alt) => alt !== locale).map((alt) => (
       <meta property="og:locale:alternate" content={OG_LOCALE[alt]} />
@@ -108,18 +122,18 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
     <meta name="twitter:card" content="summary" />
     {route && (
       <>
-        <link rel="canonical" href={localizedUrl(locale, route)} />
+        <link rel="canonical" href={localizedUrl(locale, route, subpath)} />
         {LOCALES.map((alt) => (
           <link
             rel="alternate"
             hreflang={LANG_TAG[alt]}
-            href={localizedUrl(alt, route)}
+            href={localizedUrl(alt, route, subpath)}
           />
         ))}
         <link
           rel="alternate"
           hreflang="x-default"
-          href={localizedUrl(DEFAULT_LOCALE, route)}
+          href={localizedUrl(DEFAULT_LOCALE, route, subpath)}
         />
       </>
     )}

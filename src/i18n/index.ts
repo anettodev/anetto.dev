@@ -21,10 +21,22 @@ export function localeStaticPaths() {
   }));
 }
 
-export function localizedPath(locale: Locale, route: RouteKey): string {
-  return getRelativeLocaleUrl(locale, ROUTES[route]);
+/** A route's path, or a page under it (`subpath`, e.g. a note's slug under `blog`). */
+const pathOf = (route: RouteKey, subpath?: string): string =>
+  subpath ? `${ROUTES[route]}/${subpath}` : ROUTES[route];
+
+export function localizedPath(
+  locale: Locale,
+  route: RouteKey,
+  subpath?: string,
+): string {
+  return getRelativeLocaleUrl(locale, pathOf(route, subpath));
 }
 
-export function localizedUrl(locale: Locale, route: RouteKey): string {
-  return getAbsoluteLocaleUrl(locale, ROUTES[route]);
+export function localizedUrl(
+  locale: Locale,
+  route: RouteKey,
+  subpath?: string,
+): string {
+  return getAbsoluteLocaleUrl(locale, pathOf(route, subpath));
 }

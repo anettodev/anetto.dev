@@ -25,9 +25,11 @@ import UiIcon from "./UiIcon.astro";
 interface Props {
   locale: Locale;
   route?: RouteKey | undefined;
+  /** A page under the route (a note's slug), for the language switcher's links. */
+  subpath?: string | undefined;
 }
 
-const { locale, route } = Astro.props;
+const { locale, route, subpath } = Astro.props;
 const ui = t(locale);
 const items = [
   "about",
@@ -89,7 +91,7 @@ const themes = ["dark", "light"] as const;
           </li>
         ))}
       </ul>
-      <LangSwitcher locale={locale} route={route} />
+      <LangSwitcher locale={locale} route={route} subpath={subpath} />
       <ThemeToggle locale={locale} variant="inline" />
       <button
         type="button"

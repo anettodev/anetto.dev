@@ -17,6 +17,8 @@ import Base from "./Base.astro";
 interface Props {
   locale: Locale;
   route?: RouteKey | undefined;
+  /** A page under the route (a note's slug under `blog`); see Base. */
+  subpath?: string | undefined;
   title?: string | undefined;
   description?: string | undefined;
   /** Locale the page copy actually came from; differs while a translation is missing. */
@@ -28,6 +30,7 @@ interface Props {
 const {
   locale,
   route,
+  subpath,
   title,
   description,
   contentLang = locale,
@@ -39,6 +42,7 @@ const ui = t(locale);
 <Base
   locale={locale}
   route={route}
+  subpath={subpath}
   title={title}
   description={description}
   intro={intro}
@@ -47,7 +51,7 @@ const ui = t(locale);
     {ui.skipToContent}
   </a>
   <MeshBackground />
-  <SiteIsland locale={locale} route={route} />
+  <SiteIsland locale={locale} route={route} subpath={subpath} />
   <ThemeToggle locale={locale} variant="floating" />
   <div class="shell">
     <div class="card-column">

@@ -13,9 +13,11 @@ interface Props {
   locale: Locale;
   /** Pages without twins (404) link to each locale's home. */
   route?: RouteKey | undefined;
+  /** A page under the route: a note links to the same note in each locale. */
+  subpath?: string | undefined;
 }
 
-const { locale, route = "home" } = Astro.props;
+const { locale, route = "home", subpath } = Astro.props;
 const ui = t(locale);
 ---
 
@@ -29,7 +31,7 @@ const ui = t(locale);
       {LOCALES.map((option) => (
         <li>
           <a
-            href={localizedPath(option, route)}
+            href={localizedPath(option, route, subpath)}
             hreflang={LANG_TAG[option]}
             lang={LANG_TAG[option]}
             data-locale={option}
