@@ -44,8 +44,8 @@ Next session, in order: remove the test samples, fill the placeholders, re-run Q
 Checked on 2026-10-07 with the production build, for draft PR #1 (`revamp/astro` into `main`): lint, formatting, `astro check` and the build pass (31 pages). No internal link is broken, every hreflang alternate resolves, there are no `[PLACEHOLDER]`s, and Home ships about 8 KB of JS gzipped.
 
 - [x] **Fix the note pages' URLs** (fixed 2026-10-07). Note pages pass `route="blog"`, so their canonical, `og:url` and hreflang alternates point at the Blog index instead of the note, and the language switcher sends readers there too. Give them their slug as a sub-path of the route.
-- [ ] **Analytics** (question for Antonio): the Hugo site runs GoatCounter and the Astro site has none. Keep it or launch without?
-- [ ] **Social preview image** (`og:image`, 1200×630, §13.1): not made yet.
+- [x] **Analytics:** GoatCounter kept (Antonio's call, 2026-10-07), same `anettodev` site as Hugo's.
+- [x] **Social preview image:** launching without one (Antonio's call, 2026-10-07).
 
 - [ ] Budgets on the production build (§12): Home JS ≤ 30 KB gzip, LCP < 2.5 s, CLS < 0.1. The new pieces to check are the Apple Music embed (deferred, but it pulls MusicKit), the TL;DR menus, the Blog list tools and the new icons.
 - [ ] Lighthouse (debug only) and the keyboard / reduced-motion / contrast passes on Home, About, Experiences, Projects, AI, Blog, Bookmarks and a note page, in both themes.

@@ -77,6 +77,12 @@ export const NOTES_VOICE_ID = "AloJubJl8XlsJISJOwQW";
  */
 export const VOICE_PAGES: readonly string[] = ["about"];
 
+/**
+ * GoatCounter site code (kept from the Hugo site, Antonio's choice): page
+ * views count at https://<code>.goatcounter.com. No cookies.
+ */
+export const GOATCOUNTER_CODE = "anettodev";
+
 export const LINKS = {
   /** Interim: the resume the Hugo site links today, until a current PDF is supplied (§13.1). */
   resume: "https://drive.proton.me/urls/ERWQ9A0XPR#U0bUIrcLBRHR",

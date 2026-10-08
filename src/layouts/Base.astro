@@ -5,6 +5,7 @@ import "../styles/global.css";
 import { Font } from "astro:assets";
 
 import { localizedUrl, t } from "../i18n";
+import { GOATCOUNTER_CODE } from "../lib/site";
 import {
   DEFAULT_LOCALE,
   LANG_TAG,
@@ -136,6 +137,19 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
           href={localizedUrl(DEFAULT_LOCALE, route, subpath)}
         />
       </>
+    )}
+    {/*
+      GoatCounter page views (kept from the Hugo site, Antonio's choice):
+      production builds only, async, cookie-free. It counts the canonical
+      path, so each language's page counts on its own.
+    */}
+    {import.meta.env.PROD && GOATCOUNTER_CODE && (
+      <script
+        is:inline
+        async
+        data-goatcounter={`https://${GOATCOUNTER_CODE}.goatcounter.com/count`}
+        src="https://gc.zgo.at/count.js"
+      />
     )}
     {/* The site's app-icon logo (src/assets/brand/logo-dark.png), not the old Hugo mark. */}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
