@@ -41,6 +41,12 @@ Next session, in order: remove the test samples, fill the placeholders, re-run Q
 
 ### QA (re-run Phase 6, a lot changed since)
 
+Checked on 2026-10-07 with the production build, for draft PR #1 (`revamp/astro` into `main`): lint, formatting, `astro check` and the build pass (31 pages). No internal link is broken, every hreflang alternate resolves, there are no `[PLACEHOLDER]`s, and Home ships about 8 KB of JS gzipped.
+
+- [ ] **Fix the note pages' URLs.** Note pages pass `route="blog"`, so their canonical, `og:url` and hreflang alternates point at the Blog index instead of the note, and the language switcher sends readers there too. Give them their slug as a sub-path of the route.
+- [ ] **Analytics** (question for Antonio): the Hugo site runs GoatCounter and the Astro site has none. Keep it or launch without?
+- [ ] **Social preview image** (`og:image`, 1200×630, §13.1): not made yet.
+
 - [ ] Budgets on the production build (§12): Home JS ≤ 30 KB gzip, LCP < 2.5 s, CLS < 0.1. The new pieces to check are the Apple Music embed (deferred, but it pulls MusicKit), the TL;DR menus, the Blog list tools and the new icons.
 - [ ] Lighthouse (debug only) and the keyboard / reduced-motion / contrast passes on Home, About, Experiences, Projects, AI, Blog, Bookmarks and a note page, in both themes.
 - [ ] Internal links and the i18n check (hreflang, canonicals, switcher links) across all built pages.
@@ -106,7 +112,8 @@ The build side:
 
 ## 2. Phase 7: deploy and cutover (needs Antonio's explicit approval)
 
-- [ ] **Deploy workflow:** GitHub Actions builds Astro and deploys to GitHub Pages, replacing `hugo.yml` and `super-linter.yml`.
+- [x] **CI on pull requests** (2026-10-07): `.github/workflows/ci.yml` runs the project's own checks (`npm ci`, lint, `format:check`, then `build`, which type-checks first) on pull requests into `main` and on pushes to it, and never deploys. It replaced `super-linter.yml`, which failed PR #1 on its bundled configs.
+- [ ] **Deploy workflow:** GitHub Actions builds Astro and deploys to GitHub Pages, replacing `hugo.yml`.
 - [ ] **Daily refresh in that workflow** (none needs a secret beyond the Actions token):
   - `github:refresh`
   - `ai:refresh`, which keeps the agents already in the snapshot because tokscale's cache only exists on Antonio's Mac
@@ -116,8 +123,8 @@ The build side:
   - `podcasts:refresh` with the three `SPOTIFY_*` secrets (already set). Let it fail without blocking the deploy, so the site keeps the last committed shows (e.g. if the refresh token is revoked or Premium lapses).
   - `youtube:refresh` with the `YOUTUBE_API_KEY` secret, also without blocking the deploy.
   - Commit the snapshots, then build.
-- [ ] **Redirects from Hugo URLs** (§4): `/resume/`, `/timeline/`, `/gist/`, `/tags/`, `/categories/`, `/sideprojects/`, `/contact/` and the RSS feed at `/index.xml`.
-- [ ] **Custom domain:** confirm how GitHub Pages gets `anetto.dev` (a `CNAME` file in `public/` or the Pages setting). No DNS change without approval.
+- [ ] **Redirects from Hugo URLs** (§4): `/resume/`, `/timeline/`, `/gist/`, `/tags/`, `/categories/`, `/sideprojects/` and `/contact/`, which with `/` and `/about/` are every page in the live sitemap. Pages can't redirect the RSS feed at `/index.xml`, so either publish a feed there or let it lapse (Antonio's call).
+- [x] **Custom domain** (checked 2026-10-07): Pages already builds from a workflow and has `anetto.dev` in its settings, with HTTPS enforced. The Astro deploy needs no `CNAME` file and no DNS change.
 - [ ] **Merge** `revamp/astro` into `main`. Then replace the Hugo-era docs (`README.md`, `CLAUDE.md`, `memory-bank/`, `.cursor/`) with current ones, and drop the formatter exclusions for them. Dependabot starts once its config is on `main`.
 - [ ] **After launch, check:**
   - the TL;DR buttons, whose prompts point assistants at the live pages (`anetto.dev/experiences/` etc. are 404s on the Hugo site until then);
