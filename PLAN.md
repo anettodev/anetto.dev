@@ -113,8 +113,8 @@ The build side:
 ## 2. Phase 7: deploy and cutover (needs Antonio's explicit approval)
 
 - [x] **CI on pull requests** (2026-10-07): `.github/workflows/ci.yml` runs the project's own checks (`npm ci`, lint, `format:check`, then `build`, which type-checks first) on pull requests into `main` and on pushes to it, and never deploys. It replaced `super-linter.yml`, which failed PR #1 on its bundled configs.
-- [ ] **Deploy workflow:** GitHub Actions builds Astro and deploys to GitHub Pages, replacing `hugo.yml`.
-- [ ] **Daily refresh in that workflow** (none needs a secret beyond the Actions token):
+- [x] **Deploy workflow** (written 2026-10-07; runs once merged): `.github/workflows/deploy.yml` builds Astro and deploys to GitHub Pages, replacing `hugo.yml`. A push to `main` deploys what was merged; the daily run (06:23 UTC) and manual runs refresh the snapshots first.
+- [x] **Daily refresh in that workflow** (each refresh may fail without blocking the deploy; dry-run on a clean clone with an empty home passed) (none needs a secret beyond the Actions token):
   - `github:refresh`
   - `ai:refresh`, which keeps the agents already in the snapshot because tokscale's cache only exists on Antonio's Mac
   - `bookmarks:refresh`
