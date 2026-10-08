@@ -28,7 +28,7 @@ Next session, in order: remove the test samples, fill the placeholders, re-run Q
 
 ### Content
 
-- [ ] **Remove the test samples.** Three Medium stories ("Sample: …") and three Evernote notes ("Sample:", "Amostra:", "Muestra:") were added to try the Blog page, and committed on the branch at Antonio's request.
+- [x] **Remove the test samples** (done 2026-10-07; the Blog now shows the 15 public gists only). Three Medium stories ("Sample: …") and three Evernote notes ("Sample:", "Amostra:", "Muestra:") were added to try the Blog page, and committed on the branch at Antonio's request.
   - Drop the posts whose link contains `/sample-` from `src/data/medium.json`, and delete `src/assets/medium/sample-*.png`. A Medium refresh merges into the snapshot, so it won't remove them.
   - Run `npm run notes:write` with an export of `{"notes":[]}`. That empties `src/data/evernote.json` and prunes `src/assets/notes/`.
 - [x] **Fill the remaining placeholders.** Done on 2026-10-06. The Investments proof was removed at Antonio's request. Nutria turned out to be Nutrx, now shipped, with its cover, description and links. The Home lane "03 · Latest" shows Frutalia, the newest shipped project. Only the dev-only "next entry" card on Projects keeps a `[PLACEHOLDER]`, by design.

@@ -2,36 +2,5 @@
   "fetchedAt": "2026-10-05",
   "profile": "https://medium.com/@anettodev",
   "feed": "https://medium.com/feed/@anettodev",
-  "posts": [
-    {
-      "id": "https://medium.com/p/000000000001",
-      "title": "Sample: Swift Concurrency without the surprises",
-      "link": "https://medium.com/@anettodev/sample-swift-concurrency-without-the-surprises-000000000001",
-      "date": "2026-09-22T13:00:00.000Z",
-      "tags": ["swift", "concurrency", "ios"],
-      "excerpt": "Swift’s async/await reads like ordinary code, but a few rules decide where that code actually runs. These are the ones that catch teams most often when they move from completion handlers.",
-      "image": null,
-      "cover": "sample-swift-concurrency-without-the-surprises-000000000001.png"
-    },
-    {
-      "id": "https://medium.com/p/000000000002",
-      "title": "Sample: Modularizing an iOS app with Swift packages",
-      "link": "https://medium.com/@anettodev/sample-modularizing-an-ios-app-with-swift-packages-000000000002",
-      "date": "2026-08-30T10:30:00.000Z",
-      "tags": ["ios", "architecture", "swift-package-manager"],
-      "excerpt": "Splitting an app into local Swift packages shortens incremental builds and makes ownership explicit. Start with the seams that already exist: networking, the design system, and features that rarely t…",
-      "image": null,
-      "cover": "sample-modularizing-an-ios-app-with-swift-packages-000000000002.png"
-    },
-    {
-      "id": "https://medium.com/p/000000000003",
-      "title": "Sample: Measuring SwiftUI performance with Instruments",
-      "link": "https://medium.com/@anettodev/sample-measuring-swiftui-performance-with-instruments-000000000003",
-      "date": "2026-07-14T18:15:00.000Z",
-      "tags": ["swiftui", "performance", "instruments"],
-      "excerpt": "Before optimising a SwiftUI screen, measure it. The SwiftUI template in Instruments shows which view bodies update, how often and for how long, which is usually the fastest way to find a dependency t…",
-      "image": null,
-      "cover": "sample-measuring-swiftui-performance-with-instruments-000000000003.png"
-    }
-  ]
+  "posts": []
 }
