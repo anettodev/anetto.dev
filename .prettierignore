@@ -8,5 +8,4 @@ package-lock.json
 .github/workflows/
 memory-bank/
 .cursor/
-README.md
 CLAUDE.md
