@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 Antonio Netto
+Copyright (c) 2024-2026 Antonio Netto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,32 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+SCOPE: THE MIT LICENSE ABOVE COVERS THE CODE ONLY
+
+It applies to the source code of this repository: the components, layouts,
+pages, scripts, styles, configuration and workflows. Feel free to use the
+code structure as inspiration for your own site.
+
+It does not cover the personal content of anetto.dev, which is
+Copyright (c) 2024-2026 Antonio Netto. All rights reserved. It may not be
+copied, reused or redistributed without permission. That content is:
+
+- the text about Antonio: pages, experiences, projects, notes and the site's
+  copy (src/content/, src/data/ and the strings in src/i18n/);
+- photos of Antonio (src/assets/about/);
+- the anetto.dev logo, its animations and the site icons (src/assets/brand/,
+  public/brand/, the icons in public/);
+- project artwork (src/assets/projects/) and Screenshot-anetto.dev.png;
+- the voice recordings in public/audio/, an AI-generated version of
+  Antonio's voice.
+
+Third-party material keeps its owners' terms: company logos
+(src/assets/companies/), podcast, video and playlist artwork
+(src/assets/podcasts/, src/assets/youtube/, src/assets/music/) and website
+icons (public/bookmarks/icons/). Brand marks in src/components/Icon.astro
+come from Simple Icons (CC0 1.0), Devicon (MIT, Copyright (c) 2015 konpa)
+and Lobe Icons (MIT, Copyright (c) LobeHub); the brands themselves belong to
+their owners.
