@@ -2,7 +2,7 @@
 import { t } from "../i18n";
 import type { Locale } from "../i18n/locales";
 import { FEED_PATH } from "../lib/notes-feed";
-import { PERSON, SOCIAL } from "../lib/site";
+import { PERSON, REPO_URL, SOCIAL } from "../lib/site";
 import Icon from "./Icon.astro";
 import UiIcon from "./UiIcon.astro";
 
@@ -11,7 +11,8 @@ import UiIcon from "./UiIcon.astro";
  * the notes' RSS feed on the left; the copyright and "Back to top" on the
  * right. On phones the identity card has scrolled away by the end of a
  * page, so this is where to reach Antonio or go back up. It wraps into two
- * rows on narrow screens.
+ * rows on narrow screens. Under it, a note that the site is open source,
+ * linking its GitHub repository (requested by Antonio).
  */
 interface Props {
   locale: Locale;
@@ -21,6 +22,15 @@ const { locale } = Astro.props;
 const ui = t(locale);
 // Computed at build time, never hard-coded (§5.4).
 const year = new Date().getFullYear();
+/*
+ * The note as one HTML string: in markup, the line breaks a formatter adds
+ * around the link would render as spaces ("GitHub ."). The UI strings are
+ * escaped all the same.
+ */
+const escape = (text: string) =>
+  text.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+const [beforeLink = "", afterLink = ""] = ui.footer.openSource.split("{link}");
+const note = `${escape(beforeLink)}<a href="${REPO_URL}" rel="noopener">${escape(ui.footer.repo)}</a>${escape(afterLink)}`;
 ---
 
 <footer class="site-footer">
@@ -71,6 +81,7 @@ const year = new Date().getFullYear();
       </a>
     </div>
   </div>
+  <p class="footer-note" set:html={note} />
 </footer>
 
 <style>
@@ -86,7 +97,7 @@ const year = new Date().getFullYear();
     gap: 16px 24px;
     align-items: center;
     justify-content: space-between;
-    padding: 48px 0;
+    padding: 48px 0 16px;
     border-top: 1px solid var(--line);
   }
 
@@ -132,5 +143,18 @@ const year = new Date().getFullYear();
 
   .footer-top {
     border: 1px solid var(--line-strong);
+  }
+
+  /* The open-source note: small and muted, its link in the text colour. */
+  .footer-note {
+    max-width: 60ch;
+    padding-bottom: 48px;
+    color: var(--muted);
+    font-size: var(--text-small);
+  }
+
+  /* Injected with set:html, so the link needs :global(). */
+  .footer-note :global(a) {
+    color: var(--fg);
   }
 </style>

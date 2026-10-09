@@ -22,6 +22,9 @@ export const SOCIAL: readonly { id: SocialId; label: string; href: string }[] =
     { id: "medium", label: "Medium", href: "https://medium.com/@anettodev" },
   ];
 
+/** This site's public source (the footer's open-source note). */
+export const REPO_URL = "https://github.com/anettodev/anetto.dev";
+
 /** Scheduling page for the identity card's "Book a call" (the Hugo site's /contact used it). */
 export const CALENDLY_URL = "https://calendly.com/anetto";
 

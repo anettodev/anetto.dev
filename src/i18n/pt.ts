@@ -258,6 +258,9 @@ export default {
   },
   footer: {
     top: "Voltar ao topo",
+    openSource:
+      "Este site é {link}. Fique à vontade para usar a estrutura do código como inspiração para o seu.",
+    repo: "open source no GitHub",
   },
   feed: {
     label: "Feed RSS",
