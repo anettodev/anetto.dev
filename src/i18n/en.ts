@@ -250,6 +250,11 @@ export default {
   media: {
     heading: "Recommendations",
   },
+  feed: {
+    label: "RSS feed",
+    hint: "Copy the feed's address to follow the notes in your feed reader",
+    copied: "Feed address copied",
+  },
   tech: {
     title: "Tech Stack",
     empty: "[PLACEHOLDER: the technologies to show]",

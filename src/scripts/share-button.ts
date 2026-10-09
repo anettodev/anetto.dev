@@ -6,6 +6,8 @@
  * label for "Link copied" for two seconds, and says so to screen readers.
  * Cancelling the share sheet is not an error.
  */
+import { copy } from "./clipboard";
+
 const FEEDBACK_MS = 2000;
 
 class ShareButton extends HTMLElement {
@@ -59,26 +61,6 @@ class ShareButton extends HTMLElement {
       if (done) done.hidden = true;
       if (status) status.textContent = "";
     }, FEEDBACK_MS);
-  }
-}
-
-/** Copies text; the clipboard API needs a secure page, the fallback doesn't. */
-async function copy(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    const field = document.createElement("textarea");
-    field.value = text;
-    field.setAttribute("readonly", "");
-    field.style.position = "fixed";
-    field.style.opacity = "0";
-    document.body.append(field);
-    field.select();
-    // Deprecated, but the only way left to copy without the clipboard API.
-    const ok = document.execCommand("copy");
-    field.remove();
-    return ok;
   }
 }
 

@@ -257,6 +257,11 @@ export default {
   media: {
     heading: "Recomendaciones",
   },
+  feed: {
+    label: "Feed RSS",
+    hint: "Copiar la dirección del feed para seguir las notas en tu lector de feeds",
+    copied: "Dirección del feed copiada",
+  },
   tech: {
     title: "Stack tecnológico",
     empty: "[PLACEHOLDER: las tecnologías a mostrar]",

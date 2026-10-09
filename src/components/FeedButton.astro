@@ -1,0 +1,66 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import { FEED_PATH } from "../lib/notes-feed";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Subscribe to the notes (requested by Antonio), in the Blog page's header:
+ * a real link to the RSS feed. With JavaScript a plain click copies the
+ * feed's address for a feed reader (scripts/feed-button.ts), since browsers
+ * show a feed's XML instead of subscribing. Sits in a .button-row, whose
+ * isolation the button's halo needs.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+---
+
+<feed-button data-copied={ui.feed.copied}>
+  <a
+    class="button with-icon"
+    href={FEED_PATH}
+    type="application/rss+xml"
+    title={ui.feed.hint}
+  >
+    <span class="feed-icon">
+      <UiIcon name="rss" size={16} strokeWidth={1.9} />
+    </span>
+    <span class="feed-done" hidden>
+      <UiIcon name="check" size={16} strokeWidth={2} />
+    </span>
+    <span class="feed-label">{ui.feed.label}</span>
+  </a>
+  <span class="visually-hidden" role="status"></span>
+</feed-button>
+
+<script>
+  import "../scripts/feed-button";
+</script>
+
+<style>
+  feed-button {
+    display: inline-flex;
+  }
+
+  a {
+    font-size: var(--text-small);
+  }
+
+  .feed-icon,
+  .feed-done {
+    display: grid;
+  }
+
+  .feed-done[hidden],
+  .feed-icon[hidden] {
+    display: none;
+  }
+
+  .feed-done {
+    color: var(--status-done);
+  }
+</style>

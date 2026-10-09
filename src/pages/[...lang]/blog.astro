@@ -1,6 +1,7 @@
 ---
 import ListChips from "../../components/ListChips.astro";
 import ListTools from "../../components/ListTools.astro";
+import FeedButton from "../../components/FeedButton.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import Pager from "../../components/Pager.astro";
 import PostCards from "../../components/PostCards.astro";
@@ -170,7 +171,12 @@ const sources = SOURCES.map((source) => ({
   description={blog.data.description}
   contentLang={blog.lang}
 >
-  <PageHeader label={label} title={title} lead={lead} />
+  <PageHeader label={label} title={title} lead={lead}>
+    {/* Follow the notes in a feed reader (requested by Antonio). */}
+    <div class="button-row">
+      <FeedButton locale={locale} />
+    </div>
+  </PageHeader>
 
   <filter-list
     class="list"

@@ -252,6 +252,12 @@ export interface UIStrings {
   media: {
     heading: string;
   };
+  /** The Blog's RSS button: its label, tooltip, and the copied confirmation. */
+  feed: {
+    label: string;
+    hint: string;
+    copied: string;
+  };
   /** Tech Stack (Home and About): the heading, and the placeholder until there's a list. */
   tech: {
     title: string;

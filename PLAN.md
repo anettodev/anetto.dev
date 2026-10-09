@@ -123,7 +123,7 @@ The build side:
   - `podcasts:refresh` with the three `SPOTIFY_*` secrets (already set). Let it fail without blocking the deploy, so the site keeps the last committed shows (e.g. if the refresh token is revoked or Premium lapses).
   - `youtube:refresh` with the `YOUTUBE_API_KEY` secret, also without blocking the deploy.
   - Commit the snapshots, then build.
-- [x] **Redirects from Hugo URLs** (§4; done 2026-10-07 in `astro.config.ts`, the RSS feed left to Antonio): `/resume/`, `/timeline/`, `/gist/`, `/tags/`, `/categories/`, `/sideprojects/` and `/contact/`, which with `/` and `/about/` are every page in the live sitemap. Pages can't redirect the RSS feed at `/index.xml`, so either publish a feed there or let it lapse (Antonio's call).
+- [x] **Redirects from Hugo URLs** (§4; done 2026-10-07 in `astro.config.ts`, the RSS feed left to Antonio): `/resume/`, `/timeline/`, `/gist/`, `/tags/`, `/categories/`, `/sideprojects/` and `/contact/`, which with `/` and `/about/` are every page in the live sitemap. The Hugo feed's address, `/index.xml`, now serves the notes' feed (Antonio's call, 2026-10-09).
 - [x] **Custom domain** (checked 2026-10-07): Pages already builds from a workflow and has `anetto.dev` in its settings, with HTTPS enforced. The Astro deploy needs no `CNAME` file and no DNS change.
 - [ ] **Merge** `revamp/astro` into `main`. Then replace the Hugo-era docs (`README.md`, `CLAUDE.md`, `memory-bank/`, `.cursor/`) with current ones, and drop the formatter exclusions for them. Dependabot starts once its config is on `main`.
 - [ ] **After launch, check:**

@@ -5,6 +5,7 @@ import "../styles/global.css";
 import { Font } from "astro:assets";
 
 import { localizedUrl, t } from "../i18n";
+import { FEED_PATH, FEED_TITLE } from "../lib/notes-feed";
 import { GOATCOUNTER_CODE } from "../lib/site";
 import {
   DEFAULT_LOCALE,
@@ -151,6 +152,13 @@ const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
         src="https://gc.zgo.at/count.js"
       />
     )}
+    {/* The notes' feed, for feed readers and browser extensions that look for one. */}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={FEED_TITLE}
+      href={FEED_PATH}
+    />
     {/* The site's app-icon logo (src/assets/brand/logo-dark.png), not the old Hugo mark. */}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
