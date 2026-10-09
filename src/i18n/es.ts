@@ -257,6 +257,9 @@ export default {
   media: {
     heading: "Recomendaciones",
   },
+  footer: {
+    top: "Volver arriba",
+  },
   feed: {
     label: "Feed RSS",
     hint: "Abrir el feed RSS de las notas (se abre en una pestaña nueva)",

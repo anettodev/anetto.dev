@@ -250,6 +250,9 @@ export default {
   media: {
     heading: "Recommendations",
   },
+  footer: {
+    top: "Back to top",
+  },
   feed: {
     label: "RSS feed",
     hint: "Open the notes' RSS feed (opens in a new tab)",

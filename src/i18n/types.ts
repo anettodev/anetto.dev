@@ -252,6 +252,10 @@ export interface UIStrings {
   media: {
     heading: string;
   };
+  /** The footer's "Back to top" link (its accessible name and tooltip). */
+  footer: {
+    top: string;
+  };
   /** The Blog's RSS button: its label and tooltip (it opens the feed in a new tab). */
   feed: {
     label: string;
