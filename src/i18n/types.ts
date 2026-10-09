@@ -255,6 +255,9 @@ export interface UIStrings {
   /** The footer's "Back to top" link (its accessible name and tooltip). */
   footer: {
     top: string;
+    /** The open-source note: "{link}" is replaced by `repo`, linked to the GitHub repository. */
+    openSource: string;
+    repo: string;
   };
   /** The Blog's RSS button: its label and tooltip (it opens the feed in a new tab). */
   feed: {
