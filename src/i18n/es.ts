@@ -259,8 +259,7 @@ export default {
   },
   feed: {
     label: "Feed RSS",
-    hint: "Copiar la dirección del feed para seguir las notas en tu lector de feeds",
-    copied: "Dirección del feed copiada",
+    hint: "Abrir el feed RSS de las notas (se abre en una pestaña nueva)",
   },
   tech: {
     title: "Stack tecnológico",

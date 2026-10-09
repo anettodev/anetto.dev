@@ -252,8 +252,7 @@ export default {
   },
   feed: {
     label: "RSS feed",
-    hint: "Copy the feed's address to follow the notes in your feed reader",
-    copied: "Feed address copied",
+    hint: "Open the notes' RSS feed (opens in a new tab)",
   },
   tech: {
     title: "Tech Stack",
