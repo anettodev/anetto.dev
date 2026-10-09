@@ -10,9 +10,9 @@ import { THEME_EVENT } from "./theme";
  *   +0.8s       card turns again into the docked card while moving into
  *               its spot (800ms)
  *   docked      page, island and theme toggle are revealed, sliding up 24px
- *               (500ms); the halo dims (900ms)
+ *               (250ms); the halo dims (900ms)
  *
- * About 7s in all (Antonio shortened it from about 8.8s on 2026-10-09).
+ * About 6.7s in all (Antonio shortened it from about 8.8s on 2026-10-09).
  *
  * The flip waits for the logo clip to end, capped so a slow or refused clip
  * never holds the page. The docked card never moves in layout: it is
@@ -40,7 +40,7 @@ const LOGO_GRACE = 1500;
 const TURN_TO_INFO = 800;
 const HOLD_INFO = 800;
 const TURN_TO_DOCK = 800;
-const REVEAL = 500;
+const REVEAL = 250;
 const HALO_DOCK = 900;
 const RISE = "translateY(24px)";
 const SEEN_KEY = "anetto:intro-seen";

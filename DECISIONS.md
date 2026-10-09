@@ -1058,3 +1058,4 @@ The whole intro takes about 8.8s. Any input still ends it.
   - **Style:** the icons are muted and turn to the text colour on a chip when hovered or focused, each a 44px touch target. The back-to-top arrow has a ring in `--line-strong`, which stays visible in the light theme. The footer RSS mark is Simple Icons' filled one (CC0), which matches the filled profile marks; the outline `rss` icon stays on the Blog button.
   - **Narrow screens:** the row wraps into email / icons / copyright, with no sideways scroll at 390px.
   - **Language:** the footer now gets the page's locale, for "Profiles", "RSS feed" and "Back to top" (pt "Voltar ao topo", es "Volver arriba").
+- **The intro's reveal takes 0.25s** (Antonio's call, 2026-10-09; it was 0.5s, and 0.7s before that). The page, island and theme toggle slide in over 250ms from about 6.45s, so everything is visible at about 6.7s. The halo still dims over 900ms, and the 12s CSS failsafe keeps its 700ms.
