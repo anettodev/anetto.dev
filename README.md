@@ -106,14 +106,12 @@ Evernote notes and voice recordings are refreshed by hand.
 
 ## License
 
-The code is licensed under the MIT License; see [LICENSE](LICENSE).
+- **Code: [MIT](LICENSE).** Feel free to use the code structure as inspiration for your own site.
+- **Personal content: all rights reserved.** The texts about me, my photos, the anetto.dev logo and icons, the project artwork and the voice recordings of my (AI-generated) voice aren't licensed for reuse. [LICENSE](LICENSE) lists them.
+- **Third-party material** (company logos, podcast and video artwork, brand marks) belongs to its owners. The marks come from Simple Icons (CC0), Devicon (MIT) and Lobe Icons (MIT).
 
 ## Contact
 
 - Website: [anetto.dev](https://anetto.dev)
 - Email: [hello@anetto.dev](mailto:hello@anetto.dev)
 - GitHub: [@anettodev](https://github.com/anettodev)
-
----
-
-**Note:** This is a personal site. Feel free to use the code structure as inspiration for your own, but please don't use my personal content or branding.
