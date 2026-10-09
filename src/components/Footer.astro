@@ -11,8 +11,9 @@ import UiIcon from "./UiIcon.astro";
  * the notes' RSS feed on the left; the copyright and "Back to top" on the
  * right. On phones the identity card has scrolled away by the end of a
  * page, so this is where to reach Antonio or go back up. It wraps into two
- * rows on narrow screens. Under it, a note that the site is open source,
- * linking its GitHub repository (requested by Antonio).
+ * rows on narrow screens. Above it, a note that the site is open source,
+ * linking its GitHub repository (requested by Antonio;
+ * moved above the row on 2026-10-09).
  */
 interface Props {
   locale: Locale;
@@ -34,54 +35,56 @@ const note = `${escape(beforeLink)}<a href="${REPO_URL}" rel="noopener">${escape
 ---
 
 <footer class="site-footer">
-  <div class="inner">
-    <div class="reach">
-      <a class="email" href={`mailto:${PERSON.email}`}>
-        {PERSON.email}
-      </a>
-      <ul class="footer-links" aria-label={ui.card.profilesLabel}>
-        {SOCIAL.map((profile) => (
+  <div class="footer-body">
+    <p class="footer-note" set:html={note} />
+    <div class="inner">
+      <div class="reach">
+        <a class="email" href={`mailto:${PERSON.email}`}>
+          {PERSON.email}
+        </a>
+        <ul class="footer-links" aria-label={ui.card.profilesLabel}>
+          {SOCIAL.map((profile) => (
+            <li>
+              <a
+                href={profile.href}
+                rel="me"
+                aria-label={profile.label}
+                title={profile.label}
+              >
+                <Icon name={profile.id} size={18} />
+              </a>
+            </li>
+          ))}
           <li>
             <a
-              href={profile.href}
-              rel="me"
-              aria-label={profile.label}
-              title={profile.label}
+              href={FEED_PATH}
+              type="application/rss+xml"
+              target="_blank"
+              rel="noopener"
+              aria-label={ui.feed.label}
+              title={ui.feed.hint}
             >
-              <Icon name={profile.id} size={18} />
+              <Icon name="rss" size={16} />
             </a>
           </li>
-        ))}
-        <li>
-          <a
-            href={FEED_PATH}
-            type="application/rss+xml"
-            target="_blank"
-            rel="noopener"
-            aria-label={ui.feed.label}
-            title={ui.feed.hint}
-          >
-            <Icon name="rss" size={16} />
-          </a>
-        </li>
-      </ul>
-    </div>
-    <div class="sign">
-      <p class="label">
-        © {year} {PERSON.name}
-      </p>
-      {/* "#top" is the top of the page by definition (HTML), with or without such an id. */}
-      <a
-        class="footer-top"
-        href="#top"
-        aria-label={ui.footer.top}
-        title={ui.footer.top}
-      >
-        <UiIcon name="arrowUp" size={18} strokeWidth={1.9} />
-      </a>
+        </ul>
+      </div>
+      <div class="sign">
+        <p class="label">
+          © {year} {PERSON.name}
+        </p>
+        {/* "#top" is the top of the page by definition (HTML), with or without such an id. */}
+        <a
+          class="footer-top"
+          href="#top"
+          aria-label={ui.footer.top}
+          title={ui.footer.top}
+        >
+          <UiIcon name="arrowUp" size={18} strokeWidth={1.9} />
+        </a>
+      </div>
     </div>
   </div>
-  <p class="footer-note" set:html={note} />
 </footer>
 
 <style>
@@ -91,14 +94,19 @@ const note = `${escape(beforeLink)}<a href="${REPO_URL}" rel="noopener">${escape
     padding: 0 var(--gutter);
   }
 
+  /* The hairline and padding wrap the note and the row together. */
+  .footer-body {
+    padding: 48px 0;
+    border-top: 1px solid var(--line);
+  }
+
   .inner {
     display: flex;
     flex-wrap: wrap;
     gap: 16px 24px;
     align-items: center;
     justify-content: space-between;
-    padding: 48px 0 16px;
-    border-top: 1px solid var(--line);
+    margin-top: 16px;
   }
 
   .reach,
@@ -148,7 +156,6 @@ const note = `${escape(beforeLink)}<a href="${REPO_URL}" rel="noopener">${escape
   /* The open-source note: small and muted, its link in the text colour. */
   .footer-note {
     max-width: 60ch;
-    padding-bottom: 48px;
     color: var(--muted);
     font-size: var(--text-small);
   }
