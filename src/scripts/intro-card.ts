@@ -5,12 +5,14 @@ import { THEME_EVENT } from "./theme";
 /*
  * <intro-card> (spec §8.1, extended with the logo). Timeline:
  *   0.15s       card fades in centred, scale 0.94 → 1 (600ms), and the
- *               current theme's logo clip plays once (~4.9s)
+ *               current theme's logo clip plays once, sped up to 3.9s
  *   clip ends   card turns in place to the info face (800ms)
- *   +1.2s       card turns again into the docked card while moving into
- *               its spot (1000ms)
+ *   +0.8s       card turns again into the docked card while moving into
+ *               its spot (800ms)
  *   docked      page, island and theme toggle are revealed, sliding up 24px
- *               (700ms); the halo dims (900ms)
+ *               (500ms); the halo dims (900ms)
+ *
+ * About 7s in all (Antonio shortened it from about 8.8s on 2026-10-09).
  *
  * The flip waits for the logo clip to end, capped so a slow or refused clip
  * never holds the page. The docked card never moves in layout: it is
@@ -28,14 +30,17 @@ import { THEME_EVENT } from "./theme";
 const EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
 const FADE_START = 150;
 const FADE = 600;
-/** One play of public/brand/logo-intro-<theme>.* (scripts/encode-logo.sh caps it at 4.9s). */
-const LOGO = 4900;
+/** One play of public/brand/logo-intro-<theme>.* as encoded (scripts/encode-logo.sh caps it at 4.9s). */
+const CLIP = 4900;
+/** How long the intro plays it: the same clip, sped up (the island's tile keeps 4.9s). */
+const LOGO = 3900;
+const LOGO_RATE = CLIP / LOGO;
 /** How much later than planned the clip may end before the card turns anyway. */
 const LOGO_GRACE = 1500;
 const TURN_TO_INFO = 800;
-const HOLD_INFO = 1200;
-const TURN_TO_DOCK = 1000;
-const REVEAL = 700;
+const HOLD_INFO = 800;
+const TURN_TO_DOCK = 800;
+const REVEAL = 500;
 const HALO_DOCK = 900;
 const RISE = "translateY(24px)";
 const SEEN_KEY = "anetto:intro-seen";
@@ -185,7 +190,11 @@ class IntroCard extends HTMLElement {
         return;
       }
       // Both themes' clips: the theme can change while the logo plays (#onTheme).
-      for (const each of this.querySelectorAll("video.logo-clip")) {
+      for (const each of this.querySelectorAll<HTMLVideoElement>(
+        "video.logo-clip",
+      )) {
+        each.defaultPlaybackRate = LOGO_RATE;
+        each.playbackRate = LOGO_RATE;
         each.addEventListener("ended", done, { once: true });
         each.addEventListener("error", () => this.#later(done, 1200), {
           once: true,
