@@ -35,7 +35,7 @@ jobs:
       REFRESH: ${{ github.event_name != 'push' }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
