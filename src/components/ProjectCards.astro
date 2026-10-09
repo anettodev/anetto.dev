@@ -121,12 +121,9 @@ const buttons = (project: Project) =>
                 {action.kind === "website" && (
                   <UiIcon name="globe" size={15} strokeWidth={1.75} />
                 )}
+                {action.kind === "source" && <Icon name="github" size={15} />}
                 {action.label}
-                {action.kind === "source" ? (
-                  <Icon name="github" size={16} />
-                ) : (
-                  <UiIcon name="external" size={14} strokeWidth={2} />
-                )}
+                <UiIcon name="external" size={14} strokeWidth={2} />
               </a>
             ))}
           </div>
