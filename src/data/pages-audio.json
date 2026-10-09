@@ -1,0 +1,29 @@
+{
+  "model": "eleven_multilingual_v2",
+  "voice": "AloJubJl8XlsJISJOwQW",
+  "pages": {
+    "about": {
+      "en": {
+        "hash": "7b8ad865389f376b",
+        "file": "/audio/pages/about-en.mp3",
+        "duration": 60.4,
+        "chars": 945,
+        "marks": [0, 3.97, 10.24, 23.45, 36.07, 44.9, 45.78, 50.13, 54.25]
+      },
+      "pt": {
+        "hash": "fa61654136fa9462",
+        "file": "/audio/pages/about-pt.mp3",
+        "duration": 62.5,
+        "chars": 942,
+        "marks": [0, 4.27, 10.41, 24.45, 38.15, 47.96, 48.89, 53.38, 57.46]
+      },
+      "es": {
+        "hash": "936dcdf4bc101eef",
+        "file": "/audio/pages/about-es.mp3",
+        "duration": 61.5,
+        "chars": 970,
+        "marks": [0, 4.21, 10.48, 24.7, 37.4, 45.63, 46.58, 51.85, 55.91]
+      }
+    }
+  }
+}

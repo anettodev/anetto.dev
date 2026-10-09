@@ -1,0 +1,50 @@
+/*
+ * Halo behind the identity card (spec §6.6, §8.4): a blurred conic gradient
+ * whose angle turns once every 9s. 0.7 while the intro plays, 0.35 docked.
+ * The angle is a registered property so it can animate; browsers without
+ * @property show a still halo.
+ */
+@property --halo-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.halo-host {
+  position: relative;
+  isolation: isolate;
+}
+
+.halo {
+  position: absolute;
+  inset: -10px;
+  z-index: -1;
+  border-radius: 38px;
+  background: conic-gradient(
+    from var(--halo-angle),
+    var(--halo-copper),
+    var(--halo-pearl),
+    var(--halo-blue),
+    var(--halo-copper)
+  );
+  filter: blur(42px);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: halo-turn 9s linear infinite;
+}
+
+:root[data-intro="play"] .halo {
+  opacity: 0.7;
+}
+
+@keyframes halo-turn {
+  to {
+    --halo-angle: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo {
+    animation: none;
+  }
+}

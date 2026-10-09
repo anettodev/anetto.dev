@@ -1,0 +1,316 @@
+import type { UIStrings } from "./types";
+
+// Draft — review with Antonio before launch (spec §9).
+export default {
+  siteName: "Antonio Netto",
+  skipToContent: "Pular para o conteúdo",
+  navLabel: "Principal",
+  nav: {
+    home: "Início",
+    about: "Sobre",
+    experiences: "Experiências",
+    projects: "Projetos",
+    blog: "Blog",
+    ai: "IA",
+    bookmarks: "Favoritos",
+  },
+  menu: { open: "Abrir navegação", close: "Fechar navegação" },
+  theme: {
+    toLight: "Mudar para o modo claro",
+    toDark: "Mudar para o modo escuro",
+  },
+  languageLabel: "Idioma: Português",
+  card: {
+    role: "Executive Tech Manager",
+    at: "no",
+    profilesLabel: "Perfis",
+    portraitAlt: "Retrato de Antonio Netto",
+    bookCall: "Agendar uma conversa",
+    bookCallLabel: "Agendar uma conversa pelo Calendly",
+  },
+  status: {
+    todo: "Planejado",
+    wip: "Em desenvolvimento",
+    done: "Publicado",
+  },
+  intro: { loading: "Carregando..." },
+  github: {
+    title: "Atividade no GitHub",
+    profileLink: "Ver no GitHub",
+    total: {
+      one: "{n} contribuição no último ano",
+      other: "{n} contribuições no último ano",
+    },
+    day: {
+      zero: "Nenhuma contribuição em {date}",
+      one: "{n} contribuição em {date}",
+      other: "{n} contribuições em {date}",
+    },
+    calendarLabel: "Calendário de contribuições, de {start} a {end}",
+    top: "Principais contribuições públicas em:",
+    topToggle: "Listar os principais repositórios públicos",
+    commits: { one: "commit", other: "commits" },
+    updated: "Atualizado em {date}",
+  },
+  ai: {
+    title: "Uso de IA",
+    page: {
+      label: "IA",
+      title: "Meu uso real, à vista.",
+      lead: "Já trabalhei com muitas ferramentas e provedores de IA, e hoje eles fazem parte de como escrevo software. Os números abaixo vêm dos registros locais de sessão de cada ferramenta, contados pelo tokscale e sincronizados diariamente.",
+      description:
+        "Uso diário de tokens em ferramentas de IA para programação, com os modelos e as ferramentas por trás.",
+    },
+    cost: {
+      label: "Custo equivalente em API",
+      detail: "Cerca de {amount} por dia ativo",
+    },
+    tokens: {
+      label: "Tokens",
+      detail: "{messages} mensagens em {days} dias ativos",
+    },
+    cache: {
+      label: "Tokens de prompt lidos do cache",
+      detail: "{read} lidos · {write} gravados",
+    },
+    day: {
+      zero: "Nenhum uso de IA em {date}",
+      one: "{n} token em {date}{note}",
+      other: "{n} tokens em {date}{note}",
+    },
+    calendarLabel: "Uso diário de tokens de IA, de {start} a {end}",
+    chart: {
+      label: "Gráfico",
+      heatmap: "Mapa de calor",
+      trend: "Ao longo do tempo",
+      heatmapCaption: "Tokens por dia",
+      rangeLabel: "Dias exibidos",
+      days: "dias",
+      trendLabel:
+        "Tokens por dia por modelo, últimos {n} dias: de {start} a {end}",
+      daily: "Diário",
+      weekly: "Média de 7 dias",
+      total: "Total de tokens",
+      empty: "Nenhum uso de IA nesses dias",
+    },
+    since: "Desde {date}",
+    synced: "Sincronizado em {date}",
+    models: {
+      title: "Modelos",
+      caption: "Por custo equivalente em API",
+      other: "Outros modelos",
+    },
+    agents: {
+      title: "Agentes",
+      caption: "Todo o período",
+      agent: "Agente",
+      source: "Origem",
+      messages: "Mensagens",
+      none: "Ainda não há uso de agentes.",
+      updated: "Agentes atualizados em {date}.",
+    },
+    clients: {
+      title: "Ferramentas e provedores",
+      tool: "Ferramenta",
+      cost: "Custo",
+      tokens: "Tokens",
+      share: "Parcela",
+      window: {
+        before: "Últimos",
+        after: "dias",
+        label: "Dias cobertos pelas setas da parcela",
+      },
+      points: "{n} p.p.",
+      trend: {
+        up: "alta de {n} pontos percentuais em relação aos {days} dias anteriores",
+        down: "queda de {n} pontos percentuais em relação aos {days} dias anteriores",
+      },
+    },
+    costNote: "Os custos são estimativas do tokscale a preços públicos de API.",
+    via: "Contado pelo tokscale",
+    empty:
+      "[PLACEHOLDER: o uso de IA aparece aqui após a primeira sincronização do tokscale]",
+  },
+  pager: {
+    label: "Páginas",
+    prev: "Anterior",
+    next: "Próxima",
+    page: "Página {n}",
+  },
+  blogPage: {
+    search: {
+      label: "Buscar textos",
+      placeholder: "Buscar em títulos, resumos e tags",
+    },
+    noMatch: "Nenhum texto corresponde à busca e aos filtros.",
+    perPage: "Textos por página",
+    sourceFilter: "Filtrar por fonte",
+  },
+  projectsPage: {
+    pinned: "Fixados",
+    all: "Todos os projetos",
+    carousel: "Projetos fixados",
+    prev: "Projetos anteriores",
+    next: "Próximos projetos",
+    dots: "Escolher um projeto fixado",
+    show: "Mostrar {title}",
+    count: { one: "{n} projeto", other: "{n} projetos" },
+    search: {
+      label: "Buscar projetos",
+      placeholder: "Buscar em títulos e descrições",
+    },
+    noMatch: "Nenhum projeto corresponde à busca e aos filtros.",
+    perPage: "Projetos por página",
+    statusFilter: "Filtrar por status",
+    stack: "Stack",
+    stackFilter: "Filtrar por stack",
+  },
+  list: {
+    all: "Todos",
+    results: "Mostrando {from}–{to} de {total}",
+    perPage: { before: "Mostrar", after: "por página" },
+    sort: {
+      label: "Ordenar",
+      date: "Data",
+      title: "Título",
+      newest: "mais recentes primeiro",
+      oldest: "mais antigos primeiro",
+      az: "de A a Z",
+      za: "de Z a A",
+      spoken: "Ordenar por {key}, {dir}",
+    },
+  },
+  bookmarks: {
+    label: "Favoritos",
+    title: "Favoritos",
+    lead: "Uma estante pública dos links que salvei: artigos, vídeos, ferramentas, sites e projetos do GitHub que valem uma segunda olhada.",
+    description:
+      "Favoritos públicos do Raindrop: links salvos para depois, dos mais recentes aos mais antigos.",
+    filterLabel: "Filtrar por coleção",
+    updated: "Atualizado em {date}",
+    viewOnRaindrop: "Ver no Raindrop",
+    empty:
+      "[PLACEHOLDER: os favoritos públicos do Raindrop aparecem aqui após a primeira atualização]",
+    none: "Ainda não há favoritos públicos.",
+    search: {
+      label: "Buscar favoritos",
+      placeholder: "Buscar em títulos e descrições",
+    },
+    noMatch: "Nenhum favorito corresponde à busca.",
+    perPage: "Favoritos por página",
+  },
+  tldr: {
+    label: "TL;DR",
+    hint: "Resumir esta página com {provider} (abre em nova aba)",
+    choose: "Escolher um assistente de IA",
+    menuTitle: "Resumir com",
+    prompt:
+      "Por favor, abra esta URL com busca na web e leia a página inteira: {url}\n\n{context} Depois de ler o conteúdo real, faça o seguinte:\n1) {summary}\n2) Diga quais detalhes estou perdendo por não ler a página inteira. Seja específico o bastante para despertar minha curiosidade.\n3) Lembre que posso continuar fazendo perguntas sobre ela aqui neste chat.\n4) Sugira uma boa pergunta para começar.",
+    pages: {
+      experiences: {
+        context: "É a página de experiência profissional de Antonio Netto.",
+        summary:
+          "Resuma a carreira dele nos 5 pontos mais importantes (cargos, empresas, anos e foco) e uma conclusão em uma linha.",
+      },
+      about: {
+        context: "É a página Sobre de Antonio Netto.",
+        summary:
+          "Resuma quem ele é nos 5 pontos mais importantes (o que faz hoje, sua trajetória e o que valoriza) e uma conclusão em uma linha.",
+      },
+      ai: {
+        context:
+          "É a página de Antonio Netto sobre como ele usa ferramentas de IA para programar, com seus dados reais de uso.",
+        summary:
+          "Resuma-a nos 5 pontos mais importantes (ferramentas, modelos, agentes e quanto ele os usa) e uma conclusão em uma linha.",
+      },
+      post: {
+        context: "É uma nota de Antonio Netto, “{title}”.",
+        summary: "Resuma os 5 pontos mais importantes e a conclusão.",
+      },
+    },
+  },
+  podcasts: {
+    label: "Podcasts",
+    title: "Lista de podcasts",
+    count: { one: "{n} programa", other: "{n} programas" },
+    back: "Todos os podcasts",
+    player: "Player do Spotify: {name}",
+    listen: "Ouvir no Spotify",
+    episodes: "Todos os episódios no Spotify",
+    mock: "[PLACEHOLDER: player do Spotify, depois de ligar o podcasts:refresh]",
+  },
+  videos: {
+    label: "Vídeos",
+    count: { one: "{n} vídeo", other: "{n} vídeos" },
+    back: "Todos os vídeos",
+    player: "Player do YouTube: {name}",
+    listen: "Assistir no YouTube",
+    more: "Playlist no YouTube",
+  },
+  music: {
+    heading: "Minha playlist",
+    title: "Playlist no Apple Music",
+    listen: "Ouvir no Apple Music",
+    placeholder: "[PLACEHOLDER: link da playlist no Apple Music]",
+  },
+  media: {
+    heading: "Recomendações",
+  },
+  footer: {
+    top: "Voltar ao topo",
+  },
+  feed: {
+    label: "Feed RSS",
+    hint: "Abrir o feed RSS das notas (abre em nova aba)",
+  },
+  tech: {
+    title: "Stack de tecnologia",
+    empty: "[PLACEHOLDER: as tecnologias a mostrar]",
+    count: { one: "{n} tecnologia", other: "{n} tecnologias" },
+  },
+  experience: {
+    present: "Atual",
+    more: { one: "Mais {n} experiência", other: "Mais {n} experiências" },
+    timeline: "Linha do tempo",
+    unknownLength: "[PLACEHOLDER: anos]",
+    unknownStart: "[PLACEHOLDER: data de início]",
+  },
+  post: {
+    readMore: "Ler mais",
+    note: "Nota",
+    back: "Todos os textos",
+    updated: "Atualizado em {date}",
+    toc: "Nesta página",
+    top: "Voltar ao topo",
+    next: "Próxima nota",
+    more: "Mais notas",
+    share: {
+      label: "Compartilhar",
+      hint: "Compartilhar esta página",
+      copied: "Link copiado",
+    },
+    listen: {
+      label: "Ouvir",
+      pause: "Pausar",
+      resume: "Continuar",
+      stop: "Parar",
+      speed: "Velocidade da leitura",
+      hint: "Ouvir esta página, na voz do seu dispositivo",
+      voice: "Ouvir na voz do Antonio, gerada por IA",
+    },
+  },
+  project: {
+    appStore: "App Store",
+    demo: "Demo ao vivo",
+    source: "Código-fonte",
+    website: "Site",
+    stack: "Feito com",
+    cover: "imagem de capa",
+  },
+  devOnly: "Só em dev",
+  notFound: {
+    title: "Página não encontrada",
+    body: "Esta página não existe.",
+    home: "Ir para o início",
+  },
+} satisfies UIStrings;

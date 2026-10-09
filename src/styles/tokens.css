@@ -1,0 +1,163 @@
+/*
+ * Design tokens (spec §6). This is the only file allowed to hold color values;
+ * components read the custom properties below.
+ *
+ * Dark is the default. `data-theme="light"` on <html> switches to light; the
+ * no-flash script that sets it from the system preference arrives in Phase 2.
+ */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0d0e10;
+  --fg: #edebe6;
+  --muted: #a3a3a8;
+  --surface: #16181b;
+  --line: #2a2d32;
+  --line-strong: #3a3d43;
+  --chip: #22252a;
+  --accent: #8ab4ff;
+  /* Text on an --accent fill; 9.25:1. */
+  --on-accent: #0d0e10;
+  --status: #e8c47a;
+  /* Project status dots: todo cyan, wip orange, done green. */
+  --status-todo: #7dd3fc;
+  --status-wip: #ff9d3c;
+  --status-done: #4ade80;
+  --chip-glass: rgba(255, 255, 255, 0.08);
+  --hairline: rgba(255, 255, 255, 0.2);
+  --glass-bg: rgba(30, 32, 36, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 32px rgba(0, 0, 0, 0.45);
+  --card-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  --card-fill: #1a1a1c;
+  /* Logo tile: the dark logo clip's container (scripts/encode-logo.sh prints it). */
+  --logo-tile: #0f161c;
+  /* Edge of the logo tile, which would otherwise melt into the glass. */
+  --logo-hairline: rgba(255, 255, 255, 0.14);
+
+  --mesh-top: #0d0e10;
+  --mesh-mid: #22232a;
+  --mesh-wave-a: #b9bcc6;
+  --mesh-wave-b: #f2f2f4;
+  --mesh-edge: #e0793a;
+  --mesh-tint: rgba(110, 135, 230, 0.35);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f4f3ef;
+  --fg: #141416;
+  --muted: #5c5c63;
+  --surface: #ffffff;
+  --line: #e2e0da;
+  --line-strong: #cfccc4;
+  --chip: #edebe5;
+  --accent: #2457c5;
+  /* 6.47:1 on --accent. */
+  --on-accent: #ffffff;
+  --status: #8a5a00;
+  --status-todo: #0891b2;
+  --status-wip: #e67700;
+  --status-done: #16a34a;
+  --chip-glass: rgba(0, 0, 0, 0.06);
+  --hairline: rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 32px rgba(0, 0, 0, 0.12);
+  --card-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
+  --card-fill: #ffffff;
+  /* The light logo clip's container. */
+  --logo-tile: #eff1ec;
+  --logo-hairline: rgba(0, 0, 0, 0.08);
+
+  --mesh-top: #f4f3ef;
+  --mesh-mid: #e9e7e1;
+  --mesh-wave-a: #3a3c45;
+  --mesh-wave-b: #16171b;
+  --mesh-edge: #d86a2a;
+  --mesh-tint: rgba(90, 115, 220, 0.3);
+}
+
+/* Brand gradients and glows: the same in both themes (§6.6, §6.7). */
+:root {
+  --halo-copper: #e0793a;
+  --halo-pearl: #f2f2f4;
+  --halo-blue: #6e87e6;
+  /*
+   * The intelligence palette's stops (§6.7) as a ring, for hover halos:
+   * conic-gradient(from var(--halo-angle), var(--intelligence-ring)).
+   */
+  --intelligence-ring:
+    #ff3d77, #ff9d3c, #7dd3fc, #06b6d4, #4361ee, #e0aeff, #ff3d77;
+  --gradient-pink: linear-gradient(
+    137deg,
+    #ff3d77 0%,
+    #ffb1ce 45%,
+    #ff9d3c 100%
+  );
+  --gradient-cyan: linear-gradient(
+    137deg,
+    #ffffff 0%,
+    #7dd3fc 45%,
+    #06b6d4 100%
+  );
+  --gradient-violet: linear-gradient(
+    137deg,
+    #4361ee 0%,
+    #e0aeff 45%,
+    #f72585 100%
+  );
+
+  /*
+   * Veil over the mesh whenever page content is on screen. The spec's 0.72
+   * leaves muted text over the brightest part of the wave at 3.3:1; 0.9
+   * passes 4.5:1 in both themes (dark 6.1:1, light 4.9:1).
+   */
+  --veil-opacity: 0.9;
+}
+
+:root {
+  /*
+   * Type (§6.2). SF Pro Rounded is never bundled: `ui-rounded` reaches it on
+   * Apple platforms, everything else gets self-hosted Nunito (Fonts API).
+   */
+  --font-sans: ui-rounded, "SF Pro Rounded", var(--font-nunito);
+  /* System fonts only; used for the intro's typed "Loading..." line. */
+  --font-mono:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Fluid sizes run from the phone value at 390px to the desktop value at 1440px. */
+  --text-display: clamp(3.75rem, 2.171rem + 6.476vw, 8rem); /* 60 → 128 */
+  --text-h1: clamp(2.75rem, 1.914rem + 3.429vw, 5rem); /* 44 → 80 */
+  --text-title: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); /* 40 → 64 */
+  --text-h2: clamp(1.875rem, 1.55rem + 1.333vw, 2.75rem); /* 30 → 44 */
+  --text-h3: clamp(1.75rem, 1.564rem + 0.762vw, 2.25rem); /* 28 → 36 */
+  --text-lead: clamp(1.1875rem, 0.839rem + 1.429vw, 2.125rem); /* 19 → 34 */
+  --text-body: clamp(1rem, 0.93rem + 0.286vw, 1.1875rem); /* 16 → 19 */
+  --text-small: clamp(0.875rem, 0.852rem + 0.095vw, 0.9375rem); /* 14 → 15 */
+  --text-label: 0.75rem; /* 12 */
+
+  /* Shape (§6.3) */
+  --radius-pill: 999px;
+  --radius-card: 28px;
+  --radius-panel: 24px;
+  --radius-row: 12px;
+
+  /* Layout (§5.1) */
+  --content-max: 80rem; /* 1280 */
+  --gutter: clamp(1.25rem, 5vw, 4rem); /* 20 → 64 */
+  --column-gap: 80px;
+  --nav-clearance: 104px; /* island top (16) + height (60) + air */
+  /* The 44px logo tile plus 8px all round, so the tile clears the pill's rounded end. */
+  --island-height: 60px;
+  --island-radius: 30px;
+  --space-section: clamp(4.5rem, 3.386rem + 4.571vw, 7.5rem); /* 72 → 120 */
+  --touch: 44px;
+
+  /* Motion (§8) */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

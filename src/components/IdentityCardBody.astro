@@ -1,0 +1,251 @@
+---
+import { Picture } from "astro:assets";
+
+import portrait from "../assets/portrait.jpeg";
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import { CALENDLY_URL, COMPANY, PERSON, SOCIAL } from "../lib/site";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/** Contents of the docked identity card (spec §5.2): portrait, then a solid panel. */
+interface Props {
+  locale: Locale;
+}
+
+const ui = t(Astro.props.locale);
+---
+
+<div class="card-body">
+  <div class="portrait">
+    <Picture
+      src={portrait}
+      alt={ui.card.portraitAlt}
+      formats={["avif", "webp"]}
+      widths={[184, 350]}
+      sizes="184px"
+      width={184}
+      height={184}
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+  <div class="panel">
+    <p class="name" id="identity-name">
+      {PERSON.name}
+    </p>
+    <p class="role">{ui.card.role}</p>
+    <p class="place muted">
+      <span>{ui.card.at}</span>
+      {/* set:text: no whitespace inside the link, so its underline stops at the name. */}
+      <a class="company" href={COMPANY.href} set:text={COMPANY.name} />
+      <span>· {PERSON.city}</span>
+    </p>
+    <hr />
+    <ul class="profiles" aria-label={ui.card.profilesLabel}>
+      {SOCIAL.map((profile) => (
+        <li>
+          <a href={profile.href} rel="me" aria-label={profile.label}>
+            <Icon name={profile.id} />
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a class="email" href={`mailto:${PERSON.email}`}>
+      {PERSON.email}
+    </a>
+    {/*
+      Calendly's popup (scripts/book-call.ts loads it on the first click);
+      without JavaScript, or if it fails to load, the link opens the page.
+    */}
+    <p class="book">
+      <a
+        class="book-call"
+        href={CALENDLY_URL}
+        target="_blank"
+        rel="noopener"
+        data-calendly
+        aria-label={ui.card.bookCallLabel}
+      >
+        <UiIcon name="calendar" size={16} strokeWidth={2} />
+        <span>{ui.card.bookCall}</span>
+      </a>
+    </p>
+  </div>
+</div>
+
+<script>
+  import "../scripts/book-call";
+</script>
+
+<style>
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .portrait :global(img) {
+    width: 184px;
+    height: 184px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    text-align: center;
+  }
+
+  .name {
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .role {
+    font-weight: 500;
+  }
+
+  .place {
+    font-size: var(--text-small);
+  }
+
+  /*
+   * The employer stands out in the accent. The underline keeps it
+   * recognisable as a link without relying on colour (WCAG 1.4.1).
+   */
+  .company {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .company:hover {
+    text-decoration-color: currentColor;
+  }
+
+  hr {
+    margin: 16px 0;
+  }
+
+  .profiles {
+    display: flex;
+    gap: 8px;
+  }
+
+  .profiles a {
+    display: grid;
+    place-items: center;
+    width: var(--touch);
+    height: var(--touch);
+    border-radius: 50%;
+    background: var(--chip);
+  }
+
+  .email {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+    margin-top: 4px;
+    font-size: var(--text-small);
+  }
+
+  /*
+   * "Book a call": a pill under the email with a constant halo in the
+   * intelligence ring (requested by Antonio), turning slowly and brighter,
+   * faster on hover and focus. The glow sits at z-index -1 in .book, the
+   * isolated parent, so it shows behind the pill and not over it.
+   */
+  .book {
+    margin-top: 8px;
+    isolation: isolate;
+  }
+
+  .book-call {
+    position: relative;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+    color: var(--fg);
+    font-size: var(--text-small);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .book-call::before {
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--halo-angle),
+      var(--intelligence-ring)
+    );
+    filter: blur(8px);
+    opacity: 0.7;
+    transition: opacity 200ms ease;
+    animation: halo-turn 8s linear infinite;
+    content: "";
+    pointer-events: none;
+  }
+
+  .book-call:is(:hover, :focus-visible)::before {
+    opacity: 1;
+    animation-duration: 4s;
+  }
+
+  /* While Calendly's script loads after the first click. */
+  .book-call[aria-busy="true"] {
+    cursor: progress;
+    opacity: 0.7;
+  }
+
+  /* Reduced motion: the halo stays, still. */
+  @media (prefers-reduced-motion: reduce) {
+    .book-call::before,
+    .book-call:is(:hover, :focus-visible)::before {
+      transition: none;
+      animation: none;
+    }
+  }
+
+  /* Short desktop viewports: compact variant so the sticky card never overflows (§5.2). */
+  @media (min-width: 900px) and (max-height: 819px) {
+    .card-body {
+      gap: 12px;
+    }
+
+    .portrait :global(img) {
+      width: 120px;
+      height: 120px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    hr {
+      margin: 10px 0;
+    }
+  }
+</style>

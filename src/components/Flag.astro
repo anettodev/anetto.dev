@@ -1,0 +1,48 @@
+---
+import type { Locale } from "../i18n/locales";
+
+/*
+ * Simplified flags from the design canvas, always shown next to the language
+ * name (spec §9; never emoji). Flag colors are imagery, the one exception to
+ * the tokens-only color rule.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<svg
+  class="flag"
+  viewBox="0 0 24 16"
+  width="22"
+  height="15"
+  aria-hidden="true"
+  focusable="false"
+>
+  {locale === "en" && (
+    <>
+      <rect width="24" height="16" fill="#B22234" />
+      <path
+        d="M0 2.5h24M0 5.5h24M0 8.5h24M0 11.5h24M0 14.5h24"
+        stroke="#FFFFFF"
+        stroke-width="1.2"
+      />
+      <rect width="10" height="8.6" fill="#3C3B6E" />
+    </>
+  )}
+  {locale === "pt" && (
+    <>
+      <rect width="24" height="16" fill="#009C3B" />
+      <path d="M12 2 22 8 12 14 2 8Z" fill="#FFDF00" />
+      <circle cx="12" cy="8" r="3.6" fill="#002776" />
+    </>
+  )}
+  {locale === "es" && (
+    <>
+      <rect width="24" height="16" fill="#AA151B" />
+      <rect y="4" width="24" height="8" fill="#F1BF00" />
+    </>
+  )}
+</svg>

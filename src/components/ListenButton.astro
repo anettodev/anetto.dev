@@ -1,0 +1,209 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Listen (requested by Antonio), beside Share on a note's page: the
+ * visitor's own device reads the note aloud through the browser's speech
+ * synthesis (the Web Speech API), free and without any service. One button
+ * plays, pauses and resumes; while reading, a stop button and a speed
+ * button (1×, 1.25×, 1.5×) appear, and a line under the main button shows
+ * the progress. The passage being read is highlighted in the note.
+ * Behaviour: scripts/listen-button.ts. It stays hidden where the browser
+ * can't speak. When `npm run notes:audio` made a recording of the note in
+ * Antonio's cloned voice (ElevenLabs), it plays that instead, with a time
+ * readout, says in its tooltip that the voice is AI-generated, and keeps
+ * its halo on (like "Book a call") so that version stands out.
+ */
+interface Props {
+  locale: Locale;
+  /** The note's language tag (e.g. pt-BR), for the voice. */
+  lang: string;
+  /** The text to read: the page's areas marked data-listen (the note, About's text). */
+  target?: string;
+  /** The recording, from src/data/notes-audio.json or pages-audio.json, when there is one. */
+  audio?: { file: string; duration: number; marks: number[] } | undefined;
+}
+
+const { locale, lang, audio, target = "[data-listen]" } = Astro.props;
+const ui = t(locale);
+const words = ui.post.listen;
+---
+
+<listen-button
+  class:list={{ "has-voice": audio }}
+  data-lang={lang}
+  data-target={target}
+  data-label={words.label}
+  data-pause={words.pause}
+  data-resume={words.resume}
+  hidden
+>
+  <button
+    type="button"
+    class="button with-icon listen-main"
+    title={audio ? words.voice : words.hint}
+  >
+    <span class="listen-icon listen-play">
+      <UiIcon name="play" size={16} strokeWidth={1.8} />
+    </span>
+    <span class="listen-icon listen-pause" hidden>
+      <UiIcon name="pause" size={16} strokeWidth={2.2} />
+    </span>
+    <span class="listen-label">{words.label}</span>
+    <span class="listen-progress" aria-hidden="true"></span>
+  </button>
+  <button
+    type="button"
+    class="button listen-extra listen-stop"
+    title={words.stop}
+    hidden
+  >
+    <UiIcon name="stop" size={14} strokeWidth={2} />
+    <span class="visually-hidden">{words.stop}</span>
+  </button>
+  <button
+    type="button"
+    class="button listen-extra listen-speed"
+    title={words.speed}
+    hidden
+  >
+    <span class="visually-hidden">{words.speed}: </span>
+    <span class="listen-rate">1×</span>
+  </button>
+  <span class="listen-time" aria-hidden="true" hidden></span>
+  {audio && (
+    // The recording reads this page's own text, which is its transcript: no captions track.
+    // eslint-disable-next-line astro/jsx-a11y/media-has-caption
+    <audio
+      src={audio.file}
+      preload="none"
+      data-marks={JSON.stringify(audio.marks)}
+      data-duration={audio.duration}
+    />
+  )}
+</listen-button>
+
+<script>
+  import "../scripts/listen-button";
+</script>
+
+<style>
+  listen-button {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  /*
+   * With Antonio's recorded voice (requested by Antonio): the halo stays on,
+   * like "Book a call" (IdentityCardBody): faint and slow at rest, full and
+   * faster on hover or focus, still with reduced motion. The buttons are
+   * solid so the glow behind them never tints their text.
+   */
+  listen-button.has-voice button {
+    background: var(--surface);
+  }
+
+  listen-button.has-voice .listen-main::before {
+    opacity: 0.7;
+    animation: halo-turn 8s linear infinite;
+  }
+
+  listen-button.has-voice .listen-main:is(:hover, :focus-visible)::before {
+    opacity: 1;
+    animation-duration: 4s;
+  }
+
+  listen-button[hidden],
+  [hidden] {
+    display: none;
+  }
+
+  /* Real <button>s, unlike the links .button usually styles: drop the browser's fill. */
+  button {
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+
+  /* No overflow clip here: it would cut the button's own halo (its ::before). */
+  .listen-icon {
+    display: grid;
+  }
+
+  .listen-icon[hidden] {
+    display: none;
+  }
+
+  /* While playing, the main button joins the stop and speed buttons as one group. */
+  listen-button.is-active .listen-main {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .listen-extra {
+    justify-content: center;
+    min-width: var(--touch);
+    padding: 0 12px;
+    border-radius: 6px;
+  }
+
+  .listen-speed {
+    border-top-right-radius: var(--radius-pill);
+    border-bottom-right-radius: var(--radius-pill);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The progress: a thin line along the main button's bottom edge. */
+  .listen-progress {
+    position: absolute;
+    right: 18px;
+    bottom: 5px;
+    left: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(var(--accent), var(--accent)) no-repeat left /
+      var(--listen-progress, 0%) 100%;
+    opacity: 0;
+    transition:
+      opacity 200ms ease,
+      background-size 300ms ease;
+  }
+
+  listen-button.is-active .listen-progress {
+    opacity: 1;
+  }
+
+  /* The passage being read, in any data-listen area (scripts/listen-button.ts). */
+  :global([data-listen] .is-reading) {
+    border-radius: 6px;
+    background: color-mix(in oklab, var(--accent) 14%, transparent);
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 14%, transparent);
+    transition:
+      background-color 250ms ease,
+      box-shadow 250ms ease;
+  }
+
+  /* The recording's elapsed and total time, beside the speed button. */
+  .listen-time {
+    align-self: center;
+    padding: 0 6px;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .listen-progress {
+      transition: none;
+    }
+
+    listen-button.has-voice .listen-main::before,
+    listen-button.has-voice .listen-main:is(:hover, :focus-visible)::before {
+      animation: none;
+    }
+  }
+</style>

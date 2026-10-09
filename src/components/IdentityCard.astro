@@ -1,0 +1,92 @@
+---
+import "../styles/halo.css";
+
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import IdentityCardBody from "./IdentityCardBody.astro";
+import IntroCard from "./IntroCard.astro";
+import MusicPlayer from "./MusicPlayer.astro";
+import PodcastsPlayer from "./PodcastsPlayer.astro";
+import VideosPlayer from "./VideosPlayer.astro";
+
+/*
+ * Docked identity card (spec §5.2) with its halo (§6.6). Sticky in the left
+ * column from 900px up; at the top of the page, scrolling away, below that.
+ * On Home it is wrapped by the intro card, which flips into it once per
+ * session (§8.1) and carries the halo while it travels. Under the card,
+ * in the same sticky column, Antonio's YouTube playlist (VideosPlayer),
+ * his podcasts (PodcastsPlayer) and his Apple Music playlist (MusicPlayer),
+ * in his order, one open at a time, under a "Recommendations" title
+ * (requested by Antonio).
+ */
+interface Props {
+  locale: Locale;
+  intro?: boolean | undefined;
+}
+
+const { locale, intro = false } = Astro.props;
+const ui = t(locale);
+---
+
+<aside class="identity" aria-labelledby="identity-name">
+  {intro ? (
+    <IntroCard locale={locale}>
+      <IdentityCardBody locale={locale} />
+    </IntroCard>
+  ) : (
+    <div class="halo-host">
+      <div class="halo" aria-hidden="true" />
+      <IdentityCardBody locale={locale} />
+    </div>
+  )}
+  <section class="media-group" aria-labelledby="media-heading">
+    <p class="label media-heading" id="media-heading">
+      {ui.media.heading}
+    </p>
+    <VideosPlayer locale={locale} />
+    <PodcastsPlayer locale={locale} />
+    <MusicPlayer locale={locale} />
+  </section>
+</aside>
+
+<script>
+  /*
+   * The column (card + playlist) is taller than most windows. Sticky at the
+   * nav clearance, its bottom would never come into view, so when it doesn't
+   * fit its sticky top turns negative: it scrolls with the page until its
+   * bottom is 24px above the window's, then stays there, keeping the
+   * playlist in sight. A column that fits keeps the CSS top.
+   */
+  const column = document.querySelector<HTMLElement>(".identity");
+  if (column) {
+    const fit = () => {
+      column.style.removeProperty("top");
+      const top = parseFloat(getComputedStyle(column).top);
+      if (Number.isNaN(top)) return; // Not sticky (narrow screens).
+      const room = window.innerHeight - column.offsetHeight - 24;
+      if (room < top) column.style.top = `${room}px`;
+    };
+    new ResizeObserver(fit).observe(column);
+    window.addEventListener("resize", fit);
+  }
+</script>
+
+<style>
+  .identity {
+    width: 100%;
+    max-width: 22rem;
+    margin-inline: auto;
+  }
+
+  /*
+   * No overflow clipping (it would cut the halo's glow); the compact variant
+   * in IdentityCardBody keeps the card shorter than the viewport instead.
+   */
+  @media (min-width: 900px) {
+    .identity {
+      position: sticky;
+      top: var(--nav-clearance);
+      max-width: none;
+    }
+  }
+</style>

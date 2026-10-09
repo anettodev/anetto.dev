@@ -1,0 +1,78 @@
+---
+import type { ImageMetadata } from "astro";
+
+import youtube from "../data/youtube.json";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import { YOUTUBE_PLAYLIST_TITLE } from "../lib/site";
+import MediaList from "./MediaList.astro";
+
+/*
+ * Antonio's YouTube playlist under the identity card, the first of its
+ * three containers (requested by Antonio): a MediaList with a small
+ * "YouTube Videos" label, YOUTUBE_PLAYLIST_TITLE (else the playlist's own
+ * title) on the bar and its videos in the list. Picking one plays it in
+ * YouTube's privacy-enhanced player
+ * (youtube-nocookie.com) within the playlist; the link under it opens the
+ * playlist on YouTube.
+ *
+ * The videos come from the snapshot src/data/youtube.json, thumbnails from
+ * src/assets/youtube/, written by `npm run youtube:refresh` from
+ * YOUTUBE_PLAYLIST in lib/site.ts. Before its first run the snapshot is
+ * empty and the container stays hidden.
+ */
+interface Props {
+  locale: Locale;
+}
+
+/* Explicit: an empty snapshot would type `videos` as never[]. */
+interface Snapshot {
+  playlist: { id: string; title: string; channel: string; link: string } | null;
+  videos: {
+    id: string;
+    title: string;
+    channel: string;
+    link: string;
+    thumb: string | null;
+  }[];
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const { playlist, videos } = youtube as Snapshot;
+const thumbs = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/youtube/*",
+  { eager: true },
+);
+const items = videos.map((video) => ({
+  id: video.id,
+  name: video.title,
+  meta: video.channel,
+  link: video.link,
+  image: video.thumb
+    ? thumbs[`../assets/youtube/${video.thumb}`]?.default
+    : undefined,
+}));
+const count = ui.videos.count[
+  new Intl.PluralRules(LANG_TAG[locale]).select(items.length) === "one"
+    ? "one"
+    : "other"
+].replace("{n}", String(items.length));
+---
+
+{playlist && items.length > 0 && (
+  <MediaList
+    brand="youtube"
+    brandName="YouTube"
+    label={ui.videos.label}
+    title={YOUTUBE_PLAYLIST_TITLE || playlist.title}
+    count={count}
+    items={items}
+    wide
+    embed={`https://www.youtube-nocookie.com/embed/{id}?list=${encodeURIComponent(playlist.id)}&rel=0`}
+    playerTitle={ui.videos.player}
+    back={ui.videos.back}
+    more={{ label: ui.videos.more, href: playlist.link }}
+    listen={ui.videos.listen}
+  />
+)}

@@ -1,0 +1,37 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import UiIcon from "./UiIcon.astro";
+
+/**
+ * Theme toggle (spec §7). `floating` is the glass circle fixed top right;
+ * `inline` sits inside the expanded island on narrow screens (§7 allows it).
+ * Needs JavaScript, so it is hidden without it (see island.css).
+ */
+interface Props {
+  locale: Locale;
+  variant: "floating" | "inline";
+}
+
+const { locale, variant } = Astro.props;
+const ui = t(locale);
+---
+
+<theme-toggle
+  class:list={[
+    "theme-toggle",
+    variant,
+    { "only-expanded": variant === "inline" },
+  ]}
+  data-label-to-light={ui.theme.toLight}
+  data-label-to-dark={ui.theme.toDark}
+>
+  <button type="button" aria-label={ui.theme.toLight}>
+    <UiIcon name="moon" size={20} class="moon" />
+    <UiIcon name="sun" size={20} class="sun" />
+  </button>
+</theme-toggle>
+
+<script>
+  import "../scripts/theme-toggle";
+</script>

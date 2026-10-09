@@ -1,0 +1,28 @@
+# Dependabot reads this file from the default branch only, so it takes effect at cutover.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      astro:
+        patterns: ["astro", "@astrojs/*"]
+      tooling:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "typescript-eslint"
+          - "prettier"
+          - "prettier-*"
+          - "globals"
+    ignore:
+      # @astrojs/check and typescript-eslint support TypeScript < 6.1 only.
+      - dependency-name: typescript
+        update-types:
+          ["version-update:semver-major", "version-update:semver-minor"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

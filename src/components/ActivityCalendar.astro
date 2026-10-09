@@ -1,0 +1,246 @@
+---
+/*
+ * A year of daily activity, one column per week with Sunday on top, shared
+ * by GitHub Activity and AI usage. A day's colour comes from its week's place
+ * in the year, swept through the intelligence palette (§6.7), mixed into the
+ * empty-cell colour by level (0–4).
+ *
+ * The calendar is one image to assistive tech (its label names the range);
+ * each section repeats the totals as text. A hover tooltip, filled by
+ * scripts/activity-calendar.ts, names a day's count and date. Cards narrower
+ * than 34rem show the last 26 weeks: a whole year would shrink each day to a
+ * speck. The parent card must be an inline-size container.
+ */
+export interface CalendarDay {
+  date: string;
+  count: number;
+  level: number;
+  /** Extra text for the tooltip's {note}, e.g. the day's cost. */
+  note?: string;
+}
+
+interface Props {
+  weeks: CalendarDay[][];
+  /** BCP 47 tag for the month labels and the tooltip. */
+  lang: string;
+  label: string;
+  /** Tooltip messages; {n} is the count, {date} the day, {note} its note. */
+  messages: { zero: string; one: string; other: string };
+  /** Compact counts in the tooltip (4.7M instead of 4,700,000). */
+  compact?: boolean;
+}
+
+const { weeks, lang, label, messages, compact = false } = Astro.props;
+const monthFormat = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  timeZone: "UTC",
+});
+const asDate = (iso: string) => new Date(`${iso}T00:00:00Z`);
+
+const RECENT = 26;
+const offset = Math.max(0, weeks.length - RECENT);
+
+/* A month is labelled over the first week that starts in it, as GitHub does;
+   a label too close to the next one (a partial first month) is dropped. */
+const starts = weeks.flatMap((week, col) => {
+  const first = week[0];
+  if (!first) return [];
+  const month = asDate(first.date).getUTCMonth();
+  const previous = weeks[col - 1]?.[0];
+  const isNew = !previous || asDate(previous.date).getUTCMonth() !== month;
+  return isNew ? [{ col, label: monthFormat.format(asDate(first.date)) }] : [];
+});
+const months = starts.filter(
+  (month, index) => (starts[index + 1]?.col ?? Infinity) - month.col >= 3,
+);
+
+/* Four segments between the five palette stops (see the style). */
+const sweep = (col: number) => {
+  const position = (col / Math.max(1, weeks.length - 1)) * 4;
+  const segment = Math.min(3, Math.floor(position));
+  return { segment, u: (position - segment).toFixed(3) };
+};
+const columns = (col: number) =>
+  `--col: ${col + 1}; --col-n: ${col - offset + 1}`;
+---
+
+<activity-calendar
+  class="activity"
+  data-lang={lang}
+  data-zero={messages.zero}
+  data-one={messages.one}
+  data-other={messages.other}
+  data-compact={compact ? "" : undefined}
+>
+  <div
+    class="calendar"
+    role="img"
+    aria-label={label}
+    style={`--weeks: ${weeks.length}; --recent: ${RECENT}`}
+  >
+    {months.map((month) => (
+      <span
+        class:list={["month", { older: month.col < offset }]}
+        style={columns(month.col)}
+      >
+        {month.label}
+      </span>
+    ))}
+    {weeks.map((week, col) => {
+      const { segment, u } = sweep(col);
+      return (
+        <div
+          class:list={[
+            "week",
+            `s${segment}`,
+            { older: col < offset, partial: col === 0 && week.length < 7 },
+          ]}
+          style={`${columns(col)}; --u: ${u}`}
+        >
+          {week.map((day) => (
+            <span
+              class={`day l${day.level}`}
+              data-d={day.date}
+              data-c={day.count}
+              data-n={day.note}
+            />
+          ))}
+        </div>
+      );
+    })}
+  </div>
+  <span class="tip" hidden></span>
+</activity-calendar>
+
+<script>
+  import "../scripts/activity-calendar";
+</script>
+
+<style>
+  .activity {
+    /*
+     * The intelligence palette's stops (§6.7), ordered so the hue turns one
+     * way round the wheel (orange, pink, lilac, blue, cyan) and blended in
+     * OKLCH, which keeps them vivid; an orange-to-cyan blend would pass
+     * through grey.
+     */
+    --ip-0: #ff9d3c;
+    --ip-1: #ff3d77;
+    --ip-2: #e0aeff;
+    --ip-3: #4361ee;
+    --ip-4: #7dd3fc;
+    --cell-empty: var(--chip);
+
+    position: relative;
+    display: block;
+  }
+
+  /* Deeper stops where the pale ones would wash out on a light card. */
+  :global(:root[data-theme="light"]) .activity {
+    --ip-1: #f72585;
+    --ip-2: color-mix(in oklch, #e0aeff, #4361ee 45%);
+    --ip-4: #06b6d4;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    gap: 6px 3px;
+  }
+
+  .month {
+    grid-row: 1;
+    grid-column: var(--col) / span 3;
+    color: var(--muted);
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .week {
+    display: flex;
+    flex-direction: column;
+    grid-row: 2;
+    grid-column: var(--col);
+    gap: 3px;
+  }
+
+  /* A first week that starts mid-week keeps its days on their weekday rows. */
+  .week.partial {
+    justify-content: flex-end;
+  }
+
+  .day {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: var(--cell-empty);
+  }
+
+  /* The week's colour: between two neighbouring stops, by --u (0 → 1). */
+  .s0 {
+    --hue: color-mix(in oklch, var(--ip-0), var(--ip-1) calc(var(--u) * 100%));
+  }
+
+  .s1 {
+    --hue: color-mix(in oklch, var(--ip-1), var(--ip-2) calc(var(--u) * 100%));
+  }
+
+  .s2 {
+    --hue: color-mix(in oklch, var(--ip-2), var(--ip-3) calc(var(--u) * 100%));
+  }
+
+  .s3 {
+    --hue: color-mix(in oklch, var(--ip-3), var(--ip-4) calc(var(--u) * 100%));
+  }
+
+  /* Four activity levels, as more of the week's colour. */
+  .l1 {
+    background: color-mix(in oklab, var(--hue) 45%, var(--cell-empty));
+  }
+
+  .l2 {
+    background: color-mix(in oklab, var(--hue) 65%, var(--cell-empty));
+  }
+
+  .l3 {
+    background: color-mix(in oklab, var(--hue) 85%, var(--cell-empty));
+  }
+
+  .l4 {
+    background: var(--hue);
+  }
+
+  /* Narrow cards: the last 26 weeks, renumbered from the first column. */
+  @container (max-width: 34rem) {
+    .calendar {
+      grid-template-columns: repeat(var(--recent), minmax(0, 1fr));
+    }
+
+    .older {
+      display: none;
+    }
+
+    .month {
+      grid-column: var(--col-n) / span 3;
+    }
+
+    .week {
+      grid-column: var(--col-n);
+    }
+  }
+
+  .tip {
+    position: absolute;
+    z-index: 2;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--fg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    color: var(--bg);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transform: translate(-50%, calc(-100% - 8px));
+    pointer-events: none;
+  }
+</style>

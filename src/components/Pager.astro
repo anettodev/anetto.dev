@@ -1,0 +1,82 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+
+/*
+ * A pager: previous, the page numbers, next. The numbers are drawn by the
+ * list's script (lib/page-list.ts `fillPages`: first, last and around the
+ * current, "…" between), which also unhides the nav when there's more than
+ * one page. Without JavaScript it stays hidden and the whole list shows.
+ * Used by the Bookmarks and Projects pages.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const ui = t(Astro.props.locale);
+---
+
+<nav class="pager needs-js" aria-label={ui.pager.label} hidden>
+  <button type="button" class="step" data-step="-1">
+    <span aria-hidden="true">←&nbsp;</span>
+    {ui.pager.prev}
+  </button>
+  <span class="pages"></span>
+  <button type="button" class="step" data-step="1">
+    {ui.pager.next}
+    <span aria-hidden="true">&nbsp;→</span>
+  </button>
+</nav>
+
+<style>
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pager[hidden] {
+    display: none;
+  }
+
+  .pages {
+    display: flex;
+    gap: 4px;
+  }
+
+  /* The page numbers are built by the script, so these reach them too. */
+  .pager :global(button) {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    font-size: var(--text-small);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .pager :global(.gap) {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    color: var(--muted);
+  }
+
+  .pager :global(button:disabled) {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .pager :global(button[aria-current="page"]) {
+    border-color: transparent;
+    background: var(--fg);
+    color: var(--bg);
+    font-weight: 600;
+  }
+</style>

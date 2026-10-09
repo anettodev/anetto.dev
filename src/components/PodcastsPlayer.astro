@@ -1,0 +1,76 @@
+---
+import type { ImageMetadata } from "astro";
+
+import podcasts from "../data/podcasts.json";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import MediaList from "./MediaList.astro";
+
+/*
+ * Antonio's podcasts under the identity card, between the YouTube and
+ * Apple Music playlists (requested by Antonio): a MediaList with a small
+ * "Spotify Podcasts" label and a "Podcasts List" bar. Picking a show plays
+ * Spotify's embed of it (`theme=0` in the dark theme), which shows only the
+ * newest episode, so the link under it opens the show on Spotify.
+ *
+ * The shows come from the snapshot src/data/podcasts.json, covers from
+ * src/assets/podcasts/, written by `npm run podcasts:refresh` from
+ * PODCASTS_SHOWN in lib/site.ts. A snapshot marked `mock: true` (the old
+ * "Sample:" shows) gets a [PLACEHOLDER] player and is left out of
+ * production builds, so made-up shows never go live. A show without a
+ * publisher gets no line under its name.
+ */
+interface Props {
+  locale: Locale;
+}
+
+interface Show {
+  id: string;
+  name: string;
+  publisher: string;
+  link: string;
+  cover: string | null;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const data = podcasts as { mock?: boolean; shows: Show[] };
+const mock = data.mock === true;
+const shown = data.shows.length > 0 && (!mock || import.meta.env.DEV);
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/podcasts/*",
+  { eager: true },
+);
+const items = data.shows.map((show) => ({
+  id: show.id,
+  name: show.name,
+  meta: show.publisher,
+  link: show.link,
+  image: show.cover
+    ? covers[`../assets/podcasts/${show.cover}`]?.default
+    : undefined,
+}));
+const count = ui.podcasts.count[
+  new Intl.PluralRules(LANG_TAG[locale]).select(items.length) === "one"
+    ? "one"
+    : "other"
+].replace("{n}", String(items.length));
+---
+
+{shown && (
+  <MediaList
+    brand="spotify"
+    brandName="Spotify"
+    label={ui.podcasts.label}
+    title={ui.podcasts.title}
+    count={count}
+    items={items}
+    embed="https://open.spotify.com/embed/show/{id}?utm_source=generator"
+    dark="theme=0"
+    playerTitle={ui.podcasts.player}
+    back={ui.podcasts.back}
+    more={{ label: ui.podcasts.episodes }}
+    listen={ui.podcasts.listen}
+    mock={mock ? ui.podcasts.mock : undefined}
+  />
+)}

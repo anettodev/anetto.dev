@@ -1,0 +1,141 @@
+{
+  "fetchedAt": "2026-10-05",
+  "user": "anettodev",
+  "gists": [
+    {
+      "id": "4fd022236a7db2c9d22cd60260d8f905",
+      "title": "Test LiquidGlass Music Template",
+      "files": ["liquidGlassTemplate.swift"],
+      "languages": ["Swift"],
+      "created": "2025-08-11T20:28:02Z",
+      "updated": "2025-08-11T20:28:33Z",
+      "link": "https://gist.github.com/anettodev/4fd022236a7db2c9d22cd60260d8f905"
+    },
+    {
+      "id": "b7d299fe02ef5a8ef264f523a34b47c0",
+      "title": ".cursor/rules/general.mdc",
+      "files": [],
+      "languages": [],
+      "created": "2025-05-29T19:38:23Z",
+      "updated": "2025-05-29T19:38:23Z",
+      "link": "https://gist.github.com/anettodev/b7d299fe02ef5a8ef264f523a34b47c0"
+    },
+    {
+      "id": "39eda6309da4e8a30f558a6451a3bf67",
+      "title": ".cursor/rules/swift.mdc",
+      "files": [],
+      "languages": [],
+      "created": "2025-05-29T19:35:15Z",
+      "updated": "2025-05-29T19:35:15Z",
+      "link": "https://gist.github.com/anettodev/39eda6309da4e8a30f558a6451a3bf67"
+    },
+    {
+      "id": "44a0632f5034b47534cf37dc75c11385",
+      "title": "RBENV steps installation",
+      "files": ["Install RBENV"],
+      "languages": [],
+      "created": "2020-05-29T22:48:07Z",
+      "updated": "2020-05-29T22:51:08Z",
+      "link": "https://gist.github.com/anettodev/44a0632f5034b47534cf37dc75c11385"
+    },
+    {
+      "id": "c3d6008118ebce4ea2500aead10e65ff",
+      "title": "This mine .zshrc config file",
+      "files": [".zshrc"],
+      "languages": ["Shell"],
+      "created": "2020-05-10T20:11:53Z",
+      "updated": "2020-05-10T20:12:26Z",
+      "link": "https://gist.github.com/anettodev/c3d6008118ebce4ea2500aead10e65ff"
+    },
+    {
+      "id": "be361df1c178c22dfdd9d639738cb636",
+      "title": ".gitconfig",
+      "files": [".gitconfig"],
+      "languages": ["Git Config"],
+      "created": "2020-05-10T20:10:18Z",
+      "updated": "2020-06-26T15:35:38Z",
+      "link": "https://gist.github.com/anettodev/be361df1c178c22dfdd9d639738cb636"
+    },
+    {
+      "id": "7678f48430124140a1796fecde2ebc09",
+      "title": "HTTP status codes as a Swift enum.",
+      "files": ["HTTPStatusCode.swift"],
+      "languages": ["Swift"],
+      "created": "2019-07-29T18:42:06Z",
+      "updated": "2019-07-29T18:42:06Z",
+      "link": "https://gist.github.com/anettodev/7678f48430124140a1796fecde2ebc09"
+    },
+    {
+      "id": "96f14c4f134d8056606545734ea70d1d",
+      "title": "ItalianRestaurantQueue.swift",
+      "files": ["ItalianRestaurantQueue.swift"],
+      "languages": ["Swift"],
+      "created": "2019-04-08T01:59:40Z",
+      "updated": "2019-04-08T01:59:41Z",
+      "link": "https://gist.github.com/anettodev/96f14c4f134d8056606545734ea70d1d"
+    },
+    {
+      "id": "a8c9e693a04cbe21a6c56ddcacf3d1bc",
+      "title": "RestaurantSimpleMenu.swift",
+      "files": ["RestaurantSimpleMenu.swift"],
+      "languages": ["Swift"],
+      "created": "2019-04-08T01:58:33Z",
+      "updated": "2019-04-08T01:58:33Z",
+      "link": "https://gist.github.com/anettodev/a8c9e693a04cbe21a6c56ddcacf3d1bc"
+    },
+    {
+      "id": "a25067b61641779cb85df5169daea8fc",
+      "title": "OrderProtocolRestaurantQueue.swift",
+      "files": ["OrderProtocolRestaurantQueue.swift"],
+      "languages": ["Swift"],
+      "created": "2019-04-08T01:56:02Z",
+      "updated": "2019-04-08T01:57:39Z",
+      "link": "https://gist.github.com/anettodev/a25067b61641779cb85df5169daea8fc"
+    },
+    {
+      "id": "ee0ecb91853bc0c36195f0f41d84d143",
+      "title": "CustomGenericSum.swift",
+      "files": ["CustomGenericSum.swift"],
+      "languages": ["Swift"],
+      "created": "2019-04-08T01:53:41Z",
+      "updated": "2019-04-08T01:53:42Z",
+      "link": "https://gist.github.com/anettodev/ee0ecb91853bc0c36195f0f41d84d143"
+    },
+    {
+      "id": "7bf04d0aa2e49e75ab2cb6fe98e62fa1",
+      "title": "GenericSumWithNumeric.swift",
+      "files": ["GenericSumWithNumeric.swift"],
+      "languages": ["Swift"],
+      "created": "2019-04-08T01:51:26Z",
+      "updated": "2019-04-08T01:51:26Z",
+      "link": "https://gist.github.com/anettodev/7bf04d0aa2e49e75ab2cb6fe98e62fa1"
+    },
+    {
+      "id": "d53b05370afdef010132daaf00038d2d",
+      "title": "simple integers sum() function in swift",
+      "files": ["SumInt.swift"],
+      "languages": ["Swift"],
+      "created": "2019-04-08T01:44:12Z",
+      "updated": "2019-04-08T17:10:05Z",
+      "link": "https://gist.github.com/anettodev/d53b05370afdef010132daaf00038d2d"
+    },
+    {
+      "id": "7b717ac040dccf239d9d53c36b58fc8a",
+      "title": "CocoaHeads Talk.txt",
+      "files": ["CocoaHeads Talk.txt"],
+      "languages": [],
+      "created": "2016-07-18T19:27:15Z",
+      "updated": "2019-04-11T22:17:23Z",
+      "link": "https://gist.github.com/anettodev/7b717ac040dccf239d9d53c36b58fc8a"
+    },
+    {
+      "id": "681839ff69e4b8ede8ae99c11ba0e412",
+      "title": "WWDC16 - List of iOS Sessions",
+      "files": ["wwdc16_Announcements_list.txt"],
+      "languages": [],
+      "created": "2016-07-05T19:54:55Z",
+      "updated": "2016-07-05T20:24:00Z",
+      "link": "https://gist.github.com/anettodev/681839ff69e4b8ede8ae99c11ba0e412"
+    }
+  ]
+}

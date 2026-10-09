@@ -1,0 +1,68 @@
+---
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * A compact dropdown (pill, chevron): the per-page picker and the stack
+ * filter. `filter` makes it a filter of scripts/filter-list.ts.
+ */
+interface Props {
+  label: string;
+  options: { value: string | number; label: string | number }[];
+  selected?: string | number;
+  filter?: string;
+  /** "lg" matches the search row's 40px height. */
+  size?: "md" | "lg";
+}
+
+const { label, options, selected, filter, size = "md" } = Astro.props;
+---
+
+<span class:list={["pick", size]}>
+  <select aria-label={label} data-filter={filter}>
+    {options.map((option) => (
+      <option value={option.value} selected={option.value === selected}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+  <UiIcon name="chevron" size={12} strokeWidth={2.4} />
+</span>
+
+<style>
+  .pick {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .pick select {
+    min-height: 32px;
+    padding: 0 28px 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+    color: var(--fg);
+    font: inherit;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .pick.lg select {
+    min-height: 40px;
+    padding-left: 14px;
+  }
+
+  .pick select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .pick :global(svg) {
+    position: absolute;
+    right: 10px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+</style>

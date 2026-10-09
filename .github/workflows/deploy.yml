@@ -1,0 +1,112 @@
+# Builds the Astro site and deploys it to GitHub Pages (anetto.dev, set in
+# the repo's Pages settings, so no CNAME file is needed). It replaces the
+# Hugo deploy.
+#
+# - A push to main deploys exactly what was merged.
+# - The daily run (and a manual run) first refreshes the data snapshots,
+#   commits whatever changed to main, then deploys. A refresh that fails
+#   never blocks the deploy: the site keeps its last committed data.
+#   Commits pushed with the Actions token don't start another run.
+#
+# The github-pages environment only accepts deployments from main.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily at 06:23 UTC (03:23 in Belo Horizonte).
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REFRESH: ${{ github.event_name != 'push' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      # Data snapshots (scheduled and manual runs only).
+      - name: Refresh GitHub activity
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run github:refresh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Refresh AI usage (agents stay as committed; they come from the Mac)
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run ai:refresh
+      - name: Refresh bookmarks
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run bookmarks:refresh
+      - name: Refresh Medium stories and gists
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run blog:refresh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Refresh the Apple Music playlist bar
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run music:refresh
+      - name: Refresh Spotify podcasts
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run podcasts:refresh
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+      - name: Refresh the YouTube playlist
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: npm run youtube:refresh
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      - name: Commit refreshed snapshots
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: |
+          git add -A src/data src/assets public/bookmarks
+          if git diff --cached --quiet; then
+            echo "No data changed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(data): daily refresh"
+          git push
+
+      - name: Type check and build
+        run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

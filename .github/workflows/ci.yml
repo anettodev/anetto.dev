@@ -1,0 +1,36 @@
+# Checks every pull request into main, and every push to it, with the
+# project's own tools: ESLint, Prettier, astro check and the build. It
+# replaces super-linter, whose bundled configs don't fit an Astro project
+# (they can't parse the TypeScript, and their stylelint rejects modern CSS).
+# It never deploys; the deploy workflow comes with the cutover (Phase 7).
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Formatting
+        run: npm run format:check
+      - name: Type check and build
+        run: npm run build

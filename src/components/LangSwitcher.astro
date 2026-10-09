@@ -1,0 +1,54 @@
+---
+import { localizedPath, t } from "../i18n";
+import { LANG_TAG, LOCALE_LABEL, LOCALES, type Locale } from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+import Flag from "./Flag.astro";
+import UiIcon from "./UiIcon.astro";
+
+/**
+ * Language pill (spec §7). A native <details> of real links to the same page
+ * in each locale, so it is crawlable and works without JavaScript.
+ */
+interface Props {
+  locale: Locale;
+  /** Pages without twins (404) link to each locale's home. */
+  route?: RouteKey | undefined;
+  /** A page under the route: a note links to the same note in each locale. */
+  subpath?: string | undefined;
+}
+
+const { locale, route = "home", subpath } = Astro.props;
+const ui = t(locale);
+---
+
+<lang-switcher class="lang">
+  <details>
+    <summary aria-label={ui.languageLabel}>
+      <Flag locale={locale} />
+      <UiIcon name="chevron" size={12} strokeWidth={2.2} />
+    </summary>
+    <ul class="lang-menu">
+      {LOCALES.map((option) => (
+        <li>
+          <a
+            href={localizedPath(option, route, subpath)}
+            hreflang={LANG_TAG[option]}
+            lang={LANG_TAG[option]}
+            data-locale={option}
+            aria-current={option === locale ? "true" : undefined}
+          >
+            <Flag locale={option} />
+            <span>{LOCALE_LABEL[option]}</span>
+            {option === locale && (
+              <UiIcon name="check" size={16} strokeWidth={2.2} />
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </details>
+</lang-switcher>
+
+<script>
+  import "../scripts/lang-switcher";
+</script>

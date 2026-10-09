@@ -1,0 +1,228 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import ListPick from "./ListPick.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * A filtered list's tools (scripts/filter-list.ts), in two rows:
+ *   1. the search field, as wide as the row allows, then any extra filters
+ *      (the `filters` slot: the projects' Stack picker) and the sort toggle
+ *      (`sorts`: Date and/or Title; the pressed one sorts, pressing it
+ *      again flips it)
+ *   2. the chips (the `chips` slot) on the left; "Showing 1–10 of 13"
+ *      (aria-live) and "Show [n] per page" on the right
+ * Rows wrap on narrow screens. Hidden without JavaScript.
+ */
+type SortKey = "date" | "title";
+
+interface Props {
+  locale: Locale;
+  search: { label: string; placeholder: string };
+  sorts: SortKey[];
+  /** The starting order, as the list's data-sort ("date:desc"). */
+  sort: `${SortKey}:${"asc" | "desc"}`;
+  perPage: number[];
+  /** The per-page picker's accessible name ("Bookmarks per page"). */
+  perPageLabel: string;
+}
+
+const { locale, search, sorts, sort, perPage, perPageLabel } = Astro.props;
+const ui = t(locale);
+const [sortKey, sortDir] = sort.split(":");
+const arrow = (key: SortKey) => {
+  const dir = key === sortKey ? sortDir : key === "date" ? "desc" : "asc";
+  if (key === "date") return dir === "desc" ? "↓" : "↑";
+  return dir === "asc" ? "A–Z" : "Z–A";
+};
+---
+
+<div class="tools needs-js">
+  <div class="bar">
+    <label class="search">
+      <span class="visually-hidden">{search.label}</span>
+      <UiIcon name="search" size={16} strokeWidth={2} />
+      <input
+        type="search"
+        placeholder={search.placeholder}
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </label>
+    <div class="bar-end">
+      <slot name="filters" />
+      <div
+        class="sort"
+        role="group"
+        aria-label={ui.list.sort.label}
+        data-sort-date={ui.list.sort.date}
+        data-sort-title={ui.list.sort.title}
+        data-newest={ui.list.sort.newest}
+        data-oldest={ui.list.sort.oldest}
+        data-az={ui.list.sort.az}
+        data-za={ui.list.sort.za}
+        data-spoken={ui.list.sort.spoken}
+      >
+        {sorts.map((key) => (
+          <button
+            type="button"
+            data-sort={key}
+            aria-pressed={key === sortKey ? "true" : "false"}
+          >
+            {ui.list.sort[key]}
+            <span class="dir" aria-hidden="true">
+              {arrow(key)}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="meta">
+    <slot name="chips" />
+    <div class="meta-end muted">
+      <p class="status" aria-live="polite"></p>
+      <label class="per-page">
+        {ui.list.perPage.before}
+        <ListPick
+          label={perPageLabel}
+          options={perPage.map((n) => ({ value: n, label: n }))}
+          selected={perPage[0]}
+        />
+        {ui.list.perPage.after}
+      </label>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tools {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ---------- Row 1: search, filters, sort ---------- */
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    align-items: center;
+  }
+
+  .search {
+    position: relative;
+    display: flex;
+    flex: 1 1 16rem;
+    align-items: center;
+  }
+
+  .search :global(svg) {
+    position: absolute;
+    left: 14px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .search input {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 16px 0 40px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--fg);
+    font: inherit;
+    font-size: var(--text-small);
+  }
+
+  .search input::placeholder {
+    color: var(--muted);
+  }
+
+  .search input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .bar-end {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    align-items: center;
+    font-size: var(--text-small);
+  }
+
+  .sort {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+  }
+
+  .sort button {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .sort button[aria-pressed="true"] {
+    background: var(--card-fill);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .sort button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dir {
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sort button[aria-pressed="false"] .dir {
+    opacity: 0.6;
+  }
+
+  /* ---------- Row 2: chips, then what's showing ---------- */
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    align-items: center;
+  }
+
+  .meta-end {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: center;
+    margin-left: auto;
+    font-size: var(--text-small);
+  }
+
+  .status {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .per-page {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+</style>

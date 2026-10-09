@@ -1,0 +1,174 @@
+---
+import "../styles/tokens.css";
+import "../styles/global.css";
+
+import { Font } from "astro:assets";
+
+import { localizedUrl, t } from "../i18n";
+import { FEED_PATH, FEED_TITLE } from "../lib/notes-feed";
+import { GOATCOUNTER_CODE } from "../lib/site";
+import {
+  DEFAULT_LOCALE,
+  LANG_TAG,
+  LOCALES,
+  OG_LOCALE,
+  type Locale,
+} from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+
+interface Props {
+  locale: Locale;
+  /** Omit for pages without localized twins (404): no canonical or hreflang. */
+  route?: RouteKey | undefined;
+  /**
+   * A page under the route, e.g. a note's slug under `blog`: its canonical,
+   * og:url and hreflang alternates are its own, not the route's index.
+   */
+  subpath?: string | undefined;
+  /** Page name; the site name is appended. Omit on Home. */
+  title?: string | undefined;
+  description?: string | undefined;
+  /** Home: the head script may play the intro card (§8.1). */
+  intro?: boolean | undefined;
+}
+
+const {
+  locale,
+  route,
+  subpath,
+  title,
+  description,
+  intro = false,
+} = Astro.props;
+const ui = t(locale);
+const pageTitle = title ? `${title} · ${ui.siteName}` : ui.siteName;
+---
+
+<!doctype html>
+<html lang={LANG_TAG[locale]} data-intro-page={intro ? "" : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      // Before first paint (spec §10): saved theme, else the system's; flag JS for the island.
+      (() => {
+        const root = document.documentElement;
+        root.dataset.js = "";
+        let theme = null;
+        try {
+          theme = localStorage.getItem("anetto:theme");
+        } catch {
+          // Storage blocked: fall back to the system preference.
+        }
+        if (theme !== "light" && theme !== "dark") {
+          theme = matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        root.dataset.theme = theme;
+
+        // Intro (spec §8.1): once per session, never with reduced motion.
+        // Without working storage it would replay on every visit, so skip it.
+        // `?intro` (the island's name link) replays it on request; the
+        // parameter is removed at once so a reload or a shared link doesn't.
+        if (root.hasAttribute("data-intro-page")) {
+          const params = new URLSearchParams(location.search);
+          const replay = params.has("intro");
+          if (replay) {
+            params.delete("intro");
+            const query = params.toString();
+            history.replaceState(
+              history.state,
+              "",
+              location.pathname + (query ? "?" + query : "") + location.hash,
+            );
+          }
+          let seen = true;
+          try {
+            seen = sessionStorage.getItem("anetto:intro-seen") !== null;
+          } catch {
+            // Storage blocked: treat as seen.
+          }
+          if (
+            (replay || !seen) &&
+            !matchMedia("(prefers-reduced-motion: reduce)").matches
+          ) {
+            root.dataset.intro = "play";
+            // The logo poster is the intro's largest image (its LCP): fetch
+            // it now rather than when the card's own inline script sets it
+            // (IntroCard.astro, same path).
+            const poster = document.createElement("link");
+            poster.rel = "preload";
+            poster.as = "image";
+            poster.fetchPriority = "high";
+            poster.href = `/brand/logo-intro-${theme}-poster.webp`;
+            document.head.append(poster);
+          }
+        }
+      })();
+    </script>
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    {/* Social previews (§13.2). No og:image until the new 1200×630 image exists (§13.1). */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={ui.siteName} />
+    <meta property="og:title" content={pageTitle} />
+    {description && <meta property="og:description" content={description} />}
+    {route && (
+      <meta property="og:url" content={localizedUrl(locale, route, subpath)} />
+    )}
+    <meta property="og:locale" content={OG_LOCALE[locale]} />
+    {LOCALES.filter((alt) => alt !== locale).map((alt) => (
+      <meta property="og:locale:alternate" content={OG_LOCALE[alt]} />
+    ))}
+    <meta name="twitter:card" content="summary" />
+    {route && (
+      <>
+        <link rel="canonical" href={localizedUrl(locale, route, subpath)} />
+        {LOCALES.map((alt) => (
+          <link
+            rel="alternate"
+            hreflang={LANG_TAG[alt]}
+            href={localizedUrl(alt, route, subpath)}
+          />
+        ))}
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={localizedUrl(DEFAULT_LOCALE, route, subpath)}
+        />
+      </>
+    )}
+    {/*
+      GoatCounter page views (kept from the Hugo site, Antonio's choice):
+      production builds only, async, cookie-free. It counts the canonical
+      path, so each language's page counts on its own.
+    */}
+    {import.meta.env.PROD && GOATCOUNTER_CODE && (
+      <script
+        is:inline
+        async
+        data-goatcounter={`https://${GOATCOUNTER_CODE}.goatcounter.com/count`}
+        src="https://gc.zgo.at/count.js"
+      />
+    )}
+    {/* The notes' feed, for feed readers and browser extensions that look for one. */}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={FEED_TITLE}
+      href={FEED_PATH}
+    />
+    {/* The site's app-icon logo (src/assets/brand/logo-dark.png), not the old Hugo mark. */}
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {/* Not preloaded: Apple platforms render ui-rounded and never fetch Nunito. */}
+    <Font cssVariable="--font-nunito" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

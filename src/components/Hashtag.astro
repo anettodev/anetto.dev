@@ -1,0 +1,22 @@
+---
+import "../styles/hashtags.css";
+
+/*
+ * One coloured hashtag (requested by Antonio): a list item with a "#" in
+ * the tag's hue (from lib/tag-hues.ts, given by the list), styled by
+ * styles/hashtags.css. Screen readers hear just the tag.
+ */
+interface Props {
+  tag: string;
+  hue: number | undefined;
+}
+
+const { tag, hue = 0 } = Astro.props;
+---
+
+<li class="hashtag" style={`--tag-hue: ${hue}`}>
+  <span class="hashtag-hash" aria-hidden="true">
+    #
+  </span>
+  {tag}
+</li>

@@ -1,0 +1,384 @@
+---
+import Copy from "../../components/Copy.astro";
+import ExperienceTimeline from "../../components/ExperienceTimeline.astro";
+import Icon from "../../components/Icon.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import TldrButton from "../../components/TldrButton.astro";
+import UiIcon from "../../components/UiIcon.astro";
+import { localeStaticPaths, localizedUrl, t } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+import { getCompanies, getPage } from "../../lib/content";
+import { LINKS } from "../../lib/site";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const experiences = await getPage(locale, "experiences");
+const { label, title, lead, figures, before, resumeLink, linkedinLink } =
+  experiences.data;
+const companies = await getCompanies(experiences.lang);
+
+/*
+ * The figures under the header (requested by Antonio): a `since` figure
+ * counts whole years up to the build, as "18+", so it stays current with
+ * each deploy. "Before that": the earlier jobs as a lighter continuation
+ * of the timeline (years, a dot on a dashed rail, the name and one line;
+ * nothing to open).
+ */
+const now = new Date();
+/* "{apple}" in a figure's label or pills stands for the Apple mark. */
+const APPLE = "{apple}";
+const withMarks = (text: string) =>
+  text
+    .split(/(\{apple\})/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+const yearsSince = (month: string) => {
+  const [year, mon] = month.split("-").map(Number);
+  const months =
+    (now.getFullYear() - (year ?? 0)) * 12 + now.getMonth() + 1 - (mon ?? 1);
+  return Math.floor(months / 12);
+};
+const yearRange = (start: string, end: string) => {
+  const [from, to] = [start.slice(0, 4), end.slice(0, 4)];
+  return from === to ? from : `${from}–${to}`;
+};
+---
+
+<Page
+  locale={locale}
+  route="experiences"
+  title={ui.nav.experiences}
+  description={experiences.data.description}
+  contentLang={experiences.lang}
+>
+  <PageHeader label={label} title={title} lead={lead}>
+    {/* LinkedIn, then the resume, above the timeline (requested by Antonio). */}
+    <div class="button-row">
+      <a class="button with-icon" href={LINKS.linkedin} rel="me">
+        <Icon name="linkedin" size={16} />
+        {linkedinLink}
+      </a>
+      <a class="button with-icon" href={LINKS.resume}>
+        <UiIcon name="pdf" size={18} strokeWidth={1.8} />
+        {resumeLink}
+        <span class="visually-hidden"> (PDF)</span>
+      </a>
+      {/* An AI summary of this page, after the resume (requested by Antonio). */}
+      <TldrButton
+        locale={locale}
+        kind="experiences"
+        url={localizedUrl(locale, "experiences")}
+      />
+    </div>
+  </PageHeader>
+
+  {/* At a glance, under the header and above the timeline (requested by Antonio). */}
+  {figures.length > 0 && (
+    <dl class="figures">
+      {figures.map((figure) => (
+        <div class="figure">
+          <dt class="figure-label muted">
+            {withMarks(figure.label).map((part) =>
+              part === APPLE ? (
+                <span class="brand">
+                  <Icon name="apple" size={12} />
+                </span>
+              ) : (
+                part
+              ),
+            )}
+          </dt>
+          <dd class="figure-value">
+            {figure.since ? (
+              `${yearsSince(figure.since)}+`
+            ) : (
+              <Copy text={figure.value ?? ""} />
+            )}
+          </dd>
+          {figure.pills.length > 0 && (
+            <dd class="figure-pills">
+              <ul>
+                {figure.pills.map((pill) => (
+                  <li>
+                    {withMarks(pill).map((part) =>
+                      part === APPLE ? (
+                        <span class="brand">
+                          <Icon name="apple" size={11} />
+                        </span>
+                      ) : (
+                        part
+                      ),
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          )}
+        </div>
+      ))}
+    </dl>
+  )}
+
+  {/* Every employer, newest first and open (requested by Antonio). */}
+  <section class="timeline-section" aria-labelledby="timeline-title">
+    <h2 id="timeline-title" class="visually-hidden">
+      {ui.experience.timeline}
+    </h2>
+    <ExperienceTimeline companies={companies} locale={locale} />
+  </section>
+
+  <section class="before" aria-labelledby="before-title">
+    <h2 id="before-title">{before.title}</h2>
+    <p class="lead muted">
+      <Copy text={before.lead} />
+    </p>
+    <ol class="arc">
+      {before.rows.map((row) => (
+        <li>
+          <span class="years muted">{yearRange(row.start, row.end)}</span>
+          <span class="arc-dot" aria-hidden="true" />
+          <span class="what">
+            <span class="name">
+              <Copy text={row.name} />
+            </span>
+            <span class="detail muted">
+              <Copy text={row.detail} />
+            </span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  </section>
+</Page>
+
+<style>
+  .before {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: var(--space-section);
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+  }
+
+  /* No lone last word when it wraps. */
+  .lead {
+    max-width: 38rem;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  /* ---------- Figures: value over label, a palette bar on top ---------- */
+
+  /*
+   * Equal tiles across the column, growing where a value needs it,
+   * spaced from the header above and the timeline below.
+   */
+  .figures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0 0 48px;
+  }
+
+  /* The value first, then the label, then any note. */
+  .figure {
+    position: relative;
+    display: flex;
+    flex: 1 1 9rem;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    padding: 16px 16px 14px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+  }
+
+  .figure::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--gradient-pink);
+    content: "";
+  }
+
+  .figure:nth-child(2)::before {
+    background: var(--gradient-cyan);
+  }
+
+  .figure:nth-child(3)::before {
+    background: var(--gradient-violet);
+  }
+
+  .figure-value {
+    order: -1;
+    margin: 0;
+    font-size: 1.5rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .figure-label {
+    font-size: var(--text-small);
+  }
+
+  /* A placeholder value stays readable at the label's size. */
+  .figure-value :global(mark) {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  /* The Apple mark beside "iOS", in the text's colour. */
+  .figure-label,
+  .figure-pills li {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .brand {
+    display: inline-flex;
+    margin-top: -2px;
+  }
+
+  .figure-pills {
+    margin: 8px 0 0;
+  }
+
+  .figure-pills ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .figure-pills li {
+    padding: 1px 9px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /*
+   * ---------- Earlier jobs: the timeline's columns, lighter ----------
+   * Same date and node columns as ExperienceTimeline, so the years and
+   * dots line up with the entries above; a dashed rail, hollow dots.
+   */
+  .arc {
+    --date-w: 6.25rem;
+    --node-col: 40px;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .arc::before {
+    position: absolute;
+    top: 18px;
+    bottom: 18px;
+    left: calc(var(--date-w) + var(--node-col) / 2 - 1px);
+    width: 2px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--line-strong) 0 5px,
+      transparent 5px 10px
+    );
+    content: "";
+  }
+
+  .arc li {
+    display: grid;
+    grid-template-columns: var(--date-w) var(--node-col) minmax(0, 1fr);
+    align-items: start;
+    padding: 10px 0;
+  }
+
+  .years {
+    padding: 3px 6px 0 0;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .arc-dot {
+    position: relative;
+    z-index: 1;
+    justify-self: center;
+    width: 10px;
+    height: 10px;
+    margin-top: 7px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: 0 0 0 2px var(--line-strong);
+  }
+
+  .what {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .name {
+    font-size: 1.0625rem;
+    font-weight: 500;
+  }
+
+  .detail {
+    font-size: var(--text-small);
+  }
+
+  /* Narrow columns: like the timeline, the years go above, by the dot. */
+  @container (max-width: 34rem) {
+    .arc {
+      --node-col: 22px;
+    }
+
+    .arc::before {
+      left: calc(var(--node-col) / 2 - 1px);
+    }
+
+    .arc li {
+      grid-template-areas:
+        "dot years"
+        ". what";
+      grid-template-columns: var(--node-col) minmax(0, 1fr);
+      column-gap: 10px;
+    }
+
+    .years {
+      grid-area: years;
+      padding: 0 0 4px;
+      text-align: left;
+    }
+
+    .arc-dot {
+      grid-area: dot;
+      margin-top: 4px;
+    }
+
+    .what {
+      grid-area: what;
+    }
+  }
+</style>

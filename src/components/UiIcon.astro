@@ -1,0 +1,98 @@
+---
+/* Stroke-style UI icons (spec §7, Icon). Paths match the design canvas. */
+const PATHS = {
+  menu: ["M4 9h16M4 15h16"],
+  close: ["M6 6l12 12M18 6 6 18"],
+  moon: ["M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"],
+  sun: [
+    "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
+    "M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
+  ],
+  chevron: ["M6 9l6 6 6-6"],
+  // The note page's Listen player.
+  play: ["M8 5.5v13l10.5-6.5z"],
+  pause: ["M9 5v14M15 5v14"],
+  stop: ["M7 7h10v10H7z"],
+  // A box with an arrow out of it, the iOS share mark (the note page's Share).
+  share: [
+    "M12 3v12",
+    "M8 7l4-4 4 4",
+    "M8 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-2",
+  ],
+  // A short list with bullets (the note page's "On this page" button).
+  toc: ["M9 6h11M9 12h11M9 18h7", "M4.5 6h.01M4.5 12h.01M4.5 18h.01"],
+  rss: ["M5 11a8 8 0 0 1 8 8", "M5 5a14 14 0 0 1 14 14", "M6 18h.01"],
+  arrowUp: ["M12 19V5", "M6 11l6-6 6 6"],
+  globe: [
+    "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z",
+    "M3 12h18",
+    "M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z",
+  ],
+  search: ["M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z", "M20 20l-4-4"],
+  check: ["M5 12l5 5L20 7"],
+  external: ["M7 17 17 7", "M8 7h9v9"],
+  // A page with a folded corner over "PDF" (the resume buttons).
+  pdf: [
+    "M14 3v4a1 1 0 0 0 1 1h4",
+    "M5 12V5a2 2 0 0 1 2-2h7l5 5v4",
+    "M5 21v-6h1.5a1.5 1.5 0 0 1 0 3H5",
+    "M11 15v6h1a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z",
+    "M20 15h-3v6M17 18h2",
+  ],
+  calendar: [
+    "M8 3v3M16 3v3",
+    "M4 9h16",
+    "M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z",
+  ],
+  // Home lanes (feature cards).
+  /* AI: the TL;DR button (Lucide's sparkles). */
+  sparkles: [
+    "M9.94 14.06 8 20l-1.94-5.94L0 12l6.06-1.94L8 4l1.94 6.06L16 12z",
+    "M19 2v4M21 4h-4M18 17v4M20 19h-4",
+  ],
+  /* A person: Home's "About me" card. */
+  user: [
+    "M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
+    "M5 21v-1.5A4.5 4.5 0 0 1 9.5 15h5a4.5 4.5 0 0 1 4.5 4.5V21",
+  ],
+  briefcase: [
+    "M4 7h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z",
+    "M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2",
+    "M3 13h18",
+  ],
+  layers: ["M12 3 2 8l10 5 10-5-10-5z", "M2 12.5l10 5 10-5", "M2 17l10 5 10-5"],
+  smartphone: [
+    "M8.5 2h7A2.5 2.5 0 0 1 18 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 19.5v-15A2.5 2.5 0 0 1 8.5 2z",
+    "M11 18h2",
+  ],
+} as const;
+
+export type UiIconName = keyof typeof PATHS;
+
+interface Props {
+  name: UiIconName;
+  size?: number;
+  strokeWidth?: number;
+  class?: string;
+}
+
+const { name, size = 18, strokeWidth = 1.8, class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {PATHS[name].map((d) => (
+    <path d={d} />
+  ))}
+</svg>

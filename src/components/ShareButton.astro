@@ -1,0 +1,78 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Share (requested by Antonio), beside TL;DR on a note's page. It opens
+ * the device's share sheet (the Web Share API: iPhone, Android, macOS)
+ * with the page's title and public address; where there's none, it copies
+ * the address and says so for two seconds. It needs JavaScript, so it
+ * stays hidden until scripts/share-button.ts runs. Sits in a .button-row,
+ * whose isolation the buttons' halos need.
+ */
+interface Props {
+  locale: Locale;
+  /** The page's public address (absolute). */
+  url: string;
+  title: string;
+}
+
+const { locale, url, title } = Astro.props;
+const ui = t(locale);
+---
+
+<share-button
+  data-url={url}
+  data-title={title}
+  data-copied={ui.post.share.copied}
+  hidden
+>
+  <button type="button" class="button with-icon" title={ui.post.share.hint}>
+    <span class="share-icon">
+      <UiIcon name="share" size={16} strokeWidth={1.8} />
+    </span>
+    <span class="share-done" hidden>
+      <UiIcon name="check" size={16} strokeWidth={2} />
+    </span>
+    <span class="share-label">{ui.post.share.label}</span>
+  </button>
+  <span class="visually-hidden" role="status"></span>
+</share-button>
+
+<script>
+  import "../scripts/share-button";
+</script>
+
+<style>
+  share-button {
+    display: inline-flex;
+  }
+
+  share-button[hidden] {
+    display: none;
+  }
+
+  /* A real <button>, unlike the links .button usually styles: drop the browser's fill. */
+  button {
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+
+  .share-icon,
+  .share-done {
+    display: grid;
+  }
+
+  .share-done[hidden],
+  .share-icon[hidden] {
+    display: none;
+  }
+
+  .share-done {
+    color: var(--status-done);
+  }
+</style>

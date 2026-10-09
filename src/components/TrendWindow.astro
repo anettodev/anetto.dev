@@ -1,0 +1,81 @@
+---
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * "Last [7] days": the day picker for the AI usage page's share arrows. Every
+ * picker inside one <ai-trends> stays in step (scripts/ai-trends.ts). Without
+ * JavaScript the picker hides and the default shows as text.
+ */
+interface Props {
+  windows: number[];
+  defaultWindow: number;
+  /** The words around the picker, e.g. "Last" and "days". */
+  before: string;
+  after: string;
+  /** The picker's accessible name. */
+  label: string;
+}
+
+const { windows, defaultWindow, before, after, label } = Astro.props;
+---
+
+<p class="window muted">
+  {before}
+  <span class="window-pick needs-js">
+    <select aria-label={label}>
+      {windows.map((days) => (
+        <option value={days} selected={days === defaultWindow}>
+          {days}
+        </option>
+      ))}
+    </select>
+    <UiIcon name="chevron" size={12} strokeWidth={2.4} />
+  </span>
+  <span class="window-static">{defaultWindow}</span>
+  {after}
+</p>
+
+<style>
+  .window {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-size: var(--text-small);
+  }
+
+  .window-pick {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .window-pick select {
+    min-height: 32px;
+    padding: 0 28px 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+    color: var(--fg);
+    font: inherit;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .window-pick :global(svg) {
+    position: absolute;
+    right: 10px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .window-static {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  :global(:root[data-js]) .window-static {
+    display: none;
+  }
+</style>

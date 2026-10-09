@@ -1,0 +1,169 @@
+/*
+ * The collapsible frosted-glass containers under the identity card, in the
+ * same sticky column: Antonio's YouTube playlist (VideosPlayer), his podcasts
+ * (PodcastsPlayer) and his Apple Music playlist (MusicPlayer); the two
+ * lists share MediaList. Each is a small label on top, then a bar that
+ * pulls a player down. Their <details> share `name="side-media"`, so only
+ * one is open at a time. The glass is the island's recipe (.island-glass in
+ * island.css). Global, so every class starts with `media-`.
+ */
+.media {
+  margin-top: 24px;
+}
+
+/* `~`, not `+`: MediaList's <script> sits after the first list, between two containers. */
+.media ~ .media {
+  margin-top: 12px;
+}
+
+/* "Recommendations" (pt "Recomendações"): the section title over the three, in the page's label style. */
+.media-group {
+  margin-top: 24px;
+}
+
+.media-heading {
+  margin: 0;
+  padding-inline: 14px;
+}
+
+.media-heading + .media {
+  margin-top: 8px;
+}
+
+.media-glass {
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+}
+
+/* " Music Playlist", "Spotify Podcasts": small and discreet, in the text colour. */
+.media-label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 10px 14px 0;
+  color: var(--fg);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.media-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 56px;
+  padding: 6px 12px 8px 10px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.media-bar::-webkit-details-marker {
+  display: none;
+}
+
+.media-bar:focus-visible {
+  border-radius: 21px;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.media-cover {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.media-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.media-name {
+  display: block;
+  overflow: hidden;
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-arrow {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--chip-glass);
+  color: var(--muted);
+  transition: transform 250ms var(--ease-out);
+}
+
+.media-details[open] .media-arrow {
+  transform: rotate(180deg);
+}
+
+/* The player, under the bar once open. */
+.media-panel {
+  padding: 0 8px 8px;
+}
+
+/*
+ * The pull-down: where the browser can animate to an auto height, the
+ * panel slides open; elsewhere it simply appears.
+ */
+@supports (interpolate-size: allow-keywords) {
+  .media-glass {
+    interpolate-size: allow-keywords;
+  }
+
+  .media-details::details-content {
+    height: 0;
+    overflow: clip;
+    transition:
+      height 350ms var(--ease-out),
+      content-visibility 350ms allow-discrete;
+  }
+
+  .media-details[open]::details-content {
+    height: auto;
+  }
+}
+
+/* During Home's intro the column holds only the flying card. */
+:root[data-intro="play"] .media:not(:has(.is-on)),
+:root[data-intro="play"] .media-group:not(:has(.is-on)) .media-heading {
+  visibility: hidden;
+}
+
+.media-placeholder {
+  padding: 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-panel);
+  font-size: var(--text-small);
+  text-align: center;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .media-glass {
+    border-color: var(--line-strong);
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-arrow,
+  .media-details::details-content {
+    transition: none;
+  }
+}

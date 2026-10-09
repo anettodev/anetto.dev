@@ -1,0 +1,94 @@
+---
+import Footer from "../components/Footer.astro";
+import IdentityCard from "../components/IdentityCard.astro";
+import MeshBackground from "../components/MeshBackground.astro";
+import SiteIsland from "../components/SiteIsland.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+import Base from "./Base.astro";
+
+/*
+ * Two-column shell (spec §5.1): identity card left, page content right from
+ * 900px up; one column below. The footer sits outside the grid so it pushes
+ * the sticky card up at the end of the page.
+ */
+interface Props {
+  locale: Locale;
+  route?: RouteKey | undefined;
+  /** A page under the route (a note's slug under `blog`); see Base. */
+  subpath?: string | undefined;
+  title?: string | undefined;
+  description?: string | undefined;
+  /** Locale the page copy actually came from; differs while a translation is missing. */
+  contentLang?: Locale | undefined;
+  /** Home only: the identity card plays the intro (§8.1). */
+  intro?: boolean | undefined;
+}
+
+const {
+  locale,
+  route,
+  subpath,
+  title,
+  description,
+  contentLang = locale,
+  intro = false,
+} = Astro.props;
+const ui = t(locale);
+---
+
+<Base
+  locale={locale}
+  route={route}
+  subpath={subpath}
+  title={title}
+  description={description}
+  intro={intro}
+>
+  <a class="skip-link" href="#main">
+    {ui.skipToContent}
+  </a>
+  <MeshBackground />
+  <SiteIsland locale={locale} route={route} subpath={subpath} />
+  <ThemeToggle locale={locale} variant="floating" />
+  <div class="shell">
+    <div class="card-column">
+      <IdentityCard locale={locale} intro={intro} />
+    </div>
+    <main
+      id="main"
+      tabindex="-1"
+      lang={contentLang === locale ? undefined : LANG_TAG[contentLang]}
+    >
+      <slot />
+    </main>
+  </div>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  .shell {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding: var(--nav-clearance) var(--gutter) 0;
+  }
+
+  /* Size container: components lay out by the content column's width, not the viewport's. */
+  main {
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(260px, 300px) 1fr;
+      column-gap: var(--column-gap);
+    }
+  }
+</style>

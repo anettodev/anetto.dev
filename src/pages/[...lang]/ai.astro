@@ -1,0 +1,36 @@
+---
+import AiUsage from "../../components/AiUsage.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import TldrButton from "../../components/TldrButton.astro";
+import { localeStaticPaths, localizedUrl, t } from "../../i18n";
+import type { Locale } from "../../i18n/locales";
+import Page from "../../layouts/Page.astro";
+
+/*
+ * AI usage (requested by Antonio): the full tokscale breakdown. In the
+ * navigation island as "AI", between Projects and Blog; Home's AI Usage
+ * section links here too. The copy is UI text (i18n), not a content entry:
+ * it describes the data, not Antonio.
+ */
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const { label, title, lead, description } = ui.ai.page;
+---
+
+<Page locale={locale} route="ai" title={ui.nav.ai} description={description}>
+  <PageHeader label={label} title={title} lead={lead}>
+    {/* An AI summary of this page (requested by Antonio). */}
+    <div class="button-row">
+      <TldrButton locale={locale} kind="ai" url={localizedUrl(locale, "ai")} />
+    </div>
+  </PageHeader>
+  <AiUsage locale={locale} />
+</Page>

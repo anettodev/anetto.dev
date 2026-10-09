@@ -1,0 +1,395 @@
+---
+import { CHART_RANGES, DEFAULT_RANGE, WEEKLY_FROM } from "../lib/ai-usage";
+
+/*
+ * Usage over time: stacked areas of tokens per model over the last N days,
+ * one chart per span in CHART_RANGES (the card's buttons show one; see
+ * scripts/ai-chart.ts). Spans up to 90 days plot every day; 180 and 360
+ * plot a 7-day average per week, which daily spikes would otherwise bury.
+ * In each span the five models with the most tokens get their own band, in
+ * the intelligence palette, largest at the bottom; the rest share "Other
+ * models".
+ *
+ * Drawn at build time as SVG (no chart library). On hover,
+ * scripts/usage-trend.ts shows a guide line and a tooltip with each band's
+ * value and the total, read from the span's data-points. Each chart is one
+ * image to assistive tech; its legend is text.
+ */
+interface Day {
+  date: string;
+  /** Tokens per model that day (absent models have none). */
+  models: Record<string, number | undefined>;
+}
+
+interface Props {
+  days: Day[];
+  /** The snapshot date (YYYY-MM-DD); every span ends there. */
+  end: string;
+  lang: string;
+  /** Each chart's label; {n} is its days, {start} and {end} dates. */
+  label: string;
+  otherLabel: string;
+  dailyLabel: string;
+  weeklyLabel: string;
+  totalLabel: string;
+  emptyLabel: string;
+}
+
+const {
+  days,
+  end,
+  lang,
+  label,
+  otherLabel,
+  dailyLabel,
+  weeklyLabel,
+  totalLabel,
+  emptyLabel,
+} = Astro.props;
+
+const DAY = 86_400_000;
+const TOP = 5;
+const WEEK = 7;
+const W = 1000;
+const H = 200;
+const asDate = (iso: string) => new Date(`${iso}T00:00:00Z`);
+const isoOf = (date: Date) => date.toISOString().slice(0, 10);
+const fill = (template: string, values: Record<string, string>) =>
+  template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
+const dayFormat = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const last = asDate(end);
+const byDate = new Map(days.map((day) => [day.date, day.models]));
+const modelsOn = (offset: number) =>
+  byDate.get(isoOf(new Date(last.getTime() - offset * DAY))) ?? {};
+
+const charts = CHART_RANGES.map((range) => {
+  const weekly = range >= WEEKLY_FROM;
+  /* Weekly spans cover whole weeks, at least the days asked for. */
+  const spanDays = weekly ? Math.ceil(range / WEEK) * WEEK : range;
+  const first = new Date(last.getTime() - (spanDays - 1) * DAY);
+
+  /* Bands: the span's top models by tokens, then everything else. */
+  const inSpan = new Map<string, number>();
+  for (let offset = 0; offset < spanDays; offset += 1) {
+    for (const [model, tokens] of Object.entries(modelsOn(offset))) {
+      inSpan.set(model, (inSpan.get(model) ?? 0) + (tokens ?? 0));
+    }
+  }
+  const ranked = [...inSpan]
+    .filter(([, tokens]) => tokens > 0)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name]) => name);
+  const top = ranked.slice(0, TOP);
+  const bands = [
+    ...top.map((name, index) => ({ name, cls: `s${index}`, mono: true })),
+    ...(ranked.length > TOP
+      ? [{ name: otherLabel, cls: "other", mono: false }]
+      : []),
+  ];
+  const bandOf = (model: string) => {
+    const index = top.indexOf(model);
+    return index >= 0 ? index : top.length;
+  };
+  const dailyAt = (offset: number) => {
+    const values = bands.map(() => 0);
+    for (const [model, tokens] of Object.entries(modelsOn(offset))) {
+      values[bandOf(model)]! += tokens ?? 0;
+    }
+    return values;
+  };
+
+  /* Points, oldest first: every day, or every 7th day back from the end
+     as the average of the 7 days ending there. */
+  const offsets = weekly
+    ? Array.from({ length: spanDays / WEEK }, (_, i) => i * WEEK)
+    : Array.from({ length: range }, (_, i) => i);
+  const points = offsets.reverse().map((offset) => {
+    const values = weekly
+      ? Array.from({ length: WEEK }, (_, i) => dailyAt(offset + i)).reduce(
+          (sum, day) =>
+            sum.map((value, band) => value + (day[band] ?? 0) / WEEK),
+          bands.map(() => 0),
+        )
+      : dailyAt(offset);
+    return {
+      date: isoOf(new Date(last.getTime() - offset * DAY)),
+      values: values.map(Math.round),
+    };
+  });
+
+  /* Geometry: a 1000×200 box stretched to the plot (strokes don't scale). */
+  const peak = Math.max(
+    0,
+    ...points.map((point) => point.values.reduce((n, v) => n + v, 0)),
+  );
+  const x = (index: number) =>
+    points.length > 1 ? (index / (points.length - 1)) * W : W / 2;
+  const y = (value: number) => H - (value / Math.max(peak, 1)) * H * 0.92;
+  const stacks = points.map((point) => {
+    let sum = 0;
+    return point.values.map((value) => (sum += value));
+  });
+  const coords = (band: number) =>
+    points.map(
+      (_, index) =>
+        `${x(index).toFixed(1)},${y(stacks[index]![band]!).toFixed(1)}`,
+    );
+  const base = (band: number) =>
+    band === 0 ? [`${W},${H}`, `0,${H}`] : coords(band - 1).reverse();
+
+  return {
+    range,
+    weekly,
+    empty: peak === 0,
+    bands: bands.map((band, index) => ({
+      ...band,
+      area: `M${[...coords(index), ...base(index)].join("L")}Z`,
+      line: `M${coords(index).join("L")}`,
+    })),
+    start: dayFormat.format(first),
+    label: fill(label, {
+      n: String(range),
+      start: dayFormat.format(first),
+      end: dayFormat.format(last),
+    }),
+    hidden: range !== DEFAULT_RANGE,
+    data: JSON.stringify({
+      kind: weekly ? weeklyLabel : dailyLabel,
+      bands: bands.map((band) => band.name),
+      points: points.map((point) => [point.date, ...point.values]),
+    }),
+  };
+});
+const endLabel = dayFormat.format(last);
+---
+
+<usage-trend class="trend" data-lang={lang} data-total={totalLabel}>
+  {charts.map((chart) => (
+    <div
+      class="range"
+      data-range={chart.range}
+      data-points={chart.data}
+      hidden={chart.hidden}
+    >
+      <div class="plot">
+        {chart.empty ? (
+          <p class="empty muted">{emptyLabel}</p>
+        ) : (
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            preserveAspectRatio="none"
+            role="img"
+            aria-label={chart.label}
+          >
+            {chart.bands.map((band) => (
+              <g class={band.cls}>
+                <path class="area" d={band.area} />
+                <path class="edge" d={band.line} />
+              </g>
+            ))}
+          </svg>
+        )}
+        <span class="guide" hidden></span>
+        <div class="trend-tip" hidden></div>
+      </div>
+      <div class="axis muted">
+        <span>{chart.start}</span>
+        <span>{endLabel}</span>
+      </div>
+      {!chart.empty && (
+        <ul class="legend">
+          {chart.bands.map((band) => (
+            <li class={band.cls}>
+              <span class="swatch" aria-hidden="true"></span>
+              <span class:list={{ mono: band.mono }}>{band.name}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  ))}
+</usage-trend>
+
+<script>
+  import "../scripts/usage-trend";
+</script>
+
+<style>
+  .trend {
+    display: block;
+  }
+
+  .range {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* The style above would otherwise outrank the hidden attribute. */
+  .range[hidden] {
+    display: none;
+  }
+
+  /* Four quiet gridlines behind the bands. */
+  .plot {
+    position: relative;
+    height: 180px;
+    background: linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 100% 25%;
+    border-bottom: 1px solid var(--line-strong);
+    cursor: crosshair;
+  }
+
+  .empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-size: var(--text-small);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .area {
+    fill: var(--band);
+    fill-opacity: 0.32;
+  }
+
+  .edge {
+    fill: none;
+    stroke: var(--band);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .s0 {
+    --band: var(--ip-1);
+  }
+
+  .s1 {
+    --band: var(--ip-4);
+  }
+
+  .s2 {
+    --band: var(--ip-2);
+  }
+
+  .s3 {
+    --band: var(--ip-0);
+  }
+
+  .s4 {
+    --band: var(--ip-3);
+  }
+
+  .other {
+    --band: var(--muted);
+  }
+
+  .guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--fg);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .trend-tip {
+    position: absolute;
+    z-index: 2;
+    top: 8px;
+    min-width: 200px;
+    padding: 10px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    background: var(--card-fill);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    font-size: 0.8125rem;
+    pointer-events: none;
+  }
+
+  .axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 0.8125rem;
+  }
+
+  .legend li {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--band);
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  /* The tooltip's rows, built by the script. */
+  .trend-tip :global(.tip-head) {
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .trend-tip :global(.tip-head span:last-child) {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .trend-tip :global(.tip-row),
+  .trend-tip :global(.tip-total) {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trend-tip :global(.tip-row span:first-child) {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .trend-tip :global(.tip-total) {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+  }
+
+  .trend-tip :global(.tip-dot) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+</style>

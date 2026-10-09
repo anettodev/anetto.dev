@@ -1,0 +1,193 @@
+---
+/*
+ * Mesh background (spec §6.5, §8.3): a fixed SVG wave with a copper edge and a
+ * drifting blue tint, under a veil.
+ *
+ * The veil (90%) is up whenever page content is on screen, so text over the
+ * bright wave stays above 4.5:1. The full mesh shows only behind the Home intro
+ * card. Per §8.3 the mesh is paused while the veil is up, so it is static
+ * outside the intro: the SMIL animations wait for `begin="indefinite"` and
+ * the drift for `data-live`, both started by scripts/intro-card.ts.
+ */
+const WAVES = [
+  "M0,700 C200,840 380,880 560,840 C760,795 900,660 1150,640 C1260,632 1330,660 1440,720",
+  "M0,740 C220,800 400,860 600,830 C800,800 940,700 1160,670 C1270,655 1340,680 1440,700",
+  "M0,680 C180,860 360,900 540,860 C740,815 880,640 1130,620 C1250,612 1330,640 1440,740",
+  "M0,720 C210,820 390,850 580,820 C780,790 920,680 1170,650 C1270,640 1340,670 1440,710",
+];
+const CLOSE = " L1440,900 L0,900 Z";
+const loop = (paths: string[]) => [...paths, paths[0]].join(";");
+const crest = loop(WAVES);
+const fill = loop(WAVES.map((d) => d + CLOSE));
+const SPLINE = "0.45 0 0.55 1";
+const splines = (n: number) => Array(n).fill(SPLINE).join(";");
+---
+
+<div class="mesh" aria-hidden="true">
+  <div class="mesh-drift">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="none" focusable="false">
+      <defs>
+        <linearGradient id="mesh-wave" x1="0" y1="0" x2="0.2" y2="1">
+          <stop offset="0" style="stop-color: var(--mesh-wave-a)"></stop>
+          <stop offset="0.55" style="stop-color: var(--mesh-wave-b)"></stop>
+        </linearGradient>
+        <radialGradient id="mesh-tint" cx="1" cy="0.85" r="0.45">
+          <animate
+            attributeName="cx"
+            dur="23s"
+            begin="indefinite"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keyTimes="0;0.33;0.66;1"
+            keySplines={splines(3)}
+            values="1;0.84;0.94;1"
+          ></animate>
+          <animate
+            attributeName="cy"
+            dur="23s"
+            begin="indefinite"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keyTimes="0;0.33;0.66;1"
+            keySplines={splines(3)}
+            values="0.85;0.72;0.92;0.85"
+          ></animate>
+          <stop offset="0" style="stop-color: var(--mesh-tint)"></stop>
+          <stop offset="1" style="stop-color: transparent"></stop>
+        </radialGradient>
+        <filter id="mesh-soft" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="6"></feGaussianBlur>
+        </filter>
+        <filter id="mesh-glow" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="1.6"></feGaussianBlur>
+        </filter>
+        <filter id="mesh-halo" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="14"></feGaussianBlur>
+        </filter>
+      </defs>
+      <path
+        d={WAVES[0] + CLOSE}
+        fill="url(#mesh-wave)"
+        filter="url(#mesh-soft)"
+      >
+        <animate
+          attributeName="d"
+          dur="17s"
+          begin="indefinite"
+          repeatCount="indefinite"
+          calcMode="spline"
+          keyTimes="0;0.25;0.5;0.75;1"
+          keySplines={splines(4)}
+          values={fill}
+        ></animate>
+      </path>
+      <path
+        class="edge-halo"
+        d={WAVES[0]}
+        fill="none"
+        stroke-width="10"
+        filter="url(#mesh-halo)"
+      >
+        <animate
+          attributeName="d"
+          dur="17s"
+          begin="indefinite"
+          repeatCount="indefinite"
+          calcMode="spline"
+          keyTimes="0;0.25;0.5;0.75;1"
+          keySplines={splines(4)}
+          values={crest}
+        ></animate>
+      </path>
+      <path
+        class="edge"
+        d={WAVES[0]}
+        fill="none"
+        stroke-width="2.4"
+        filter="url(#mesh-glow)"
+      >
+        <animate
+          attributeName="d"
+          dur="17s"
+          begin="indefinite"
+          repeatCount="indefinite"
+          calcMode="spline"
+          keyTimes="0;0.25;0.5;0.75;1"
+          keySplines={splines(4)}
+          values={crest}
+        ></animate>
+      </path>
+      <rect width="1440" height="900" fill="url(#mesh-tint)"></rect>
+    </svg>
+  </div>
+  <div class="mesh-veil"></div>
+</div>
+
+<style>
+  .mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      var(--mesh-top) 0%,
+      var(--mesh-mid) 62%
+    );
+  }
+
+  /* Whole-layer drift, 31s (§8.3). Coprime with the wave (17s) and tint (23s). */
+  .mesh-drift {
+    position: absolute;
+    inset: -40px;
+    transform-origin: 50% 100%;
+    animation: mesh-drift 31s ease-in-out infinite paused;
+  }
+
+  .mesh[data-live] .mesh-drift {
+    animation-play-state: running;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .edge-halo,
+  .edge {
+    stroke: var(--mesh-edge);
+  }
+
+  .edge-halo {
+    opacity: 0.45;
+  }
+
+  .edge {
+    opacity: 0.9;
+  }
+
+  .mesh-veil {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    opacity: var(--veil-opacity);
+  }
+
+  @keyframes mesh-drift {
+    33% {
+      transform: translate3d(-30px, -12px, 0) scale(1.03);
+    }
+
+    66% {
+      transform: translate3d(22px, -22px, 0) scale(1.02);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mesh-drift {
+      animation: none;
+    }
+  }
+</style>

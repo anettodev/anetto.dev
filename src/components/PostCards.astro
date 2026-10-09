@@ -1,0 +1,396 @@
+---
+import { Image } from "astro:assets";
+
+import { t } from "../i18n";
+import { LANG_TAG, LOCALES, type Locale } from "../i18n/locales";
+import type { PageData } from "../lib/content";
+import Copy from "./Copy.astro";
+import Flag from "./Flag.astro";
+import Hashtag from "./Hashtag.astro";
+import { tagHues } from "../lib/tag-hues";
+import { sourceOf } from "../lib/sources";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Writing as cards (requested by Antonio), alongside the project cards: one
+ * row of three on Home, every post on the Blog page; two columns, then one,
+ * as the content column narrows. Each card: cover, source, title, a summary
+ * clamped to two lines, up to three tags, then the date and "Read more".
+ * A post without `href` is a placeholder: its card has no link. A real
+ * post without an image gets a quiet cover with its platform's mark.
+ * Inside a <filter-list> (the Blog page), each card is a data-item: its
+ * title and date (ISO) sort it, its source filters it, and its title,
+ * summary and tags are searched. A placeholder has neither title nor date
+ * there, so it stays last whichever way the list sorts.
+ */
+/*
+ * `lang`: the post's own language (Evernote notes), when known; `date`: its
+ * date as ISO, for sorting.
+ */
+type Post = PageData<"blog">["posts"][number] & {
+  lang?: string;
+  date?: string;
+};
+
+interface Props {
+  posts: Post[];
+  locale: Locale;
+  headingLevel?: 2 | 3;
+}
+
+const { posts, locale, headingLevel = 2 } = Astro.props;
+const ui = t(locale);
+/* A post in another language than the page's says so: its flag, and its name for screen readers. */
+const languageNames = new Intl.DisplayNames([LANG_TAG[locale]], {
+  type: "language",
+});
+const otherLang = (lang?: string) =>
+  lang && lang !== locale && (LOCALES as readonly string[]).includes(lang)
+    ? (lang as Locale)
+    : undefined;
+const langs = posts.map((post) => {
+  const other = otherLang(post.lang);
+  return other
+    ? {
+        code: other,
+        tag: LANG_TAG[other],
+        name: languageNames.of(LANG_TAG[other]),
+      }
+    : undefined;
+});
+const Heading = `h${headingLevel}` as "h2" | "h3";
+---
+
+<div class="post-cards">
+  {posts.map((post, index) => {
+    /* The source's mark and colour: its pill, and a cover without an image. */
+    const source = sourceOf(post.source);
+    const mark = source?.icon;
+    const tint = !post.cover && post.href ? source?.color : undefined;
+    /* Its tags' colours (lib/tag-hues.ts). */
+    const hues = tagHues(post.tags);
+    const lang = langs[index];
+    /*
+     * A real post's cover links to it too: a duplicate of the title link,
+     * so it's out of the tab order and hidden from screen readers.
+     */
+    const Cover = post.href ? "a" : "div";
+    return (
+      <article
+        class="post-card"
+        data-item
+        data-title={post.href ? post.title : undefined}
+        data-date={post.date}
+        data-source={post.source}
+      >
+        <Cover
+          class:list={["post-cover", { tinted: tint }]}
+          style={tint ? `--tint: ${tint}` : undefined}
+          href={post.href}
+          tabindex={post.href ? -1 : undefined}
+          aria-hidden={post.href ? "true" : undefined}
+        >
+          {post.cover ? (
+            <Image
+              src={post.cover}
+              alt=""
+              widths={[360, 720]}
+              sizes="(min-width: 64rem) 300px, 100vw"
+            />
+          ) : post.href ? (
+            /* A real post without an image: a quiet cover, not a placeholder. */
+            <span class="post-cover-blank" aria-hidden="true">
+              {mark && <Icon name={mark} size={tint ? 36 : 28} />}
+            </span>
+          ) : (
+            <p class="post-cover-placeholder">
+              <Copy text={`[PLACEHOLDER: ${ui.project.cover}]`} />
+            </p>
+          )}
+        </Cover>
+
+        <div class="post-body">
+          <p class="post-source">
+            <span
+              class:list={["label", "source-pill", { colored: source }]}
+              style={source ? `--source-color: ${source.color}` : undefined}
+            >
+              {mark && <Icon name={mark} size={12} />}
+              {post.source}
+            </span>
+            {lang && (
+              <span class="post-lang" title={lang.name}>
+                <Flag locale={lang.code} />
+                <span class="visually-hidden">, {lang.name}</span>
+              </span>
+            )}
+          </p>
+          <Heading class="post-title" lang={lang?.tag} data-search>
+            {post.href ? (
+              <a href={post.href}>
+                <Copy text={post.title} />
+              </a>
+            ) : (
+              <Copy text={post.title} />
+            )}
+          </Heading>
+          {post.description && (
+            <p class="post-summary muted" lang={lang?.tag} data-search>
+              <Copy text={post.description} />
+            </p>
+          )}
+          {post.tags.length > 0 && (
+            <ul class="post-tags" data-search>
+              {post.tags.map((tag) => (
+                <Hashtag tag={tag} hue={hues.get(tag)} />
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div class="post-foot">
+          <span class="post-date muted">
+            <UiIcon name="calendar" size={14} strokeWidth={1.8} />
+            <Copy text={post.year} />
+          </span>
+          {post.href && (
+            <a href={post.href}>
+              {ui.post.readMore}
+              <span aria-hidden="true">&nbsp;→</span>
+            </a>
+          )}
+        </div>
+      </article>
+    );
+  })}
+</div>
+
+<style>
+  /* Isolated so the cards' hover halos stay above the page behind them. */
+  .post-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    isolation: isolate;
+  }
+
+  /* Two per row once the content column (the <main> container) has room, then three. */
+  @container (min-width: 34rem) {
+    .post-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 52rem) {
+    .post-cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .post-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+  }
+
+  /*
+   * Hover (or keyboard focus inside): the intelligence halo, as on the
+   * project cards. It sits at z-index -1 in the cards' isolated context,
+   * behind every card's background; nothing on the card may clip it.
+   */
+  .post-card::before {
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--halo-angle),
+      var(--intelligence-ring)
+    );
+    filter: blur(14px);
+    opacity: 0;
+    transition: opacity 200ms ease;
+    content: "";
+    pointer-events: none;
+  }
+
+  .post-card:is(:hover, :has(:focus-visible))::before {
+    opacity: 0.9;
+    animation: halo-turn 4s linear infinite;
+  }
+
+  /* Reduced motion: the halo shows, still. */
+  @media (prefers-reduced-motion: reduce) {
+    .post-card::before {
+      transition: none;
+    }
+
+    .post-card:is(:hover, :has(:focus-visible))::before {
+      animation: none;
+    }
+  }
+
+  .post-card[hidden] {
+    display: none;
+  }
+
+  .post-cover {
+    display: grid;
+    color: inherit;
+    place-items: center;
+    margin: 10px 10px 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--chip);
+    aspect-ratio: 16 / 10;
+  }
+
+  .post-cover :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* A cover without an image, in its source's colour (lib/sources.ts). */
+  .post-cover.tinted {
+    background: var(--tint);
+  }
+
+  .post-cover.tinted .post-cover-blank {
+    color: #ffffff;
+    opacity: 1;
+  }
+
+  /* The source as a pill, then the post's language when it isn't the page's. */
+  .post-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .source-pill {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    color: var(--fg);
+  }
+
+  /* The post's language: the flag the language switcher uses, on its own. */
+  .post-lang {
+    display: inline-flex;
+  }
+
+  /* In its source's colour, like the source chips above the list. */
+  .source-pill.colored {
+    border-color: color-mix(in srgb, var(--source-color) 60%, transparent);
+    background: color-mix(in srgb, var(--source-color) 16%, transparent);
+  }
+
+  .post-cover-blank {
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .post-cover-placeholder {
+    padding: 16px;
+    font-size: var(--text-small);
+    text-align: center;
+  }
+
+  .post-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 18px 18px;
+  }
+
+  .post-title {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    /* A file name as title (a gist's) has no spaces to wrap at. */
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .post-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .post-title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Two lines at most; the full text stays in the page source. */
+  .post-summary {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: var(--text-small);
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Coloured hashtags (Hashtag.astro), a size down on a card. */
+  .post-tags :global(.hashtag) {
+    font-size: 0.8125rem;
+  }
+
+  .post-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 12px;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 0 18px;
+    border-top: 1px solid var(--line);
+    font-size: var(--text-small);
+  }
+
+  .post-date {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .post-foot a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+    color: var(--fg);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .post-foot a:hover {
+    text-decoration: underline;
+  }
+</style>

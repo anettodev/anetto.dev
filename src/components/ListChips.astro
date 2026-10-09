@@ -1,0 +1,126 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import Icon, { type BrandId } from "./Icon.astro";
+
+/*
+ * A filtered list's chips (scripts/filter-list.ts): "All" and one per
+ * value, each with its count, one pressed at a time. `dot` colours a small
+ * dot before the label (the projects' status colours); `icon` puts a brand
+ * mark there instead (the Blog page's sources). `color` tints a chip with
+ * it, solid once pressed (the sources' colours). Hidden without JavaScript.
+ */
+interface Props {
+  filter: string;
+  label: string;
+  total: number;
+  items: {
+    value: string | number;
+    label: string;
+    count: number;
+    dot?: string;
+    icon?: BrandId;
+    color?: string;
+  }[];
+  locale: Locale;
+}
+
+const { filter, label, total, items, locale } = Astro.props;
+const ui = t(locale);
+---
+
+<div
+  class="chips needs-js"
+  role="group"
+  aria-label={label}
+  data-filter={filter}
+>
+  <button type="button" data-value="all" aria-pressed="true">
+    {ui.list.all}
+    <span class="n">{total}</span>
+  </button>
+  {items.map((item) => (
+    <button
+      type="button"
+      data-value={item.value}
+      aria-pressed="false"
+      class:list={{ colored: item.color }}
+      style={item.color ? `--chip-color: ${item.color}` : undefined}
+    >
+      {item.dot && (
+        <span class="dot" style={`--dot: ${item.dot}`} aria-hidden="true" />
+      )}
+      {item.icon && (
+        <span class="mark" aria-hidden="true">
+          <Icon name={item.icon} size={14} />
+        </span>
+      )}
+      {item.label}
+      <span class="n">{item.count}</span>
+    </button>
+  ))}
+</div>
+
+<style>
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chips button {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+
+  .chips button[aria-pressed="true"] {
+    border-color: transparent;
+    background: var(--fg);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  /* A chip in its own colour: a tint, then solid with white text once pressed. */
+  .chips button.colored {
+    border-color: color-mix(in srgb, var(--chip-color) 60%, transparent);
+    background: color-mix(in srgb, var(--chip-color) 16%, transparent);
+    color: var(--fg);
+  }
+
+  .chips button.colored[aria-pressed="true"] {
+    border-color: transparent;
+    background: var(--chip-color);
+    color: #ffffff;
+  }
+
+  .chips button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+  }
+
+  .mark {
+    display: inline-flex;
+  }
+
+  .n {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+</style>

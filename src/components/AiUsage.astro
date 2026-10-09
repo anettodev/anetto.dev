@@ -1,0 +1,1083 @@
+---
+import usage from "../data/ai-usage.json";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import { CHART_RANGES, DEFAULT_RANGE } from "../lib/ai-usage";
+import ActivityCalendar, { type CalendarDay } from "./ActivityCalendar.astro";
+import Copy from "./Copy.astro";
+import Icon, { type BrandId } from "./Icon.astro";
+import TrendWindow from "./TrendWindow.astro";
+import UsageTrend from "./UsageTrend.astro";
+
+/*
+ * AI usage (requested by Antonio; modelled on a page he shared). A snapshot
+ * of the public tokscale profile, data/ai-usage.json, which
+ * `npm run ai:refresh` rewrites; the build never calls tokscale. The /ai
+ * page's body: the card, then models, then tools & providers beside agents. (It was also a
+ * section on Home until Antonio took it off.)
+ *
+ * The card: the date range, three totals (API-equivalent cost, tokens, the
+ * share of prompt tokens read from cache), the year's calendar and a link to
+ * the tokscale profile. Costs are tokscale's estimates at API list prices,
+ * never what was paid: every cost label says "API-equivalent", and the page
+ * spells it out.
+ *
+ * With no data yet, the page shows a [PLACEHOLDER].
+ */
+interface Props {
+  locale: Locale;
+  /** Prefix for the panels' heading ids; unique per page. */
+  id?: string;
+}
+
+const { locale, id = "ai-usage" } = Astro.props;
+const ui = t(locale);
+const lang = LANG_TAG[locale];
+const { totals } = usage;
+const hasData = totals.tokens > 0 && usage.days.length > 0;
+const profile = `https://tokscale.ai/u/${usage.username}`;
+
+const compact = new Intl.NumberFormat(lang, {
+  notation: "compact",
+  maximumSignificantDigits: 3,
+});
+const number = new Intl.NumberFormat(lang);
+const money = new Intl.NumberFormat(lang, {
+  style: "currency",
+  currency: "USD",
+});
+const moneyCompact = new Intl.NumberFormat(lang, {
+  style: "currency",
+  currency: "USD",
+  notation: "compact",
+  maximumSignificantDigits: 3,
+});
+const percentFormat = new Intl.NumberFormat(lang, {
+  style: "percent",
+  maximumFractionDigits: 1,
+});
+/** A share too small to round above 0% reads "<0.1%", not "0%". */
+const percent = {
+  format: (n: number) =>
+    n > 0 && n < 0.0005
+      ? `<${percentFormat.format(0.001)}`
+      : percentFormat.format(n),
+};
+const dayFormat = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const asDate = (iso: string) => new Date(`${iso}T00:00:00Z`);
+const isoOf = (date: Date) => date.toISOString().slice(0, 10);
+const fill = (template: string, values: Record<string, string>) =>
+  template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
+const share = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
+
+/* ---------- Calendar: 53 weeks to the snapshot date, as GitHub's ---------- */
+
+const DAY = 86_400_000;
+const end = asDate(usage.fetchedAt);
+const first = new Date(end.getTime() - (end.getUTCDay() + 52 * 7) * DAY);
+const byDate = new Map(usage.days.map((day) => [day.date, day]));
+const inWindow = usage.days
+  .filter((day) => day.date >= isoOf(first) && day.tokens > 0)
+  .map((day) => day.tokens)
+  .sort((a, b) => a - b);
+/* Four levels by quartile of the active days, as GitHub's calendar does. */
+const quartile = (p: number) =>
+  inWindow[Math.floor((inWindow.length - 1) * p)] ?? 0;
+const cuts = [quartile(0.25), quartile(0.5), quartile(0.75)];
+const levelOf = (tokens: number) =>
+  tokens <= 0 ? 0 : 1 + cuts.filter((cut) => tokens > cut).length;
+
+const weeks: CalendarDay[][] = [];
+for (let ms = first.getTime(); ms <= end.getTime(); ms += DAY) {
+  const date = new Date(ms);
+  const iso = isoOf(date);
+  const day = byDate.get(iso);
+  if (date.getUTCDay() === 0 || weeks.length === 0) weeks.push([]);
+  weeks.at(-1)!.push({
+    date: iso,
+    count: day?.tokens ?? 0,
+    level: levelOf(day?.tokens ?? 0),
+    note: day && day.cost > 0 ? ` · ${money.format(day.cost)}` : "",
+  });
+}
+
+/* ---------- Totals ---------- */
+
+const promptTokens = totals.input + totals.cacheRead + totals.cacheWrite;
+const stats = [
+  {
+    value: moneyCompact.format(totals.cost),
+    gradient: "pink",
+    label: ui.ai.cost.label,
+    detail: fill(ui.ai.cost.detail, {
+      amount: money.format(share(totals.cost, totals.activeDays)),
+    }),
+  },
+  {
+    value: compact.format(totals.tokens),
+    gradient: "cyan",
+    label: ui.ai.tokens.label,
+    detail: fill(ui.ai.tokens.detail, {
+      messages: number.format(totals.messages),
+      days: number.format(totals.activeDays),
+    }),
+  },
+  {
+    value: percent.format(share(totals.cacheRead, promptTokens)),
+    gradient: "violet",
+    label: ui.ai.cache.label,
+    detail: fill(ui.ai.cache.detail, {
+      read: compact.format(totals.cacheRead),
+      write: compact.format(totals.cacheWrite),
+    }),
+  },
+];
+
+/* ---------- Page panels ---------- */
+
+/*
+ * Models and Tools show one period at a time, the last N days (the script's
+ * `periods[N]`); 7 days shows first and the pickers swap them
+ * (scripts/ai-trends.ts). Each share is of the period's cost, and its arrow
+ * is the change against the previous N days. Under 0.05 points it's noise,
+ * so no arrow.
+ */
+interface PeriodRow {
+  name: string;
+  tokens: number;
+  cost: number;
+  shareDelta: number | null;
+}
+interface Period {
+  cost: number;
+  tokens: number;
+  models: PeriodRow[];
+  clients: PeriodRow[];
+}
+const PERIODS: Record<string, Period> = usage.periods;
+const WINDOWS = usage.periodDays;
+const DEFAULT_WINDOW = 7;
+const points = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
+const trendOf = (delta: number | null, days: number) => {
+  if (delta === null || Math.abs(delta) < 0.0005) return null;
+  const dir: "up" | "down" = delta > 0 ? "up" : "down";
+  const n = points.format(Math.abs(delta) * 100);
+  return {
+    dir,
+    arrow: dir === "up" ? "▲" : "▼",
+    points: fill(ui.ai.clients.points, { n }),
+    label: fill(ui.ai.clients.trend[dir], { n, days: String(days) }),
+  };
+};
+
+/*
+ * tokscale's client ids, as the tools call themselves, with their maker's
+ * mark (Icon.astro) where we carry one; the rest show their initial, and
+ * unknown ids their id.
+ */
+const TOOLS: Record<string, { name: string; icon?: BrandId }> = {
+  amp: { name: "Amp" },
+  claude: { name: "Claude Code", icon: "claude" },
+  codex: { name: "Codex CLI" },
+  copilot: { name: "GitHub Copilot" },
+  cursor: { name: "Cursor", icon: "cursor" },
+  gemini: { name: "Gemini CLI", icon: "gemini" },
+  kimi: { name: "Kimi CLI", icon: "kimi" },
+  opencode: { name: "OpenCode" },
+};
+
+/*
+ * The agents (Claude Code's subagents), from the snapshot's local-cache copy
+ * (scripts/fetch-ai-usage.mjs), most tokens first, named after their tool.
+ */
+const agents = (usage.agents?.items ?? []).map((agent) => ({
+  ...agent,
+  source: (agent.client && TOOLS[agent.client]?.name) || agent.client || "",
+  icon: agent.client ? TOOLS[agent.client]?.icon : undefined,
+}));
+const agentsUpdated = usage.agents?.updatedAt
+  ? dayFormat.format(asDate(usage.agents.updatedAt))
+  : "";
+
+/*
+ * Each period's rows. Models: the top six by cost; any after them share one
+ * "Other models" row, whose change is the sum of theirs (shares add up).
+ */
+const TOP_MODELS = 6;
+const sumOf = (values: number[]) => values.reduce((n, v) => n + v, 0);
+const panels = WINDOWS.map((days) => {
+  const period = PERIODS[String(days)] ?? {
+    cost: 0,
+    tokens: 0,
+    models: [],
+    clients: [],
+  };
+  const shown = period.models.slice(0, TOP_MODELS);
+  const rest = period.models.slice(TOP_MODELS);
+  const restDeltas = rest
+    .map((row) => row.shareDelta)
+    .filter((delta): delta is number => typeof delta === "number");
+  const models = [
+    ...shown.map((row) => ({
+      ...row,
+      mono: true,
+      trend: trendOf(row.shareDelta, days),
+    })),
+    ...(rest.length > 0
+      ? [
+          {
+            name: ui.ai.models.other,
+            tokens: sumOf(rest.map((row) => row.tokens)),
+            cost: sumOf(rest.map((row) => row.cost)),
+            mono: false,
+            trend: trendOf(restDeltas.length ? sumOf(restDeltas) : null, days),
+          },
+        ]
+      : []),
+  ];
+  return {
+    days,
+    hidden: days !== DEFAULT_WINDOW,
+    cost: period.cost,
+    models,
+    topCost: Math.max(0, ...models.map((row) => row.cost)),
+    tools: period.clients.map((client) => ({
+      ...client,
+      label: TOOLS[client.name]?.name ?? client.name,
+      icon: TOOLS[client.name]?.icon,
+      trend: trendOf(client.shareDelta, days),
+    })),
+  };
+});
+const picker = {
+  windows: WINDOWS,
+  defaultWindow: DEFAULT_WINDOW,
+  ...ui.ai.clients.window,
+};
+---
+
+<section class="ai-usage" aria-label={ui.ai.title}>
+  {hasData ? (
+    <div class="ai-card">
+      <div class="card-head muted">
+        <p>
+          {fill(ui.ai.since, {
+            date: dayFormat.format(
+              asDate(usage.range.start ?? usage.fetchedAt),
+            ),
+          })}
+        </p>
+        {usage.syncedAt && (
+          <p>
+            {fill(ui.ai.synced, {
+              date: dayFormat.format(new Date(usage.syncedAt)),
+            })}
+          </p>
+        )}
+      </div>
+
+      <dl class="stats">
+        {stats.map((stat) => (
+          <div
+            class="stat"
+            style={`--tile-gradient: var(--gradient-${stat.gradient})`}
+          >
+            <dt class="stat-label">{stat.label}</dt>
+            <dd class="stat-value">{stat.value}</dd>
+            <dd class="stat-detail muted">{stat.detail}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {/* Heatmap or usage over time (scripts/ai-chart.ts); the heatmap without JS. */}
+      <ai-chart class="chart" data-view="heatmap">
+        <div class="chart-head">
+          <p class="chart-caption muted for-heatmap">
+            {ui.ai.chart.heatmapCaption}
+          </p>
+          <div class="range-pick for-trend">
+            <div
+              class="segmented"
+              role="group"
+              aria-label={ui.ai.chart.rangeLabel}
+            >
+              {CHART_RANGES.map((range) => (
+                <button
+                  type="button"
+                  data-range={range}
+                  aria-pressed={range === DEFAULT_RANGE ? "true" : "false"}
+                >
+                  {String(range)}
+                </button>
+              ))}
+            </div>
+            <span class="muted">{ui.ai.chart.days}</span>
+          </div>
+          <div
+            class="segmented needs-js"
+            role="group"
+            aria-label={ui.ai.chart.label}
+          >
+            <button type="button" data-view="heatmap" aria-pressed="true">
+              {ui.ai.chart.heatmap}
+            </button>
+            <button type="button" data-view="trend" aria-pressed="false">
+              {ui.ai.chart.trend}
+            </button>
+          </div>
+        </div>
+        <div class="for-heatmap">
+          <ActivityCalendar
+            weeks={weeks}
+            lang={lang}
+            label={fill(ui.ai.calendarLabel, {
+              start: dayFormat.format(first),
+              end: dayFormat.format(end),
+            })}
+            messages={ui.ai.day}
+            compact
+          />
+        </div>
+        <div class="for-trend">
+          <UsageTrend
+            days={usage.days}
+            end={usage.fetchedAt}
+            lang={lang}
+            label={ui.ai.chart.trendLabel}
+            otherLabel={ui.ai.models.other}
+            dailyLabel={ui.ai.chart.daily}
+            weeklyLabel={ui.ai.chart.weekly}
+            totalLabel={ui.ai.chart.total}
+            emptyLabel={ui.ai.chart.empty}
+          />
+        </div>
+      </ai-chart>
+
+      <footer class="card-foot">
+        <a href={profile}>
+          {ui.ai.via}
+          <span aria-hidden="true">·</span>
+          <span>@{usage.username}</span>
+        </a>
+      </footer>
+    </div>
+  ) : (
+    <p class="ai-card empty">
+      <Copy text={ui.ai.empty} />
+    </p>
+  )}
+
+  {hasData && (
+    <>
+      <ai-trends>
+        <div class="panels">
+          <section class="panel models" aria-labelledby={`${id}-models`}>
+            <div class="panel-head">
+              <div class="panel-title">
+                <h2 id={`${id}-models`}>{ui.ai.models.title}</h2>
+                <p class="muted">{ui.ai.models.caption}</p>
+              </div>
+              <TrendWindow {...picker} />
+            </div>
+            {panels.map((panel) => (
+              <div class="period" data-w={panel.days} hidden={panel.hidden}>
+                {panel.models.length > 0 ? (
+                  <ol class="model-list">
+                    {panel.models.map((row, index) => (
+                      <li class={`c${index % 5}`}>
+                        <span class:list={["model-name", { mono: row.mono }]}>
+                          {row.name}
+                        </span>
+                        <span class="model-cost">{money.format(row.cost)}</span>
+                        <span class="model-share">
+                          <span class="share-cell">
+                            <span class="muted">
+                              {percent.format(share(row.cost, panel.cost))}
+                            </span>
+                            {row.trend && (
+                              <span
+                                class:list={["delta", row.trend.dir]}
+                                title={row.trend.label}
+                              >
+                                <span aria-hidden="true">
+                                  {row.trend.arrow} {row.trend.points}
+                                </span>
+                                <span class="visually-hidden">
+                                  , {row.trend.label}
+                                </span>
+                              </span>
+                            )}
+                          </span>
+                        </span>
+                        <span class="bar" aria-hidden="true">
+                          <span
+                            class:list={{ none: row.cost === 0 }}
+                            style={`--w: ${share(row.cost, panel.topCost) * 100}%`}
+                          />
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p class="period-empty muted">{ui.ai.chart.empty}</p>
+                )}
+              </div>
+            ))}
+            <p class="panel-foot muted">{ui.ai.costNote}</p>
+          </section>
+
+          <section class="panel" aria-labelledby={`${id}-tools`}>
+            <div class="panel-head">
+              <h2 id={`${id}-tools`}>{ui.ai.clients.title}</h2>
+              <TrendWindow {...picker} />
+            </div>
+            <table class="tools">
+              <thead>
+                <tr>
+                  <th scope="col">{ui.ai.clients.tool}</th>
+                  <th scope="col" class="aux">
+                    {ui.ai.clients.cost}
+                  </th>
+                  <th scope="col" class="aux">
+                    {ui.ai.clients.tokens}
+                  </th>
+                  <th scope="col" class="share-col">
+                    {ui.ai.clients.share}
+                  </th>
+                </tr>
+              </thead>
+              {panels.map((panel) => (
+                <tbody data-w={panel.days} hidden={panel.hidden}>
+                  {panel.tools.length > 0 ? (
+                    panel.tools.map((tool) => (
+                      <tr>
+                        <th scope="row">
+                          <span class="tool">
+                            <span class="tool-mark" aria-hidden="true">
+                              {tool.icon ? (
+                                <Icon name={tool.icon} size={16} />
+                              ) : (
+                                tool.label.charAt(0).toUpperCase()
+                              )}
+                            </span>
+                            <span class="tool-text">
+                              {tool.label}
+                              {/* Narrow panels: cost and tokens move here. */}
+                              <span class="tool-sub muted">
+                                {money.format(tool.cost)} ·{" "}
+                                {compact.format(tool.tokens)}{" "}
+                                {ui.ai.clients.tokens.toLowerCase()}
+                              </span>
+                            </span>
+                          </span>
+                        </th>
+                        <td class="aux">{money.format(tool.cost)}</td>
+                        <td class="aux">{compact.format(tool.tokens)}</td>
+                        <td class="share-col">
+                          <span class="share-cell">
+                            {percent.format(share(tool.cost, panel.cost))}
+                            {tool.trend && (
+                              <span
+                                class:list={["delta", tool.trend.dir]}
+                                title={tool.trend.label}
+                              >
+                                <span aria-hidden="true">
+                                  {tool.trend.arrow} {tool.trend.points}
+                                </span>
+                                <span class="visually-hidden">
+                                  , {tool.trend.label}
+                                </span>
+                              </span>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colspan="4" class="period-empty muted">
+                        {ui.ai.chart.empty}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              ))}
+            </table>
+            <p class="panel-foot muted">{ui.ai.costNote}</p>
+          </section>
+
+          {/* Claude Code's subagents, all time (tokscale's local data). */}
+          <section class="panel" aria-labelledby={`${id}-agents`}>
+            <div class="panel-head">
+              <h2 id={`${id}-agents`}>{ui.ai.agents.title}</h2>
+              <p class="muted">{ui.ai.agents.caption}</p>
+            </div>
+            {agents.length > 0 ? (
+              <table class="tools">
+                <thead>
+                  <tr>
+                    <th scope="col">{ui.ai.agents.agent}</th>
+                    <th scope="col" class="aux">
+                      {ui.ai.agents.messages}
+                    </th>
+                    <th scope="col" class="share-col">
+                      {ui.ai.clients.tokens}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agents.map((agent) => (
+                    <tr>
+                      <th scope="row">
+                        <span class="tool">
+                          <span class="tool-mark" aria-hidden="true">
+                            {agent.icon ? (
+                              <Icon name={agent.icon} size={16} />
+                            ) : (
+                              agent.source.charAt(0).toUpperCase()
+                            )}
+                          </span>
+                          <span class="tool-text">
+                            {agent.name}
+                            {/* The tool it ran in, always under the name. */}
+                            <span class="agent-source muted">
+                              <span class="visually-hidden">
+                                {ui.ai.agents.source}:{" "}
+                              </span>
+                              {agent.source}
+                            </span>
+                            {/* Narrow panels: the messages move here. */}
+                            <span class="tool-sub muted">
+                              {number.format(agent.messages)}{" "}
+                              {ui.ai.agents.messages.toLowerCase()}
+                            </span>
+                          </span>
+                        </span>
+                      </th>
+                      <td class="aux">{number.format(agent.messages)}</td>
+                      <td class="share-col">{compact.format(agent.tokens)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p class="muted">{ui.ai.agents.none}</p>
+            )}
+            <p class="panel-foot muted">
+              {agentsUpdated &&
+                fill(ui.ai.agents.updated, { date: agentsUpdated })}
+            </p>
+          </section>
+        </div>
+      </ai-trends>
+    </>
+  )}
+</section>
+
+<script>
+  import "../scripts/ai-trends";
+  import "../scripts/ai-chart";
+</script>
+
+<style>
+  .ai-usage {
+    /* The intelligence palette's stops, as ActivityCalendar's. */
+    --ip-0: #ff9d3c;
+    --ip-1: #ff3d77;
+    --ip-2: #e0aeff;
+    --ip-3: #4361ee;
+    --ip-4: #7dd3fc;
+  }
+
+  /* Share arrows: green up, pink down; deeper in light mode for contrast. */
+  .ai-usage {
+    --delta-up: #4ade80;
+    --delta-down: #ff3d77;
+  }
+
+  :global(:root[data-theme="light"]) .ai-usage {
+    --delta-up: #15803d;
+    --delta-down: #be185d;
+    --ip-1: #f72585;
+    --ip-2: color-mix(in oklch, #e0aeff, #4361ee 45%);
+    --ip-4: #06b6d4;
+  }
+
+  .ai-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    container-type: inline-size;
+  }
+
+  .empty {
+    display: block;
+  }
+
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    justify-content: space-between;
+    font-size: var(--text-small);
+  }
+
+  /* ---------- Totals ---------- */
+
+  /* Isolated, so each tile's glow (z-index -1) sits behind the tiles but above the card. */
+  .stats {
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  @container (min-width: 36rem) {
+    .stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /*
+   * The lane cards' look (FeatureCard, §6.7) at tile size: a gradient border
+   * over a blurred glow of the same gradient, pink, cyan and violet in the
+   * lanes' order.
+   */
+  .stat {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 4px solid transparent;
+    border-radius: 22px;
+    background:
+      linear-gradient(var(--card-fill), var(--card-fill)) padding-box,
+      var(--tile-gradient) border-box;
+  }
+
+  .stat::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--tile-gradient);
+    opacity: 0.45;
+    filter: blur(24px);
+    pointer-events: none;
+  }
+
+  .stat dd {
+    margin: 0;
+  }
+
+  .stat-label {
+    color: var(--muted);
+    font-size: var(--text-small);
+  }
+
+  .stat-value {
+    order: -1;
+    font-size: 1.75rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .stat-detail {
+    font-size: 0.8125rem;
+  }
+
+  /* ---------- Chart: heatmap or usage over time ---------- */
+
+  ai-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  ai-chart[data-view="heatmap"] .for-trend,
+  ai-chart[data-view="trend"] .for-heatmap {
+    display: none;
+  }
+
+  .chart-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chart-caption {
+    font-size: var(--text-small);
+  }
+
+  /* Pill-shaped segmented buttons: the span picker and the view switch. */
+  .segmented {
+    display: inline-flex;
+    flex-wrap: wrap;
+    padding: 3px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+  }
+
+  .segmented button {
+    min-height: 30px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: var(--text-small);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .segmented button[aria-pressed="true"] {
+    background: var(--card-fill);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .range-pick {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-size: var(--text-small);
+  }
+
+  .range-pick .segmented button {
+    padding: 0 10px;
+  }
+
+  .card-foot {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+
+  .card-foot a {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: var(--touch);
+    color: var(--muted);
+    font-size: var(--text-small);
+    text-decoration: none;
+  }
+
+  .card-foot a:hover {
+    color: var(--fg);
+    text-decoration: underline;
+  }
+
+  /* ---------- Page panels ---------- */
+
+  .panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  @container (min-width: 44rem) {
+    .panels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .models {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    container-type: inline-size;
+  }
+
+  .panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .panel-head h2 {
+    font-size: 1.25rem;
+  }
+
+  .panel-head p {
+    font-size: var(--text-small);
+  }
+
+  .panel-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* One colour per row, round the palette. */
+  .c0 {
+    --tint: var(--ip-1);
+  }
+
+  .c1 {
+    --tint: var(--ip-4);
+  }
+
+  .c2 {
+    --tint: var(--ip-2);
+  }
+
+  .c3 {
+    --tint: var(--ip-0);
+  }
+
+  .c4 {
+    --tint: var(--ip-3);
+  }
+
+  .model-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .model-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 4.5rem;
+    gap: 6px 16px;
+    align-items: baseline;
+  }
+
+  .model-name {
+    overflow-wrap: anywhere;
+  }
+
+  /* Narrow panels: the model on its own line, its cost and share under it. */
+  @container (max-width: 24rem) {
+    .model-list li {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .model-name {
+      grid-column: 1 / -1;
+    }
+
+    .model-list .model-cost {
+      text-align: left;
+    }
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .model-cost,
+  .model-share {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .bar {
+    grid-column: 1 / -1;
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--chip);
+  }
+
+  /* A model unused in the period (listed for its fall) gets no sliver. */
+  .bar span.none {
+    min-width: 0;
+  }
+
+  .bar span {
+    display: block;
+    width: var(--w);
+    min-width: 6px;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--tint);
+  }
+
+  .tools {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tools th,
+  .tools td {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    text-align: right;
+  }
+
+  .tools tr > :first-child {
+    text-align: left;
+  }
+
+  .tools th + th,
+  .tools td {
+    padding-left: 12px;
+  }
+
+  .tools thead th {
+    color: var(--muted);
+    font-size: var(--text-small);
+    font-weight: 500;
+  }
+
+  .tools tbody th {
+    font-weight: 500;
+  }
+
+  /* Rows line up on their first line; the share's arrow hangs below it. */
+  .tools tbody > tr > * {
+    vertical-align: baseline;
+  }
+
+  .tool {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* The share over its arrow (and the points it moved). */
+  .share-cell {
+    display: inline-grid;
+    gap: 2px;
+    justify-items: end;
+  }
+
+  .delta {
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .delta.up {
+    color: var(--delta-up);
+  }
+
+  .delta.down {
+    color: var(--delta-down);
+  }
+
+  /* Cost and tokens are secondary; the share leads (larger, bolder). */
+  .tools .aux {
+    color: var(--muted);
+  }
+
+  .tools thead .share-col {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .share-cell {
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  /* In Models the share stays secondary; only Tools leads with it. */
+  .model-share .share-cell {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  .tool-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tool-sub {
+    display: none;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .agent-source {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 400;
+  }
+
+  /* Narrow panels keep the share: cost and tokens move under the tool's name. */
+  @container (max-width: 22rem) {
+    .tools .aux {
+      display: none;
+    }
+
+    .tool-sub {
+      display: block;
+    }
+  }
+
+  /* The panels lay out as if the element weren't there. */
+  ai-trends {
+    display: contents;
+  }
+
+  /* The maker's mark (or the initial) on a chip, in the text colour. */
+  .tool-mark {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--chip);
+    color: var(--fg);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .tools tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .period-empty {
+    padding: 12px 0;
+    font-size: var(--text-small);
+  }
+
+  .tools td.period-empty {
+    text-align: left;
+  }
+
+  /* The cost note at the foot of Models and Tools, pinned to the bottom. */
+  .panel-foot {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 0.8125rem;
+  }
+</style>

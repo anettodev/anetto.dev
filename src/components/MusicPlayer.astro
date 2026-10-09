@@ -1,0 +1,143 @@
+---
+import "../styles/media-bar.css";
+
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+import playlist from "../data/playlist.json";
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import { APPLE_MUSIC_PLAYLIST } from "../lib/site";
+import Copy from "./Copy.astro";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Antonio's Apple Music playlist under the identity card, in the same
+ * sticky column (requested by Antonio). It starts collapsed: a discreet
+ * frosted-glass container (styles/media-bar.css, shared with the podcasts
+ * above it) with a small " Music Playlist" label on top, then a bar with
+ * the playlist's cover and title and a down arrow. Tapping it pulls the
+ * player down: Apple's own embed at its standard 450px, the height its
+ * sheets (••• menu, sign-in, after-preview) are laid out for. Only one of
+ * the column's containers is open at a time (`name="side-media"`).
+ *
+ * Title and cover come from the snapshot `npm run music:refresh` writes
+ * (scripts/fetch-playlist.mjs), so the collapsed bar loads nothing from
+ * Apple. scripts/music-player.ts gives the frame its address each time the
+ * bar opens, in the site's theme, and unloads it when the bar closes (so
+ * it never plays out of sight). Subscribers signed in to Apple Music hear
+ * full tracks, everyone else Apple's previews. Without JavaScript the bar
+ * opens to a plain link. No playlist set: a [PLACEHOLDER].
+ */
+interface Props {
+  locale: Locale;
+}
+
+const ui = t(Astro.props.locale);
+/* music.apple.com/<storefront>/playlist/… → embed.music.apple.com/<storefront>/playlist/… */
+const embed = APPLE_MUSIC_PLAYLIST.replace(
+  "://music.apple.com/",
+  "://embed.music.apple.com/",
+);
+/* The snapshot only counts while it describes the configured playlist. */
+const snapshot =
+  (playlist as { link?: string }).link === APPLE_MUSIC_PLAYLIST
+    ? (playlist as { title: string; cover: string | null })
+    : null;
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/music/*",
+  { eager: true },
+);
+const cover = snapshot?.cover
+  ? covers[`../assets/music/${snapshot.cover}`]?.default
+  : undefined;
+const title = snapshot?.title ?? ui.music.heading;
+---
+
+<div class="media music">
+  {APPLE_MUSIC_PLAYLIST ? (
+    <music-player data-src={embed}>
+      <div class="media-glass">
+        <p class="media-label">
+          <Icon name="apple" size={11} />
+          <span class="visually-hidden">Apple </span>Music Playlist
+        </p>
+        <details class="media-details" name="side-media">
+          <summary class="media-bar">
+            {cover && (
+              <Image
+                class="media-cover"
+                src={cover}
+                alt=""
+                width={40}
+                height={40}
+                densities={[1, 2]}
+              />
+            )}
+            <span class="media-text">
+              <span class="visually-hidden">{ui.music.heading}: </span>
+              <span class="media-name">{title}</span>
+              <span class="visually-hidden">, Apple Music</span>
+            </span>
+            <span class="media-arrow" aria-hidden="true">
+              <UiIcon name="chevron" size={16} strokeWidth={2} />
+            </span>
+          </summary>
+          <div class="media-panel">
+            <iframe
+              title={ui.music.title}
+              height="450"
+              scrolling="no"
+              allow="autoplay *; encrypted-media *; clipboard-write"
+              sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+            />
+            <noscript>
+              <a class="more-link" href={APPLE_MUSIC_PLAYLIST}>
+                {ui.music.listen}
+                <span aria-hidden="true">&nbsp;→</span>
+              </a>
+            </noscript>
+          </div>
+        </details>
+      </div>
+    </music-player>
+  ) : (
+    <p class="media-placeholder">
+      <Copy text={ui.music.placeholder} />
+    </p>
+  )}
+</div>
+
+<script>
+  import "../scripts/music-player";
+</script>
+
+<style>
+  music-player {
+    display: block;
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    opacity: 0;
+    transition: opacity 400ms ease;
+  }
+
+  /* Faded in once Apple's player has loaded (the script adds .is-loaded). */
+  music-player.is-loaded iframe {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    iframe {
+      transition: none;
+    }
+  }
+</style>

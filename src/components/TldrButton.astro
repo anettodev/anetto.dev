@@ -1,0 +1,188 @@
+---
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import type { UIStrings } from "../i18n/types";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * TL;DR (requested by Antonio, after akitaonrails.com's): a button that
+ * opens an AI assistant in a new tab with a ready prompt to read this
+ * page's public address and summarize it: five key points and a
+ * conclusion, what the summary leaves out, and a follow-up question to
+ * start a chat. Nothing runs on the site and nothing is sent until the
+ * visitor clicks; the assistant reads the live page itself. Used on
+ * Experiences, About, AI and each note's page; the prompt says which kind
+ * of page it is and what to summarize (i18n `tldr.pages`).
+ *
+ * The button opens Claude; the arrow beside it lists the others: ChatGPT
+ * and Grok (the prompt in `q`, like Claude) and Cursor, whose web link
+ * (cursor.com/link/prompt, `text`) opens a chat in the Cursor app. The menu is a
+ * native <details>, so it works without JavaScript;
+ * scripts/tldr-menu.ts closes it on Escape, outside clicks and a choice.
+ * Sits in a .button-row, whose isolation the buttons' halos need.
+ */
+interface Props {
+  locale: Locale;
+  /** What kind of page this is, for the prompt. */
+  kind: keyof UIStrings["tldr"]["pages"];
+  /** The page's public address (absolute), which the assistant reads. */
+  url: string;
+  /** A note's title, quoted in its prompt. */
+  title?: string | undefined;
+}
+
+const { locale, kind, url, title = "" } = Astro.props;
+const ui = t(locale);
+const page = ui.tldr.pages[kind];
+const prompt = ui.tldr.prompt
+  .replace("{url}", url)
+  .replace("{context}", page.context.replace("{title}", title))
+  .replace("{summary}", page.summary);
+const PROVIDERS = [
+  { name: "Claude", icon: "claude", base: "https://claude.ai/new", param: "q" },
+  { name: "ChatGPT", icon: "openai", base: "https://chatgpt.com/", param: "q" },
+  { name: "Grok", icon: "grok", base: "https://grok.com/", param: "q" },
+  {
+    name: "Cursor",
+    icon: "cursor",
+    base: "https://cursor.com/link/prompt",
+    param: "text",
+  },
+] as const;
+const links = PROVIDERS.map((provider) => ({
+  name: provider.name,
+  icon: provider.icon,
+  href: `${provider.base}?${new URLSearchParams({ [provider.param]: prompt })}`,
+  hint: ui.tldr.hint.replace("{provider}", provider.name),
+}));
+const [main] = links;
+---
+
+<tldr-menu class="tldr">
+  {main && (
+    <a
+      class="button with-icon tldr-main"
+      href={main.href}
+      target="_blank"
+      rel="noopener"
+      title={main.hint}
+    >
+      <UiIcon name="sparkles" size={16} strokeWidth={1.8} />
+      {ui.tldr.label}
+      <span class="visually-hidden">: {main.hint}</span>
+    </a>
+  )}
+  <details class="tldr-more">
+    <summary class="button tldr-toggle" title={ui.tldr.choose}>
+      <UiIcon name="chevron" size={16} strokeWidth={2} />
+      <span class="visually-hidden">{ui.tldr.choose}</span>
+    </summary>
+    <div class="tldr-menu">
+      <p class="label">{ui.tldr.menuTitle}</p>
+      <ul>
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener"
+              title={link.hint}
+            >
+              <Icon name={link.icon} size={14} />
+              {link.name}
+              <span class="visually-hidden"> ({link.hint})</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </details>
+</tldr-menu>
+
+<script>
+  import "../scripts/tldr-menu";
+</script>
+
+<style>
+  /*
+   * The row is isolated for the halos, so the open menu can't rise above
+   * what follows the row (Experiences' figures) on its own: the row is
+   * lifted while the menu is open.
+   */
+  :global(.button-row:has(.tldr-more[open])) {
+    position: relative;
+    z-index: 5;
+  }
+
+  /* No isolation or z-index here: the buttons' halos belong to the row. */
+  .tldr {
+    position: relative;
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  .tldr-main {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .tldr-toggle {
+    padding: 0 12px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .tldr-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .tldr-toggle :global(svg) {
+    transition: transform 200ms ease;
+  }
+
+  .tldr-more[open] .tldr-toggle :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .tldr-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 10;
+    min-width: 200px;
+    padding: 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .tldr-menu .label {
+    padding: 4px 10px 8px;
+  }
+
+  .tldr-menu a {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-height: var(--touch);
+    padding: 0 10px;
+    border-radius: 10px;
+    color: var(--fg);
+    font-size: var(--text-small);
+    text-decoration: none;
+  }
+
+  .tldr-menu a:is(:hover, :focus-visible) {
+    background: var(--chip);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tldr-toggle :global(svg) {
+      transition: none;
+    }
+  }
+</style>

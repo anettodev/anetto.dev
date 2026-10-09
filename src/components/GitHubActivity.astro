@@ -1,0 +1,466 @@
+---
+import activity from "../data/github-activity.json";
+import { t } from "../i18n";
+import { LANG_TAG, type Locale } from "../i18n/locales";
+import ActivityCalendar from "./ActivityCalendar.astro";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * GitHub Activity (requested by Antonio; modelled on a contribution chart he
+ * shared). A snapshot of the last year from data/github-activity.json, which
+ * `npm run github:refresh` rewrites; the build never calls GitHub.
+ *
+ *   calendar  ActivityCalendar, with GitHub's own four levels per day
+ *   top repos up to five glossy orbs (none: no row at all), one link per
+ *             public repository with its commit count
+ *             inside; hover or focus slides its name out to the right. A
+ *             button lists them in full (open by default without JS).
+ *             Public repositories only (the script drops private ones).
+ *
+ * A footer names the profile (@login, from the snapshot) and links to it.
+ *
+ * The total, the update date and the repositories are real text.
+ */
+interface Props {
+  locale: Locale;
+  /** id for the heading; unique per page. */
+  id?: string;
+  /**
+   * Right under a page header (Projects): no section margin on top, so the
+   * gap is the header's own, as with Experiences' figures.
+   */
+  flush?: boolean;
+}
+
+const { locale, id = "github-activity", flush = false } = Astro.props;
+const ui = t(locale);
+const lang = LANG_TAG[locale];
+const plural = new Intl.PluralRules(lang);
+const number = new Intl.NumberFormat(lang);
+const dayFormat = new Intl.DateTimeFormat(lang, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const asDate = (iso: string) => new Date(`${iso}T00:00:00Z`);
+const fill = (template: string, values: Record<string, string>) =>
+  template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
+const oneOrOther = (n: number) =>
+  plural.select(n) === "one" ? "one" : "other";
+
+const { weeks, repos, login } = activity;
+const days = weeks.flat();
+const firstDay = days[0]?.date ?? activity.fetchedAt;
+const lastDay = days.at(-1)?.date ?? activity.fetchedAt;
+
+type Repo = (typeof repos)[number];
+const repoName = (repo: Repo) =>
+  repo.owner === login ? repo.name : `${repo.owner}/${repo.name}`;
+/** At most three characters, to fit inside an orb: 999, then 1k … 99k. */
+const orbCount = (n: number) =>
+  n < 1000 ? String(n) : `${Math.min(99, Math.floor(n / 1000))}k`;
+const commitsLabel = (repo: Repo) =>
+  `${repoName(repo)}, ${number.format(repo.commits)} ${ui.github.commits[oneOrOther(repo.commits)]}`;
+---
+
+<section class:list={["github", { flush }]} aria-labelledby={id}>
+  <div class="head">
+    <h2 id={id}>{ui.github.title}</h2>
+    <a class="more-link" href={`https://github.com/${login}`}>
+      {ui.github.profileLink}
+      <span aria-hidden="true">&nbsp;→</span>
+    </a>
+  </div>
+
+  <github-activity class="card">
+    <div class="card-head">
+      <p class="total">
+        {fill(ui.github.total[oneOrOther(activity.total)], {
+          n: number.format(activity.total),
+        })}
+      </p>
+      <p class="updated muted">
+        {fill(ui.github.updated, {
+          date: dayFormat.format(asDate(activity.fetchedAt)),
+        })}
+      </p>
+    </div>
+
+    <ActivityCalendar
+      weeks={weeks}
+      lang={lang}
+      label={fill(ui.github.calendarLabel, {
+        start: dayFormat.format(asDate(firstDay)),
+        end: dayFormat.format(asDate(lastDay)),
+      })}
+      messages={ui.github.day}
+    />
+
+    {repos.length > 0 && (
+      <div class="top">
+        <div class="top-row">
+          <p class="top-label" id={`${id}-top`}>
+            {ui.github.top}
+          </p>
+          <ul class="orbs" aria-labelledby={`${id}-top`}>
+            {repos.map((repo, index) => (
+              <li>
+                <a
+                  class="orb-link"
+                  href={repo.url}
+                  aria-label={commitsLabel(repo)}
+                >
+                  <span class={`orb o${index}`}>
+                    <span class="orb-count">{orbCount(repo.commits)}</span>
+                  </span>
+                  <span class="orb-name">
+                    <span>
+                      <span>{repoName(repo)}</span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            class="toggle needs-js"
+            aria-expanded="false"
+            aria-controls={`${id}-repos`}
+            aria-label={ui.github.topToggle}
+          >
+            <UiIcon name="chevron" size={14} strokeWidth={2.2} />
+          </button>
+        </div>
+        <ol class="repos" id={`${id}-repos`}>
+          {repos.map((repo, index) => (
+            <li>
+              <span class={`orb o${index}`} aria-hidden="true" />
+              <a href={repo.url}>{repoName(repo)}</a>
+              <span class="count">
+                {number.format(repo.commits)}
+                <span class="visually-hidden">
+                  {" "}
+                  {ui.github.commits[oneOrOther(repo.commits)]}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    )}
+
+    <footer class="card-foot">
+      <a href={`https://github.com/${login}`}>
+        <Icon name="github" size={16} />
+        <span>@{login}</span>
+      </a>
+    </footer>
+  </github-activity>
+</section>
+
+<script>
+  import "../scripts/github-activity";
+</script>
+
+<style>
+  .github {
+    margin-top: var(--space-section);
+  }
+
+  .github.flush {
+    margin-top: 0;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .head h2 {
+    font-size: var(--text-h2);
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 32px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    container-type: inline-size;
+  }
+
+  .card-foot {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+
+  .card-foot a {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: var(--touch);
+    color: var(--muted);
+    font-size: var(--text-small);
+    text-decoration: none;
+  }
+
+  .card-foot a:hover {
+    color: var(--fg);
+  }
+
+  .card-foot a:hover span {
+    text-decoration: underline;
+  }
+
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .total {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .updated {
+    font-size: var(--text-small);
+  }
+
+  /* ---------- Top repositories ---------- */
+
+  .top {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--chip-glass);
+  }
+
+  .top-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: center;
+    min-height: 60px;
+    padding: 8px 8px 8px 20px;
+  }
+
+  .top-label {
+    color: var(--muted);
+    font-size: var(--text-small);
+  }
+
+  /* Left-anchored after the label, so a name slides out into free space. */
+  .orbs {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .orbs li + li {
+    margin-left: -8px;
+    transition: margin-left 200ms ease;
+  }
+
+  /* The stack fans out while one orb is hovered or focused. */
+  .orbs:has(.orb-link:is(:hover, :focus-visible)) li + li {
+    margin-left: 4px;
+  }
+
+  .orb-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    color: var(--fg);
+    text-decoration: none;
+    transition: background-color 200ms ease;
+  }
+
+  .orb-link:is(:hover, :focus-visible) {
+    z-index: 1;
+    background: var(--chip);
+  }
+
+  /* The name: a 0fr → 1fr grid track animates its width from nothing. */
+  .orb-name {
+    display: grid;
+    grid-template-columns: 0fr;
+    transition: grid-template-columns 250ms ease;
+  }
+
+  .orb-name > span {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .orb-name > span > span {
+    display: block;
+    padding: 0 14px 0 10px;
+    font-size: var(--text-small);
+    white-space: nowrap;
+  }
+
+  .orb-link:is(:hover, :focus-visible) .orb-name {
+    grid-template-columns: 1fr;
+  }
+
+  .top[data-open] .orbs {
+    visibility: hidden;
+  }
+
+  .toggle {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: var(--touch);
+    height: var(--touch);
+    padding: 0;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .toggle :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .top[data-open] .toggle :global(svg) {
+    transform: none;
+  }
+
+  /* With JavaScript the list waits for the button; without, it stays open. */
+  :global(:root[data-js]) .top:not([data-open]) .repos {
+    display: none;
+  }
+
+  /*
+   * Narrow cards: the label and the button share the first line, and the
+   * orbs get a full row. With five orbs a long name can still need more,
+   * so the orbs after it wrap to a second line while it's open.
+   */
+  @container (max-width: 30rem) {
+    .top-label {
+      flex: 1;
+    }
+
+    .orbs {
+      flex-basis: 100%;
+      flex-wrap: wrap;
+      row-gap: 8px;
+      order: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbs li + li,
+    .orb-link,
+    .orb-name {
+      transition: none;
+    }
+  }
+
+  .repos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 20px 16px;
+  }
+
+  .repos li {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    min-height: var(--touch);
+  }
+
+  .repos a {
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .repos a:hover {
+    text-decoration: underline;
+  }
+
+  .count {
+    margin-left: auto;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Glossy spheres in the intelligence palette: a highlight over a lit ball. */
+  .orb {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle at 34% 28%,
+        rgba(255, 255, 255, 0.95) 0 7%,
+        rgba(255, 255, 255, 0.35) 20%,
+        transparent 42%
+      ),
+      radial-gradient(circle at 50% 62%, var(--orb-light), var(--orb-deep));
+    box-shadow:
+      0 0 0 2px var(--surface),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  /* The commit count, up to three characters at 0.7rem; dark on the light ball. */
+  .orb-count {
+    color: #16181b;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .o0 {
+    --orb-light: #ffb1ce;
+    --orb-deep: #ff3d77;
+  }
+
+  .o1 {
+    --orb-light: #7dd3fc;
+    --orb-deep: #06b6d4;
+  }
+
+  .o2 {
+    --orb-light: #e0aeff;
+    --orb-deep: #4361ee;
+  }
+
+  .o3 {
+    --orb-light: #ffd29e;
+    --orb-deep: #ff9d3c;
+  }
+
+  .o4 {
+    --orb-light: #a5b4fc;
+    --orb-deep: #4361ee;
+  }
+</style>

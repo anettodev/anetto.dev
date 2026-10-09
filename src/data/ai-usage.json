@@ -1,0 +1,1950 @@
+{
+  "username": "anettodev",
+  "fetchedAt": "2026-10-04",
+  "syncedAt": "2026-10-05T01:01:45.664Z",
+  "rank": 1162,
+  "range": {
+    "start": "2025-05-17",
+    "end": "2026-10-04"
+  },
+  "totals": {
+    "tokens": 8554117049,
+    "cost": 5114.69,
+    "input": 132471587,
+    "output": 36753586,
+    "cacheRead": 8174984558,
+    "cacheWrite": 209819400,
+    "reasoning": 87918,
+    "messages": 19517,
+    "activeDays": 171,
+    "sessions": 4742
+  },
+  "days": [
+    {
+      "date": "2025-05-17",
+      "tokens": 94016,
+      "cost": 0.29,
+      "models": {
+        "claude-3-7-sonnet-thinking": 94016
+      }
+    },
+    {
+      "date": "2025-06-22",
+      "tokens": 5656420,
+      "cost": 2.49,
+      "models": {
+        "default": 5656420
+      }
+    },
+    {
+      "date": "2025-07-06",
+      "tokens": 2897561,
+      "cost": 2.29,
+      "models": {
+        "default": 2897561
+      }
+    },
+    {
+      "date": "2025-07-12",
+      "tokens": 8923689,
+      "cost": 8.53,
+      "models": {
+        "default": 8038574,
+        "grok-4-0709": 885115
+      }
+    },
+    {
+      "date": "2025-08-10",
+      "tokens": 3812753,
+      "cost": 2.47,
+      "models": {
+        "gpt-5": 898332,
+        "claude-4-sonnet": 2914421
+      }
+    },
+    {
+      "date": "2025-08-11",
+      "tokens": 1079088,
+      "cost": 0.86,
+      "models": {
+        "claude-4-sonnet": 1079088
+      }
+    },
+    {
+      "date": "2025-08-14",
+      "tokens": 2143294,
+      "cost": 1.07,
+      "models": {
+        "claude-4-sonnet": 2143294
+      }
+    },
+    {
+      "date": "2025-08-15",
+      "tokens": 57219747,
+      "cost": 28.44,
+      "models": {
+        "claude-4-sonnet": 57219747
+      }
+    },
+    {
+      "date": "2025-08-16",
+      "tokens": 17736427,
+      "cost": 14.76,
+      "models": {
+        "claude-4-sonnet": 17736427
+      }
+    },
+    {
+      "date": "2025-08-17",
+      "tokens": 47884080,
+      "cost": 29.33,
+      "models": {
+        "claude-4-sonnet": 47884080
+      }
+    },
+    {
+      "date": "2025-08-18",
+      "tokens": 20159953,
+      "cost": 8.88,
+      "models": {
+        "claude-4-sonnet": 20159953
+      }
+    },
+    {
+      "date": "2025-08-19",
+      "tokens": 3116134,
+      "cost": 1.92,
+      "models": {
+        "default": 68080,
+        "claude-4-sonnet": 3048054
+      }
+    },
+    {
+      "date": "2025-08-20",
+      "tokens": 2026402,
+      "cost": 0.65,
+      "models": {
+        "default": 2026402
+      }
+    },
+    {
+      "date": "2025-08-21",
+      "tokens": 552610,
+      "cost": 0,
+      "models": {
+        "sonic": 552610
+      }
+    },
+    {
+      "date": "2025-08-22",
+      "tokens": 8697621,
+      "cost": 0.29,
+      "models": {
+        "sonic": 8492669,
+        "default": 204952
+      }
+    },
+    {
+      "date": "2025-08-24",
+      "tokens": 806176,
+      "cost": 0.33,
+      "models": {
+        "default": 806176
+      }
+    },
+    {
+      "date": "2025-08-25",
+      "tokens": 3115790,
+      "cost": 1.13,
+      "models": {
+        "default": 3115790
+      }
+    },
+    {
+      "date": "2025-08-26",
+      "tokens": 4507176,
+      "cost": 1.2,
+      "models": {
+        "sonic": 620770,
+        "default": 3886406
+      }
+    },
+    {
+      "date": "2025-08-27",
+      "tokens": 10611960,
+      "cost": 6.19,
+      "models": {
+        "sonic": 619471,
+        "claude-4-sonnet": 9992489
+      }
+    },
+    {
+      "date": "2025-09-01",
+      "tokens": 26601757,
+      "cost": 16.42,
+      "models": {
+        "claude-4-sonnet": 26601757
+      }
+    },
+    {
+      "date": "2025-09-02",
+      "tokens": 21980913,
+      "cost": 16.38,
+      "models": {
+        "claude-4-sonnet": 21980913
+      }
+    },
+    {
+      "date": "2025-09-03",
+      "tokens": 6150461,
+      "cost": 3.5,
+      "models": {
+        "claude-4-sonnet": 6150461
+      }
+    },
+    {
+      "date": "2025-09-04",
+      "tokens": 31620696,
+      "cost": 18.23,
+      "models": {
+        "default": 9497,
+        "claude-4-sonnet": 31611199
+      }
+    },
+    {
+      "date": "2025-09-05",
+      "tokens": 32289019,
+      "cost": 20.21,
+      "models": {
+        "claude-4-sonnet": 32289019
+      }
+    },
+    {
+      "date": "2025-09-06",
+      "tokens": 18880011,
+      "cost": 10.69,
+      "models": {
+        "default": 5881656,
+        "claude-4-sonnet": 12998355
+      }
+    },
+    {
+      "date": "2025-09-07",
+      "tokens": 9529532,
+      "cost": 2.96,
+      "models": {
+        "default": 9529532
+      }
+    },
+    {
+      "date": "2025-09-08",
+      "tokens": 2437295,
+      "cost": 0.78,
+      "models": {
+        "default": 2437295
+      }
+    },
+    {
+      "date": "2025-09-11",
+      "tokens": 164415,
+      "cost": 0.07,
+      "models": {
+        "default": 164415
+      }
+    },
+    {
+      "date": "2025-09-12",
+      "tokens": 399285,
+      "cost": 0.18,
+      "models": {
+        "default": 399285
+      }
+    },
+    {
+      "date": "2025-09-13",
+      "tokens": 8850472,
+      "cost": 2.69,
+      "models": {
+        "default": 8850472
+      }
+    },
+    {
+      "date": "2025-09-14",
+      "tokens": 23772526,
+      "cost": 7.44,
+      "models": {
+        "default": 13588798,
+        "gemini-2.5-pro": 7115880,
+        "gemini-2.5-flash": 3067848
+      }
+    },
+    {
+      "date": "2025-09-15",
+      "tokens": 4281340,
+      "cost": 2.22,
+      "models": {
+        "default": 2672624,
+        "gemini-2.5-pro": 1471262,
+        "gemini-2.5-flash": 137454
+      }
+    },
+    {
+      "date": "2025-09-16",
+      "tokens": 3491837,
+      "cost": 1.95,
+      "models": {
+        "default": 1076664,
+        "gemini-2.5-pro": 2415173
+      }
+    },
+    {
+      "date": "2025-09-18",
+      "tokens": 357494,
+      "cost": 0.45,
+      "models": {
+        "gemini-2.5-pro": 357494
+      }
+    },
+    {
+      "date": "2025-09-20",
+      "tokens": 237808,
+      "cost": 0.1,
+      "models": {
+        "default": 237808
+      }
+    },
+    {
+      "date": "2025-09-21",
+      "tokens": 509310,
+      "cost": 0.19,
+      "models": {
+        "default": 509310
+      }
+    },
+    {
+      "date": "2025-11-02",
+      "tokens": 3629339,
+      "cost": 1.21,
+      "models": {
+        "default": 3629339
+      }
+    },
+    {
+      "date": "2025-11-04",
+      "tokens": 12413404,
+      "cost": 4.25,
+      "models": {
+        "default": 12413404
+      }
+    },
+    {
+      "date": "2025-11-05",
+      "tokens": 30874953,
+      "cost": 24.47,
+      "models": {
+        "default": 8904024,
+        "claude-4-5-sonnet-thinking": 21970929
+      }
+    },
+    {
+      "date": "2025-11-06",
+      "tokens": 48549464,
+      "cost": 20.73,
+      "models": {
+        "default": 15558198,
+        "grok-code-fast-1": 12834694,
+        "claude-4-5-sonnet-thinking": 20156572
+      }
+    },
+    {
+      "date": "2025-11-07",
+      "tokens": 15149563,
+      "cost": 5.3,
+      "models": {
+        "default": 15149563
+      }
+    },
+    {
+      "date": "2025-11-08",
+      "tokens": 62239128,
+      "cost": 30.08,
+      "models": {
+        "default": 47110858,
+        "claude-4-5-sonnet-thinking": 15128270
+      }
+    },
+    {
+      "date": "2025-11-09",
+      "tokens": 47438556,
+      "cost": 28.62,
+      "models": {
+        "default": 15934671,
+        "claude-4-5-sonnet-thinking": 31503885
+      }
+    },
+    {
+      "date": "2025-11-10",
+      "tokens": 21012383,
+      "cost": 12.9,
+      "models": {
+        "default": 12542161,
+        "claude-4-5-sonnet-thinking": 8470222
+      }
+    },
+    {
+      "date": "2025-11-11",
+      "tokens": 31576680,
+      "cost": 6.94,
+      "models": {
+        "default": 18402175,
+        "composer-1": 13174505
+      }
+    },
+    {
+      "date": "2025-11-12",
+      "tokens": 26972108,
+      "cost": 10.33,
+      "models": {
+        "default": 26972108
+      }
+    },
+    {
+      "date": "2025-11-13",
+      "tokens": 39288192,
+      "cost": 15.43,
+      "models": {
+        "default": 39288192
+      }
+    },
+    {
+      "date": "2025-11-14",
+      "tokens": 9980480,
+      "cost": 3.54,
+      "models": {
+        "default": 9980480
+      }
+    },
+    {
+      "date": "2025-11-15",
+      "tokens": 39632014,
+      "cost": 14.68,
+      "models": {
+        "default": 39632014
+      }
+    },
+    {
+      "date": "2025-11-16",
+      "tokens": 40673638,
+      "cost": 13.85,
+      "models": {
+        "default": 40673638
+      }
+    },
+    {
+      "date": "2025-11-17",
+      "tokens": 31803041,
+      "cost": 10.77,
+      "models": {
+        "default": 31803041
+      }
+    },
+    {
+      "date": "2025-11-18",
+      "tokens": 55905799,
+      "cost": 19.08,
+      "models": {
+        "default": 55905799
+      }
+    },
+    {
+      "date": "2025-11-19",
+      "tokens": 22305622,
+      "cost": 8.26,
+      "models": {
+        "default": 22305622
+      }
+    },
+    {
+      "date": "2025-11-20",
+      "tokens": 76561971,
+      "cost": 7.14,
+      "models": {
+        "default": 15511975,
+        "grok-code-fast-1": 61049996
+      }
+    },
+    {
+      "date": "2025-11-21",
+      "tokens": 52612027,
+      "cost": 2.87,
+      "models": {
+        "grok-code-fast-1": 52612027
+      }
+    },
+    {
+      "date": "2025-11-22",
+      "tokens": 73829070,
+      "cost": 2.22,
+      "models": {
+        "grok-code-fast-1": 73829070
+      }
+    },
+    {
+      "date": "2025-11-23",
+      "tokens": 33249121,
+      "cost": 0.65,
+      "models": {
+        "composer-1": 10297451,
+        "grok-code-fast-1": 22951670
+      }
+    },
+    {
+      "date": "2025-11-24",
+      "tokens": 36435402,
+      "cost": 3.45,
+      "models": {
+        "default": 9522835,
+        "composer-1": 26912567
+      }
+    },
+    {
+      "date": "2025-11-25",
+      "tokens": 43957080,
+      "cost": 15.96,
+      "models": {
+        "default": 43957080
+      }
+    },
+    {
+      "date": "2025-11-26",
+      "tokens": 39275600,
+      "cost": 13.43,
+      "models": {
+        "default": 39275600
+      }
+    },
+    {
+      "date": "2025-11-27",
+      "tokens": 38693022,
+      "cost": 15.38,
+      "models": {
+        "default": 34504847,
+        "claude-4-5-sonnet-thinking": 4188175
+      }
+    },
+    {
+      "date": "2025-11-28",
+      "tokens": 39792206,
+      "cost": 27.44,
+      "models": {
+        "claude-4-5-sonnet-thinking": 39792206
+      }
+    },
+    {
+      "date": "2025-11-29",
+      "tokens": 57938439,
+      "cost": 43.69,
+      "models": {
+        "claude-4-5-sonnet-thinking": 57938439
+      }
+    },
+    {
+      "date": "2025-11-30",
+      "tokens": 44527874,
+      "cost": 17.44,
+      "models": {
+        "default": 41490564,
+        "claude-4-5-sonnet-thinking": 3037310
+      }
+    },
+    {
+      "date": "2025-12-01",
+      "tokens": 57880149,
+      "cost": 8.21,
+      "models": {
+        "default": 16128889,
+        "grok-code-fast-1": 41751260
+      }
+    },
+    {
+      "date": "2025-12-02",
+      "tokens": 67027508,
+      "cost": 4.27,
+      "models": {
+        "grok-code-fast-1": 67027508
+      }
+    },
+    {
+      "date": "2025-12-03",
+      "tokens": 70188094,
+      "cost": 8.4,
+      "models": {
+        "default": 14276315,
+        "grok-code-fast-1": 55911779
+      }
+    },
+    {
+      "date": "2025-12-04",
+      "tokens": 38588470,
+      "cost": 7.01,
+      "models": {
+        "default": 15712431,
+        "agent_review": 1134055,
+        "grok-code-fast-1": 21741984
+      }
+    },
+    {
+      "date": "2025-12-06",
+      "tokens": 76894301,
+      "cost": 2.96,
+      "models": {
+        "grok-code-fast-1": 76894301
+      }
+    },
+    {
+      "date": "2025-12-07",
+      "tokens": 56648302,
+      "cost": 3.59,
+      "models": {
+        "default": 2673803,
+        "grok-code-fast-1": 53974499
+      }
+    },
+    {
+      "date": "2025-12-08",
+      "tokens": 47316138,
+      "cost": 16.09,
+      "models": {
+        "default": 47316138
+      }
+    },
+    {
+      "date": "2025-12-09",
+      "tokens": 31901056,
+      "cost": 11.12,
+      "models": {
+        "default": 31901056
+      }
+    },
+    {
+      "date": "2025-12-10",
+      "tokens": 18340639,
+      "cost": 6.61,
+      "models": {
+        "default": 18340639
+      }
+    },
+    {
+      "date": "2025-12-11",
+      "tokens": 23326328,
+      "cost": 8.67,
+      "models": {
+        "default": 23326328
+      }
+    },
+    {
+      "date": "2025-12-12",
+      "tokens": 16989185,
+      "cost": 6.19,
+      "models": {
+        "default": 16989185
+      }
+    },
+    {
+      "date": "2025-12-13",
+      "tokens": 18650812,
+      "cost": 6.84,
+      "models": {
+        "default": 18650812
+      }
+    },
+    {
+      "date": "2025-12-14",
+      "tokens": 32165859,
+      "cost": 11.44,
+      "models": {
+        "default": 32165859
+      }
+    },
+    {
+      "date": "2025-12-15",
+      "tokens": 6478268,
+      "cost": 2.47,
+      "models": {
+        "default": 6478268
+      }
+    },
+    {
+      "date": "2025-12-16",
+      "tokens": 8983187,
+      "cost": 3.1,
+      "models": {
+        "default": 8983187
+      }
+    },
+    {
+      "date": "2025-12-17",
+      "tokens": 11684907,
+      "cost": 4.3,
+      "models": {
+        "default": 11684907
+      }
+    },
+    {
+      "date": "2025-12-20",
+      "tokens": 6468752,
+      "cost": 2.63,
+      "models": {
+        "default": 6468752
+      }
+    },
+    {
+      "date": "2025-12-21",
+      "tokens": 48298475,
+      "cost": 18.68,
+      "models": {
+        "default": 48298475
+      }
+    },
+    {
+      "date": "2026-01-10",
+      "tokens": 27889,
+      "cost": 0.03,
+      "models": {
+        "default": 27889
+      }
+    },
+    {
+      "date": "2026-01-11",
+      "tokens": 5102227,
+      "cost": 1.64,
+      "models": {
+        "default": 5102227
+      }
+    },
+    {
+      "date": "2026-01-12",
+      "tokens": 508965,
+      "cost": 0.25,
+      "models": {
+        "default": 508965
+      }
+    },
+    {
+      "date": "2026-01-13",
+      "tokens": 9818621,
+      "cost": 7.71,
+      "models": {
+        "claude-4-5-sonnet-thinking": 9818621
+      }
+    },
+    {
+      "date": "2026-01-14",
+      "tokens": 9720838,
+      "cost": 7.12,
+      "models": {
+        "claude-4-5-sonnet-thinking": 9720838
+      }
+    },
+    {
+      "date": "2026-01-17",
+      "tokens": 1017247,
+      "cost": 0.91,
+      "models": {
+        "claude-4-5-sonnet-thinking": 1017247
+      }
+    },
+    {
+      "date": "2026-01-19",
+      "tokens": 310027,
+      "cost": 0.42,
+      "models": {
+        "claude-4-5-sonnet-thinking": 310027
+      }
+    },
+    {
+      "date": "2026-01-23",
+      "tokens": 20066558,
+      "cost": 11.81,
+      "models": {
+        "default": 147214,
+        "claude-4-5-sonnet-thinking": 19919344
+      }
+    },
+    {
+      "date": "2026-01-24",
+      "tokens": 471922,
+      "cost": 0.25,
+      "models": {
+        "default": 471922
+      }
+    },
+    {
+      "date": "2026-01-25",
+      "tokens": 13304643,
+      "cost": 4.31,
+      "models": {
+        "default": 13304643
+      }
+    },
+    {
+      "date": "2026-01-26",
+      "tokens": 907570,
+      "cost": 0.42,
+      "models": {
+        "default": 907570
+      }
+    },
+    {
+      "date": "2026-01-27",
+      "tokens": 2401210,
+      "cost": 0.81,
+      "models": {
+        "default": 2401210
+      }
+    },
+    {
+      "date": "2026-01-28",
+      "tokens": 1472179,
+      "cost": 1.08,
+      "models": {
+        "default": 1472179
+      }
+    },
+    {
+      "date": "2026-01-31",
+      "tokens": 9673499,
+      "cost": 3.18,
+      "models": {
+        "default": 9673499
+      }
+    },
+    {
+      "date": "2026-02-01",
+      "tokens": 39619073,
+      "cost": 25.77,
+      "models": {
+        "default": 3590560,
+        "claude-4-5-sonnet-thinking": 36028513
+      }
+    },
+    {
+      "date": "2026-02-03",
+      "tokens": 4795033,
+      "cost": 1.76,
+      "models": {
+        "default": 4795033
+      }
+    },
+    {
+      "date": "2026-02-04",
+      "tokens": 111161,
+      "cost": 0.06,
+      "models": {
+        "default": 111161
+      }
+    },
+    {
+      "date": "2026-02-07",
+      "tokens": 5196057,
+      "cost": 1.76,
+      "models": {
+        "default": 5196057
+      }
+    },
+    {
+      "date": "2026-02-08",
+      "tokens": 2558796,
+      "cost": 0.91,
+      "models": {
+        "default": 2558796
+      }
+    },
+    {
+      "date": "2026-02-09",
+      "tokens": 4506326,
+      "cost": 29.97,
+      "models": {
+        "claude-4-6-opus-high-thinking-fast": 4506326
+      }
+    },
+    {
+      "date": "2026-02-10",
+      "tokens": 37779431,
+      "cost": 84.18,
+      "models": {
+        "default": 30420333,
+        "claude-4-6-opus-high-thinking-fast": 7359098
+      }
+    },
+    {
+      "date": "2026-02-11",
+      "tokens": 22434090,
+      "cost": 7.66,
+      "models": {
+        "default": 22434090
+      }
+    },
+    {
+      "date": "2026-02-12",
+      "tokens": 55935452,
+      "cost": 19.82,
+      "models": {
+        "default": 23027721,
+        "composer-1.5": 32907731
+      }
+    },
+    {
+      "date": "2026-02-13",
+      "tokens": 13592711,
+      "cost": 4.88,
+      "models": {
+        "composer-1.5": 13592711
+      }
+    },
+    {
+      "date": "2026-02-14",
+      "tokens": 5694435,
+      "cost": 2.33,
+      "models": {
+        "composer-1.5": 5694435
+      }
+    },
+    {
+      "date": "2026-02-15",
+      "tokens": 28034281,
+      "cost": 10,
+      "models": {
+        "composer-1.5": 28034281
+      }
+    },
+    {
+      "date": "2026-02-16",
+      "tokens": 865335,
+      "cost": 0.34,
+      "models": {
+        "composer-1.5": 865335
+      }
+    },
+    {
+      "date": "2026-02-21",
+      "tokens": 24614725,
+      "cost": 8.69,
+      "models": {
+        "composer-1.5": 24614725
+      }
+    },
+    {
+      "date": "2026-02-22",
+      "tokens": 5609805,
+      "cost": 2.12,
+      "models": {
+        "composer-1.5": 5609805
+      }
+    },
+    {
+      "date": "2026-02-23",
+      "tokens": 27599733,
+      "cost": 9.79,
+      "models": {
+        "composer-1.5": 27599733
+      }
+    },
+    {
+      "date": "2026-02-24",
+      "tokens": 16851917,
+      "cost": 5.91,
+      "models": {
+        "composer-1.5": 16851917
+      }
+    },
+    {
+      "date": "2026-02-28",
+      "tokens": 40854100,
+      "cost": 14.39,
+      "models": {
+        "composer-1.5": 40854100
+      }
+    },
+    {
+      "date": "2026-03-01",
+      "tokens": 18302160,
+      "cost": 6.54,
+      "models": {
+        "composer-1.5": 18302160
+      }
+    },
+    {
+      "date": "2026-03-02",
+      "tokens": 433181,
+      "cost": 0.25,
+      "models": {
+        "composer-1.5": 433181
+      }
+    },
+    {
+      "date": "2026-03-04",
+      "tokens": 4469486,
+      "cost": 1.51,
+      "models": {
+        "composer-1.5": 4469486
+      }
+    },
+    {
+      "date": "2026-03-05",
+      "tokens": 1054710,
+      "cost": 0.42,
+      "models": {
+        "composer-1.5": 1054710
+      }
+    },
+    {
+      "date": "2026-03-06",
+      "tokens": 8597979,
+      "cost": 2.56,
+      "models": {
+        "composer-1.5": 8597979
+      }
+    },
+    {
+      "date": "2026-03-07",
+      "tokens": 17205133,
+      "cost": 5.32,
+      "models": {
+        "composer-1.5": 17205133
+      }
+    },
+    {
+      "date": "2026-03-08",
+      "tokens": 3525820,
+      "cost": 1.22,
+      "models": {
+        "composer-1.5": 3525820
+      }
+    },
+    {
+      "date": "2026-03-10",
+      "tokens": 55668741,
+      "cost": 33.23,
+      "models": {
+        "composer-1.5": 10844513,
+        "claude-4-6-sonnet-medium-thinking": 44824228
+      }
+    },
+    {
+      "date": "2026-03-12",
+      "tokens": 9108215,
+      "cost": 5.51,
+      "models": {
+        "claude-4-6-sonnet-medium-thinking": 9108215
+      }
+    },
+    {
+      "date": "2026-03-29",
+      "tokens": 1350372,
+      "cost": 1.58,
+      "models": {
+        "claude-4-6-sonnet-medium-thinking": 1350372
+      }
+    },
+    {
+      "date": "2026-04-11",
+      "tokens": 1934654,
+      "cost": 1.42,
+      "models": {
+        "claude-4-6-sonnet-medium-thinking": 1934654
+      }
+    },
+    {
+      "date": "2026-04-12",
+      "tokens": 181568,
+      "cost": 0.27,
+      "models": {
+        "claude-4-6-sonnet-medium-thinking": 181568
+      }
+    },
+    {
+      "date": "2026-04-15",
+      "tokens": 1163023,
+      "cost": 0.88,
+      "models": {
+        "claude-4-6-sonnet-medium-thinking": 1163023
+      }
+    },
+    {
+      "date": "2026-06-21",
+      "tokens": 34618491,
+      "cost": 9.26,
+      "models": {
+        "gpt-5.3-codex": 34599084,
+        "gpt-5.3-codex-high": 19407
+      }
+    },
+    {
+      "date": "2026-06-22",
+      "tokens": 4261580,
+      "cost": 0.99,
+      "models": {
+        "gpt-5.3-codex": 4261580
+      }
+    },
+    {
+      "date": "2026-08-09",
+      "tokens": 494949,
+      "cost": 0.41,
+      "models": {
+        "k3": 494949
+      }
+    },
+    {
+      "date": "2026-08-10",
+      "tokens": 41299364,
+      "cost": 17.14,
+      "models": {
+        "k3": 33866687,
+        "kimi-for-coding": 7432677
+      }
+    },
+    {
+      "date": "2026-08-11",
+      "tokens": 8580480,
+      "cost": 5.03,
+      "models": {
+        "k3": 8580480
+      }
+    },
+    {
+      "date": "2026-08-12",
+      "tokens": 14348146,
+      "cost": 6.97,
+      "models": {
+        "k3": 14348146
+      }
+    },
+    {
+      "date": "2026-08-13",
+      "tokens": 653481,
+      "cost": 0.64,
+      "models": {
+        "k3": 653481
+      }
+    },
+    {
+      "date": "2026-08-14",
+      "tokens": 1747893,
+      "cost": 1.55,
+      "models": {
+        "k3": 1747893
+      }
+    },
+    {
+      "date": "2026-08-15",
+      "tokens": 443267,
+      "cost": 0.35,
+      "models": {
+        "k3": 443267
+      }
+    },
+    {
+      "date": "2026-08-24",
+      "tokens": 3812101,
+      "cost": 2.02,
+      "models": {
+        "k3": 3812101
+      }
+    },
+    {
+      "date": "2026-08-25",
+      "tokens": 6174280,
+      "cost": 2.95,
+      "models": {
+        "k3": 6174280
+      }
+    },
+    {
+      "date": "2026-08-26",
+      "tokens": 28022587,
+      "cost": 10.54,
+      "models": {
+        "k3": 28022587
+      }
+    },
+    {
+      "date": "2026-08-28",
+      "tokens": 37438821,
+      "cost": 15.55,
+      "models": {
+        "k3": 36639795,
+        "default": 799026
+      }
+    },
+    {
+      "date": "2026-08-29",
+      "tokens": 2210467,
+      "cost": 1.07,
+      "models": {
+        "k3": 2210467
+      }
+    },
+    {
+      "date": "2026-08-30",
+      "tokens": 26524354,
+      "cost": 12.53,
+      "models": {
+        "k3": 21790949,
+        "default": 4733405
+      }
+    },
+    {
+      "date": "2026-08-31",
+      "tokens": 867547,
+      "cost": 0.57,
+      "models": {
+        "k3": 867547
+      }
+    },
+    {
+      "date": "2026-09-01",
+      "tokens": 3111374,
+      "cost": 2.14,
+      "models": {
+        "k3": 3111374
+      }
+    },
+    {
+      "date": "2026-09-02",
+      "tokens": 27370008,
+      "cost": 19.21,
+      "models": {
+        "claude-opus-5": 27370008
+      }
+    },
+    {
+      "date": "2026-09-03",
+      "tokens": 308776297,
+      "cost": 254.97,
+      "models": {
+        "claude-opus-5": 287526393,
+        "gemini-3.1-pro": 23781,
+        "claude-4-5-sonnet": 363085,
+        "cursor-grok-4.5-high-fast": 911740,
+        "cursor-grok-4.6-high-fast": 11986222,
+        "claude-opus-4-8-thinking-high": 6802611,
+        "claude-fable-5-1-thinking-high": 1162465
+      }
+    },
+    {
+      "date": "2026-09-04",
+      "tokens": 215708808,
+      "cost": 194.5,
+      "models": {
+        "claude-opus-5": 163938599,
+        "claude-fable-5-1": 3186624,
+        "cursor-grok-4.6-high-fast": 40512513,
+        "claude-fable-5-1-thinking-high": 8071072
+      }
+    },
+    {
+      "date": "2026-09-05",
+      "tokens": 88300087,
+      "cost": 88.67,
+      "models": {
+        "claude-opus-5": 28616429,
+        "claude-fable-5-1": 39824856,
+        "cursor-grok-4.6-high-fast": 17374357,
+        "claude-fable-5-1-thinking-high": 2484445
+      }
+    },
+    {
+      "date": "2026-09-06",
+      "tokens": 409655409,
+      "cost": 322.09,
+      "models": {
+        "claude-opus-5": 246869719,
+        "cursor-grok-4.5-high-fast": 199680,
+        "cursor-grok-4.6-high-fast": 27687549,
+        "cursor-grok-4.6-xhigh-fast": 59145550,
+        "claude-fable-5-1-thinking-high": 75752911
+      }
+    },
+    {
+      "date": "2026-09-07",
+      "tokens": 261089841,
+      "cost": 218.22,
+      "models": {
+        "claude-opus-5": 159524980,
+        "claude-fable-5-1": 43753125,
+        "cursor-grok-4.6-high-fast": 900425,
+        "cursor-grok-4.6-xhigh-fast": 56911311
+      }
+    },
+    {
+      "date": "2026-09-08",
+      "tokens": 107449458,
+      "cost": 101,
+      "models": {
+        "claude-opus-5": 53355623,
+        "cursor-grok-4.6-xhigh-fast": 54093835
+      }
+    },
+    {
+      "date": "2026-09-09",
+      "tokens": 160608889,
+      "cost": 94.78,
+      "models": {
+        "claude-opus-5": 160608889
+      }
+    },
+    {
+      "date": "2026-09-10",
+      "tokens": 152599799,
+      "cost": 123.84,
+      "models": {
+        "claude-opus-5": 132881638,
+        "cursor-grok-4.6-xhigh-fast": 19718161
+      }
+    },
+    {
+      "date": "2026-09-11",
+      "tokens": 201833727,
+      "cost": 137.42,
+      "models": {
+        "claude-opus-5": 183552247,
+        "cursor-grok-4.6-xhigh-fast": 18281480
+      }
+    },
+    {
+      "date": "2026-09-12",
+      "tokens": 308370487,
+      "cost": 205.55,
+      "models": {
+        "claude-opus-5": 306676960,
+        "composer-2.5-fast": 1035553,
+        "cursor-grok-4.6-xhigh-fast": 657974
+      }
+    },
+    {
+      "date": "2026-09-13",
+      "tokens": 374850565,
+      "cost": 269.44,
+      "models": {
+        "claude-opus-5": 299970088,
+        "claude-fable-5-1": 37796810,
+        "cursor-grok-4.6-xhigh-fast": 37083667
+      }
+    },
+    {
+      "date": "2026-09-14",
+      "tokens": 433680440,
+      "cost": 331.72,
+      "models": {
+        "claude-opus-5": 231808284,
+        "claude-fable-5-1": 133211033,
+        "cursor-grok-4.6-xhigh-fast": 68661123
+      }
+    },
+    {
+      "date": "2026-09-15",
+      "tokens": 572807980,
+      "cost": 492.54,
+      "models": {
+        "claude-opus-5": 457382514,
+        "claude-fable-5-1": 13171852,
+        "cursor-grok-4.6-xhigh-fast": 102253614
+      }
+    },
+    {
+      "date": "2026-09-16",
+      "tokens": 460826399,
+      "cost": 308.26,
+      "models": {
+        "claude-opus-5": 412631600,
+        "cursor-grok-4.6-xhigh-fast": 48194799
+      }
+    },
+    {
+      "date": "2026-09-17",
+      "tokens": 101398939,
+      "cost": 84.98,
+      "models": {
+        "claude-opus-5": 77497648,
+        "cursor-grok-4.6-xhigh-fast": 23901291
+      }
+    },
+    {
+      "date": "2026-09-18",
+      "tokens": 3229362,
+      "cost": 6.24,
+      "models": {
+        "claude-opus-5": 3229362
+      }
+    },
+    {
+      "date": "2026-09-20",
+      "tokens": 186854266,
+      "cost": 125.25,
+      "models": {
+        "claude-opus-5": 169612279,
+        "cursor-grok-4.6-xhigh-fast": 17241987
+      }
+    },
+    {
+      "date": "2026-09-21",
+      "tokens": 333456573,
+      "cost": 276.11,
+      "models": {
+        "claude-opus-5": 266479951,
+        "grok-4.7-xhigh-fast": 66976622
+      }
+    },
+    {
+      "date": "2026-09-22",
+      "tokens": 41232198,
+      "cost": 34.81,
+      "models": {
+        "claude-opus-5": 20836215,
+        "claude-opus-5-5": 7141587,
+        "grok-4.7-xhigh-fast": 13254396
+      }
+    },
+    {
+      "date": "2026-09-24",
+      "tokens": 24181459,
+      "cost": 9.18,
+      "models": {
+        "claude-opus-5-5": 24181459
+      }
+    },
+    {
+      "date": "2026-09-27",
+      "tokens": 2187941,
+      "cost": 1.73,
+      "models": {
+        "claude-opus-5-5": 2187941
+      }
+    },
+    {
+      "date": "2026-09-28",
+      "tokens": 4029414,
+      "cost": 3.02,
+      "models": {
+        "claude-opus-5-5": 4029414
+      }
+    },
+    {
+      "date": "2026-09-29",
+      "tokens": 54303767,
+      "cost": 16.59,
+      "models": {
+        "claude-opus-5-5": 11240867,
+        "claude-sonnet-5-5": 43062900
+      }
+    },
+    {
+      "date": "2026-09-30",
+      "tokens": 4801962,
+      "cost": 2.71,
+      "models": {
+        "claude-opus-5-5": 4475078,
+        "claude-sonnet-5-5": 326884
+      }
+    },
+    {
+      "date": "2026-10-03",
+      "tokens": 428742121,
+      "cost": 125.94,
+      "models": {
+        "claude-opus-5-5": 426071544,
+        "grok-4.7-high-fast": 1374077,
+        "grok-4.7-xhigh-fast": 1296500
+      }
+    },
+    {
+      "date": "2026-10-04",
+      "tokens": 429969099,
+      "cost": 117.03,
+      "models": {
+        "claude-opus-5-5": 429969099
+      }
+    }
+  ],
+  "models": [
+    {
+      "name": "claude-opus-5",
+      "tokens": 3690369426,
+      "cost": 2463.01
+    },
+    {
+      "name": "cursor-grok-4.6-xhigh-fast",
+      "tokens": 506144792,
+      "cost": 618.39
+    },
+    {
+      "name": "default",
+      "tokens": 1123604449,
+      "cost": 408.81
+    },
+    {
+      "name": "claude-opus-5-5",
+      "tokens": 909296989,
+      "cost": 263.44
+    },
+    {
+      "name": "claude-fable-5-1",
+      "tokens": 270944300,
+      "cost": 238.28
+    },
+    {
+      "name": "claude-4-5-sonnet-thinking",
+      "tokens": 279000598,
+      "cost": 205.79
+    },
+    {
+      "name": "claude-4-sonnet",
+      "tokens": 293809257,
+      "cost": 177.1
+    },
+    {
+      "name": "grok-4.7-xhigh-fast",
+      "tokens": 81527518,
+      "cost": 133.12
+    },
+    {
+      "name": "cursor-grok-4.6-high-fast",
+      "tokens": 98461066,
+      "cost": 116.81
+    },
+    {
+      "name": "claude-fable-5-1-thinking-high",
+      "tokens": 87470893,
+      "cost": 109.55
+    },
+    {
+      "name": "claude-4-6-opus-high-thinking-fast",
+      "tokens": 11865424,
+      "cost": 104.26
+    },
+    {
+      "name": "composer-1.5",
+      "tokens": 261057755,
+      "cost": 92.01
+    },
+    {
+      "name": "k3",
+      "tokens": 162764003,
+      "cost": 76.45
+    },
+    {
+      "name": "claude-4-6-sonnet-medium-thinking",
+      "tokens": 58562060,
+      "cost": 39.36
+    },
+    {
+      "name": "grok-code-fast-1",
+      "tokens": 540578788,
+      "cost": 23.25
+    },
+    {
+      "name": "claude-sonnet-5-5",
+      "tokens": 43389784,
+      "cost": 12.48
+    },
+    {
+      "name": "gpt-5.3-codex",
+      "tokens": 38860664,
+      "cost": 10.21
+    },
+    {
+      "name": "gemini-2.5-pro",
+      "tokens": 11359809,
+      "cost": 6.14
+    },
+    {
+      "name": "claude-opus-4-8-thinking-high",
+      "tokens": 6802611,
+      "cost": 5.4
+    },
+    {
+      "name": "cursor-grok-4.5-high-fast",
+      "tokens": 1111420,
+      "cost": 2.32
+    },
+    {
+      "name": "grok-4-0709",
+      "tokens": 885115,
+      "cost": 2.11
+    },
+    {
+      "name": "grok-4.7-high-fast",
+      "tokens": 1374077,
+      "cost": 1.8
+    },
+    {
+      "name": "kimi-for-coding",
+      "tokens": 7432677,
+      "cost": 1.64
+    },
+    {
+      "name": "composer-2.5-fast",
+      "tokens": 1035553,
+      "cost": 0.89
+    },
+    {
+      "name": "gemini-2.5-flash",
+      "tokens": 3205302,
+      "cost": 0.55
+    },
+    {
+      "name": "gpt-5",
+      "tokens": 898332,
+      "cost": 0.47
+    },
+    {
+      "name": "agent_review",
+      "tokens": 1134055,
+      "cost": 0.37
+    },
+    {
+      "name": "claude-3-7-sonnet-thinking",
+      "tokens": 94016,
+      "cost": 0.29
+    },
+    {
+      "name": "claude-4-5-sonnet",
+      "tokens": 363085,
+      "cost": 0.22
+    },
+    {
+      "name": "gemini-3.1-pro",
+      "tokens": 23781,
+      "cost": 0.07
+    },
+    {
+      "name": "sonic",
+      "tokens": 10285520,
+      "cost": 0.06
+    },
+    {
+      "name": "gpt-5.3-codex-high",
+      "tokens": 19407,
+      "cost": 0.04
+    },
+    {
+      "name": "composer-1",
+      "tokens": 50384523,
+      "cost": 0
+    }
+  ],
+  "clients": [
+    {
+      "name": "claude",
+      "tokens": 4914000499,
+      "cost": 2977.21
+    },
+    {
+      "name": "cursor",
+      "tokens": 3455354759,
+      "cost": 2052.71
+    },
+    {
+      "name": "kimi",
+      "tokens": 170196680,
+      "cost": 78.09
+    },
+    {
+      "name": "gemini",
+      "tokens": 14565111,
+      "cost": 6.68
+    }
+  ],
+  "periodDays": [7, 15, 30],
+  "periods": {
+    "7": {
+      "cost": 265.28,
+      "tokens": 921846363,
+      "models": [
+        {
+          "name": "claude-opus-5-5",
+          "tokens": 875786002,
+          "cost": 248.4,
+          "shareDelta": 0.8896
+        },
+        {
+          "name": "claude-sonnet-5-5",
+          "tokens": 43389784,
+          "cost": 12.48,
+          "shareDelta": 0.047
+        },
+        {
+          "name": "grok-4.7-xhigh-fast",
+          "tokens": 1296500,
+          "cost": 2.6,
+          "shareDelta": -0.3958
+        },
+        {
+          "name": "grok-4.7-high-fast",
+          "tokens": 1374077,
+          "cost": 1.8,
+          "shareDelta": 0.0068
+        },
+        {
+          "name": "claude-opus-5",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.5477
+        }
+      ],
+      "clients": [
+        {
+          "name": "claude",
+          "tokens": 919175786,
+          "cost": 260.88,
+          "shareDelta": 0.389
+        },
+        {
+          "name": "cursor",
+          "tokens": 2670577,
+          "cost": 4.4,
+          "shareDelta": -0.389
+        }
+      ]
+    },
+    "15": {
+      "cost": 712.36,
+      "tokens": 1509758800,
+      "models": [
+        {
+          "name": "claude-opus-5",
+          "tokens": 456928445,
+          "cost": 280.91,
+          "shareDelta": -0.2592
+        },
+        {
+          "name": "claude-opus-5-5",
+          "tokens": 909296989,
+          "cost": 263.44,
+          "shareDelta": 0.3698
+        },
+        {
+          "name": "grok-4.7-xhigh-fast",
+          "tokens": 81527518,
+          "cost": 133.12,
+          "shareDelta": 0.1869
+        },
+        {
+          "name": "cursor-grok-4.6-xhigh-fast",
+          "tokens": 17241987,
+          "cost": 20.6,
+          "shareDelta": -0.1857
+        },
+        {
+          "name": "claude-sonnet-5-5",
+          "tokens": 43389784,
+          "cost": 12.48,
+          "shareDelta": 0.0175
+        },
+        {
+          "name": "grok-4.7-high-fast",
+          "tokens": 1374077,
+          "cost": 1.8,
+          "shareDelta": 0.0025
+        },
+        {
+          "name": "claude-fable-5-1",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0839
+        },
+        {
+          "name": "claude-fable-5-1-thinking-high",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0281
+        },
+        {
+          "name": "cursor-grok-4.6-high-fast",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0194
+        },
+        {
+          "name": "composer-2.5-fast",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0003
+        },
+        {
+          "name": "cursor-grok-4.5-high-fast",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0002
+        }
+      ],
+      "clients": [
+        {
+          "name": "claude",
+          "tokens": 1409615218,
+          "cost": 556.83,
+          "shareDelta": 0.0442
+        },
+        {
+          "name": "cursor",
+          "tokens": 100143582,
+          "cost": 155.53,
+          "shareDelta": -0.0442
+        }
+      ]
+    },
+    "30": {
+      "cost": 3497.11,
+      "tokens": 5146460182,
+      "models": [
+        {
+          "name": "claude-opus-5",
+          "tokens": 3211534426,
+          "cost": 2100.72,
+          "shareDelta": -0.0603
+        },
+        {
+          "name": "cursor-grok-4.6-xhigh-fast",
+          "tokens": 506144792,
+          "cost": 618.39,
+          "shareDelta": 0.1768
+        },
+        {
+          "name": "claude-opus-5-5",
+          "tokens": 909296989,
+          "cost": 263.44,
+          "shareDelta": 0.0753
+        },
+        {
+          "name": "claude-fable-5-1",
+          "tokens": 267757676,
+          "cost": 233.74,
+          "shareDelta": 0.0585
+        },
+        {
+          "name": "grok-4.7-xhigh-fast",
+          "tokens": 81527518,
+          "cost": 133.12,
+          "shareDelta": 0.0381
+        },
+        {
+          "name": "claude-fable-5-1-thinking-high",
+          "tokens": 78237356,
+          "cost": 78.19,
+          "shareDelta": -0.0349
+        },
+        {
+          "name": "cursor-grok-4.6-high-fast",
+          "tokens": 45962331,
+          "cost": 53.89,
+          "shareDelta": -0.0994
+        },
+        {
+          "name": "claude-sonnet-5-5",
+          "tokens": 43389784,
+          "cost": 12.48,
+          "shareDelta": 0.0036
+        },
+        {
+          "name": "grok-4.7-high-fast",
+          "tokens": 1374077,
+          "cost": 1.8,
+          "shareDelta": 0.0005
+        },
+        {
+          "name": "composer-2.5-fast",
+          "tokens": 1035553,
+          "cost": 0.89,
+          "shareDelta": 0.0003
+        },
+        {
+          "name": "cursor-grok-4.5-high-fast",
+          "tokens": 199680,
+          "cost": 0.45,
+          "shareDelta": -0.0033
+        },
+        {
+          "name": "k3",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.1395
+        },
+        {
+          "name": "claude-opus-4-8-thinking-high",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0099
+        },
+        {
+          "name": "kimi-for-coding",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.003
+        },
+        {
+          "name": "default",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0024
+        },
+        {
+          "name": "claude-4-5-sonnet",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0004
+        },
+        {
+          "name": "gemini-3.1-pro",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.0001
+        }
+      ],
+      "clients": [
+        {
+          "name": "claude",
+          "tokens": 4431978875,
+          "cost": 2610.38,
+          "shareDelta": 0.0772
+        },
+        {
+          "name": "cursor",
+          "tokens": 714481307,
+          "cost": 886.73,
+          "shareDelta": 0.0653
+        },
+        {
+          "name": "kimi",
+          "tokens": 0,
+          "cost": 0,
+          "shareDelta": -0.1425
+        }
+      ]
+    }
+  },
+  "agents": {
+    "updatedAt": "2026-10-04",
+    "items": [
+      {
+        "name": "Workflow Subagent",
+        "client": "claude",
+        "tokens": 249532689,
+        "messages": 2593
+      },
+      {
+        "name": "Explore",
+        "client": "claude",
+        "tokens": 2348333,
+        "messages": 35
+      },
+      {
+        "name": "Plan",
+        "client": "claude",
+        "tokens": 955650,
+        "messages": 11
+      }
+    ]
+  }
+}

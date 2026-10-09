@@ -1,0 +1,33 @@
+/*
+ * Coloured hashtags (lib/tag-hues.ts, Hashtag.astro): a tinted pill with a
+ * coloured "#", on note pages and Blog cards. The text stays --fg; the
+ * "#", the tint and the border carry the tag's hue, at a lightness per
+ * theme (the "#" measures 9.9:1 on dark and 6.3:1 on light). Global, so
+ * its classes start with `hashtag` (none of the island's names).
+ */
+:root {
+  --tag-l: 0.8;
+  --tag-c: 0.13;
+}
+
+:root[data-theme="light"] {
+  --tag-l: 0.48;
+  --tag-c: 0.15;
+}
+
+.hashtag {
+  display: inline-flex;
+  gap: 1px;
+  align-items: baseline;
+  padding: 2px 10px 2px 8px;
+  border: 1px solid oklch(var(--tag-l) var(--tag-c) var(--tag-hue) / 0.45);
+  border-radius: var(--radius-pill);
+  background: oklch(var(--tag-l) var(--tag-c) var(--tag-hue) / 0.12);
+  color: var(--fg);
+  font-size: var(--text-small);
+}
+
+.hashtag-hash {
+  color: oklch(var(--tag-l) var(--tag-c) var(--tag-hue));
+  font-weight: 600;
+}

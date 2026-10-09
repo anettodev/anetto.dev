@@ -1,0 +1,422 @@
+---
+import { Image } from "astro:assets";
+
+import { t } from "../i18n";
+import type { Locale } from "../i18n/locales";
+import type { Project } from "../lib/content";
+import Copy from "./Copy.astro";
+import Icon from "./Icon.astro";
+import UiIcon from "./UiIcon.astro";
+
+/*
+ * Project cards (requested by Antonio), in one of three layouts:
+ *   grid      two columns, one on narrow screens
+ *   grid-3    three columns, then two, then one (the Projects page's "All
+ *             projects", searched, filtered, sorted and paged by
+ *             <filter-list>: each card is a data-item with its title,
+ *             status and stack as data attributes)
+ *   carousel  one horizontal row that scrolls and snaps card by card, two
+ *             in view (one and a bit on phones); ProjectCarousel adds the
+ *             arrows, dots and autoplay (no scrollbar with JavaScript)
+ * Each card: cover, title, status (todo cyan, wip orange, done green),
+ * description clamped to three lines, up to five stack pills, then buttons
+ * for whichever links the project has (App Store, live demo, source code,
+ * website). A missing cover shows a [PLACEHOLDER] (§13.1).
+ */
+interface Props {
+  projects: Project[];
+  locale: Locale;
+  headingLevel?: 2 | 3;
+  /** Dev builds only: a dashed card with this text after the projects (§5.4). */
+  devPlaceholder?: string | undefined;
+  layout?: "grid" | "grid-3" | "carousel";
+}
+
+const {
+  projects,
+  locale,
+  headingLevel = 2,
+  devPlaceholder,
+  layout = "grid",
+} = Astro.props;
+const ui = t(locale);
+const Heading = `h${headingLevel}` as "h2" | "h3";
+
+const buttons = (project: Project) =>
+  (
+    [
+      ["appStore", ui.project.appStore],
+      ["demo", ui.project.demo],
+      ["source", ui.project.source],
+      ["website", ui.project.website],
+    ] as const
+  ).flatMap(([kind, label]) => {
+    const href = project.links[kind];
+    return href ? [{ kind, label, href }] : [];
+  });
+---
+
+<div
+  class:list={["cards", layout]}
+  tabindex={layout === "carousel" ? 0 : undefined}
+>
+  {projects.map((project) => {
+    const actions = buttons(project);
+    return (
+      <article
+        class="card"
+        data-item
+        data-title={project.title}
+        data-status={project.status}
+        data-stack={project.stack.join("|")}
+      >
+        <div class="cover">
+          {project.cover ? (
+            <Image
+              src={project.cover}
+              alt=""
+              widths={[420, 840]}
+              sizes="(min-width: 64rem) 420px, 100vw"
+            />
+          ) : (
+            <p class="cover-placeholder">
+              <Copy
+                text={`[PLACEHOLDER: ${project.title} ${ui.project.cover}]`}
+              />
+            </p>
+          )}
+        </div>
+
+        <div class="body">
+          <div class="title-row">
+            <Heading class="title" data-search>
+              {project.title}
+            </Heading>
+            <p class:list={["status", project.status]}>
+              <span class="dot" aria-hidden="true" />
+              {ui.status[project.status]}
+            </p>
+          </div>
+          <p class="description muted" data-search>
+            <Copy text={project.description} />
+          </p>
+          {project.stack.length > 0 && (
+            <ul class="stack" aria-label={ui.project.stack}>
+              {project.stack.map((tech) => (
+                <li>{tech}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {actions.length > 0 && (
+          <div class="actions">
+            {actions.map((action) => (
+              <a
+                href={action.href}
+                aria-label={`${action.label}: ${project.title}`}
+              >
+                {/* What the link opens, before its name (requested by Antonio). */}
+                {action.kind === "appStore" && <Icon name="apple" size={15} />}
+                {action.kind === "website" && (
+                  <UiIcon name="globe" size={15} strokeWidth={1.75} />
+                )}
+                {action.kind === "source" && <Icon name="github" size={15} />}
+                {action.label}
+                <UiIcon name="external" size={14} strokeWidth={2} />
+              </a>
+            ))}
+          </div>
+        )}
+      </article>
+    );
+  })}
+  {import.meta.env.DEV && devPlaceholder && (
+    <article class="dev-placeholder">
+      <p class="label">{ui.devOnly}</p>
+      <p class="muted">
+        <Copy text={devPlaceholder} />
+      </p>
+    </article>
+  )}
+</div>
+
+<style>
+  /* Isolated so the cards' hover halos stay above the page behind them. */
+  .cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    isolation: isolate;
+  }
+
+  /* Two per row once the content column (the <main> container) has room. */
+  @container (min-width: 40rem) {
+    .cards.grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Three per row from 44rem, two from 30rem, with smaller type to fit. */
+  @container (min-width: 30rem) {
+    .cards.grid-3 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 44rem) {
+    .cards.grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+
+  .grid-3 .title {
+    font-size: 1.125rem;
+  }
+
+  .grid-3 .body {
+    gap: 10px;
+    padding: 14px 16px 16px;
+  }
+
+  .card[hidden] {
+    display: none;
+  }
+
+  /*
+   * The carousel: one row that scrolls sideways and snaps to each card; two
+   * cards in view from 40rem, one and a bit (the next one peeking) below.
+   * A scroller clips what spills out of it, so the row reaches 20px past
+   * the cards on every side (padding, cancelled by the margin) to leave the
+   * hover halo room; the snap padding keeps the cards where they were.
+   */
+  .cards.carousel {
+    display: flex;
+    gap: 20px;
+    margin: -20px;
+    padding: 20px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  /* With JavaScript the carousel's arrows and dots move it: no scrollbar. */
+  :global(:root[data-js]) .cards.carousel {
+    scrollbar-width: none;
+  }
+
+  :global(:root[data-js]) .cards.carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel > * {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+
+  @container (min-width: 40rem) {
+    .carousel > * {
+      flex-basis: calc((100% - 20px) / 2);
+    }
+  }
+
+  .cards.carousel:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -16px;
+    border-radius: var(--radius-panel);
+  }
+
+  /*
+   * No overflow clip on the card, or it would clip its own halo; the
+   * buttons' row rounds its own corners instead.
+   */
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+  }
+
+  /*
+   * Hover (or keyboard focus inside): the intelligence halo, the ring that
+   * turns behind "Book a call" and the timeline's "more" link. It sits at
+   * z-index -1 in the cards' isolated context, behind every card's
+   * background, so it never tints a card.
+   */
+  .card::before {
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--halo-angle),
+      var(--intelligence-ring)
+    );
+    filter: blur(14px);
+    opacity: 0;
+    transition: opacity 200ms ease;
+    content: "";
+    pointer-events: none;
+  }
+
+  .card:is(:hover, :has(:focus-visible))::before {
+    opacity: 0.9;
+    animation: halo-turn 4s linear infinite;
+  }
+
+  /* Reduced motion: the halo shows, still. */
+  @media (prefers-reduced-motion: reduce) {
+    .card::before {
+      transition: none;
+    }
+
+    .card:is(:hover, :has(:focus-visible))::before {
+      animation: none;
+    }
+  }
+
+  .cover {
+    display: grid;
+    place-items: center;
+    margin: 10px 10px 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--chip);
+    aspect-ratio: 16 / 10;
+  }
+
+  .cover :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cover-placeholder {
+    padding: 16px;
+    font-size: var(--text-small);
+    text-align: center;
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 20px 20px;
+  }
+
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .title {
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .status {
+    display: inline-flex;
+    flex: none;
+    gap: 8px;
+    align-items: center;
+    font-size: var(--text-small);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--dot) 22%, transparent);
+  }
+
+  .todo {
+    --dot: var(--status-todo);
+  }
+
+  .wip {
+    --dot: var(--status-wip);
+  }
+
+  .done {
+    --dot: var(--status-done);
+  }
+
+  /* Three lines at most; the full text stays in the page source. */
+  .description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .stack li {
+    padding: 3px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    font-size: 0.8125rem;
+  }
+
+  /*
+   * Buttons share the row and wrap when there are more than fit (two to a
+   * row on phones, three on desktop). The 1px gaps over a --line background
+   * draw the dividers wherever the rows break.
+   */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 calc(var(--radius-panel) - 1px)
+      calc(var(--radius-panel) - 1px);
+    background: var(--line);
+  }
+
+  .actions a {
+    display: inline-flex;
+    flex: 1 1 9rem;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0 12px;
+    background: var(--surface);
+    color: var(--fg);
+    font-size: var(--text-small);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .actions a:hover {
+    background: var(--chip);
+  }
+
+  /* Dev builds only (§5.4); the one place dashed borders are allowed (§6.3). */
+  .dev-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+    padding: 40px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-panel);
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import Copy from "./Copy.astro";
+
+interface Props {
+  label: string;
+  title: string;
+  lead?: string | undefined;
+}
+
+const { label, title, lead } = Astro.props;
+/*
+ * A line break in the title ("…\n…") puts the rest on its own smaller line,
+ * still part of the heading (Experiences). Anything passed in (e.g.
+ * buttons) renders under the lead, inside the header.
+ */
+const [headline = "", ...rest] = title.split("\n");
+---
+
+<header class="page-header">
+  <p class="label">{label}</p>
+  <h1>
+    <Copy text={headline} />
+    {rest.length > 0 && (
+      <>
+        {" "}
+        <span class="sub">
+          <Copy text={rest.join(" ")} />
+        </span>
+      </>
+    )}
+  </h1>
+  {lead && (
+    <p class="lead muted">
+      <Copy text={lead} />
+    </p>
+  )}
+  <slot />
+</header>
+
+<style>
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: calc(var(--space-section) * 0.75);
+  }
+
+  /*
+   * 2px under the display size, filling the column (requested by Antonio):
+   * lines run as long as they fit (no lone last word) rather than the
+   * balanced lines other headings get.
+   */
+  h1 {
+    font-size: calc(var(--text-h1) - 2px);
+    line-height: 1;
+    text-wrap: pretty;
+  }
+
+  .sub {
+    display: block;
+    margin-top: 0.35em;
+    color: var(--muted);
+    font-size: 0.42em;
+    line-height: 1.2;
+  }
+
+  .lead {
+    font-size: calc(1.25rem - 2px);
+    line-height: 1.5;
+  }
+</style>
