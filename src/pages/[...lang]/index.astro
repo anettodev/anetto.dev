@@ -139,6 +139,20 @@ const LANE_LOOK = [
     () => document.querySelector(".wave")?.classList.add("is-on"),
     { once: true },
   );
+
+  /*
+   * Hovering (or tapping) the 👋 waves it again (requested by Antonio), at
+   * once, skipping the first wave's delay. Only once the last wave has
+   * finished: never mid-wave, never while it waits under the intro. With
+   * reduced motion it has no animation, so nothing plays.
+   */
+  const wave = document.querySelector<HTMLElement>(".wave");
+  wave?.addEventListener("pointerenter", () => {
+    const [animation] = wave.getAnimations();
+    if (!animation || animation.playState !== "finished") return;
+    animation.currentTime = Number(animation.effect?.getTiming().delay ?? 0);
+    animation.play();
+  });
 </script>
 
 <style>
@@ -155,9 +169,10 @@ const LANE_LOOK = [
   }
 
   /*
-   * The greeting's 👋 waves once as the page appears (requested by Antonio).
+   * The greeting's 👋 waves once as the page appears (requested by Antonio),
+   * and again on hover once that wave has ended (the script above).
    * During Home's intro the page sits under the intro card, so the wave
-   * waits, paused, until the intro reveals the page (the script below adds
+   * waits, paused, until the intro reveals the page (the script above adds
    * .is-on). Not at all with reduced motion.
    */
   .wave {
