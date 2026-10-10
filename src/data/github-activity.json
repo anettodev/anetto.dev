@@ -1,45 +1,8 @@
 {
   "login": "anettodev",
-  "fetchedAt": "2026-10-03",
-  "total": 957,
+  "fetchedAt": "2026-10-10",
+  "total": 1008,
   "weeks": [
-    [
-      {
-        "date": "2025-09-28",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-09-29",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-09-30",
-        "count": 2,
-        "level": 1
-      },
-      {
-        "date": "2025-10-01",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-10-02",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-10-03",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-10-04",
-        "count": 0,
-        "level": 0
-      }
-    ],
     [
       {
         "date": "2025-10-05",
@@ -549,13 +512,13 @@
       },
       {
         "date": "2026-01-09",
-        "count": 1,
-        "level": 1
+        "count": 0,
+        "level": 0
       },
       {
         "date": "2026-01-10",
-        "count": 0,
-        "level": 0
+        "count": 1,
+        "level": 1
       }
     ],
     [
@@ -715,7 +678,7 @@
       {
         "date": "2026-02-09",
         "count": 24,
-        "level": 3
+        "level": 4
       },
       {
         "date": "2026-02-10",
@@ -725,7 +688,7 @@
       {
         "date": "2026-02-11",
         "count": 8,
-        "level": 1
+        "level": 2
       },
       {
         "date": "2026-02-12",
@@ -821,7 +784,7 @@
       {
         "date": "2026-03-01",
         "count": 8,
-        "level": 1
+        "level": 2
       },
       {
         "date": "2026-03-02",
@@ -858,7 +821,7 @@
       {
         "date": "2026-03-08",
         "count": 8,
-        "level": 1
+        "level": 2
       },
       {
         "date": "2026-03-09",
@@ -946,12 +909,12 @@
       },
       {
         "date": "2026-03-25",
-        "count": 2,
+        "count": 1,
         "level": 1
       },
       {
         "date": "2026-03-26",
-        "count": 1,
+        "count": 2,
         "level": 1
       },
       {
@@ -968,12 +931,12 @@
     [
       {
         "date": "2026-03-29",
-        "count": 31,
+        "count": 30,
         "level": 4
       },
       {
         "date": "2026-03-30",
-        "count": 11,
+        "count": 12,
         "level": 2
       },
       {
@@ -1200,7 +1163,7 @@
       },
       {
         "date": "2026-05-12",
-        "count": 7,
+        "count": 6,
         "level": 1
       },
       {
@@ -1215,13 +1178,13 @@
       },
       {
         "date": "2026-05-15",
-        "count": 4,
+        "count": 2,
         "level": 1
       },
       {
         "date": "2026-05-16",
-        "count": 0,
-        "level": 0
+        "count": 3,
+        "level": 1
       }
     ],
     [
@@ -1233,7 +1196,7 @@
       {
         "date": "2026-05-18",
         "count": 8,
-        "level": 1
+        "level": 2
       },
       {
         "date": "2026-05-19",
@@ -1258,7 +1221,7 @@
       {
         "date": "2026-05-23",
         "count": 8,
-        "level": 1
+        "level": 2
       }
     ],
     [
@@ -1322,7 +1285,7 @@
       {
         "date": "2026-06-04",
         "count": 8,
-        "level": 1
+        "level": 2
       },
       {
         "date": "2026-06-05",
@@ -1413,7 +1376,7 @@
       {
         "date": "2026-06-21",
         "count": 8,
-        "level": 1
+        "level": 2
       },
       {
         "date": "2026-06-22",
@@ -1443,7 +1406,7 @@
       {
         "date": "2026-06-27",
         "count": 8,
-        "level": 1
+        "level": 2
       }
     ],
     [
@@ -1671,12 +1634,12 @@
     [
       {
         "date": "2026-08-09",
-        "count": 8,
+        "count": 7,
         "level": 1
       },
       {
         "date": "2026-08-10",
-        "count": 33,
+        "count": 34,
         "level": 4
       },
       {
@@ -1867,7 +1830,7 @@
       {
         "date": "2026-09-15",
         "count": 24,
-        "level": 3
+        "level": 4
       },
       {
         "date": "2026-09-16",
@@ -1960,23 +1923,60 @@
       },
       {
         "date": "2026-10-03",
+        "count": 6,
+        "level": 1
+      }
+    ],
+    [
+      {
+        "date": "2026-10-04",
         "count": 0,
         "level": 0
+      },
+      {
+        "date": "2026-10-05",
+        "count": 3,
+        "level": 1
+      },
+      {
+        "date": "2026-10-06",
+        "count": 2,
+        "level": 1
+      },
+      {
+        "date": "2026-10-07",
+        "count": 8,
+        "level": 2
+      },
+      {
+        "date": "2026-10-08",
+        "count": 0,
+        "level": 0
+      },
+      {
+        "date": "2026-10-09",
+        "count": 30,
+        "level": 4
+      },
+      {
+        "date": "2026-10-10",
+        "count": 4,
+        "level": 1
       }
     ]
   ],
   "repos": [
     {
+      "name": "anetto.dev",
+      "owner": "anettodev",
+      "url": "https://github.com/anettodev/anetto.dev",
+      "commits": 46
+    },
+    {
       "name": "github-planner",
       "owner": "anettodev",
       "url": "https://github.com/anettodev/github-planner",
       "commits": 22
-    },
-    {
-      "name": "anetto.dev",
-      "owner": "anettodev",
-      "url": "https://github.com/anettodev/anetto.dev",
-      "commits": 5
     },
     {
       "name": "anettodev",
