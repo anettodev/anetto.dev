@@ -1,22 +1,22 @@
 {
   "username": "anettodev",
-  "fetchedAt": "2026-10-15",
-  "syncedAt": "2026-10-15T01:02:32.415Z",
-  "rank": 1103,
+  "fetchedAt": "2026-10-16",
+  "syncedAt": "2026-10-16T01:00:46.563Z",
+  "rank": 1099,
   "range": {
     "start": "2025-05-17",
-    "end": "2026-10-14"
+    "end": "2026-10-15"
   },
   "totals": {
-    "tokens": 10652467165,
-    "cost": 5695.97,
-    "input": 132480727,
-    "output": 41753483,
-    "cacheRead": 10254299485,
-    "cacheWrite": 223845552,
+    "tokens": 10878566084,
+    "cost": 5749.68,
+    "input": 132481405,
+    "output": 42040167,
+    "cacheRead": 10479525786,
+    "cacheWrite": 224430808,
     "reasoning": 87918,
-    "messages": 24087,
-    "activeDays": 179,
+    "messages": 24426,
+    "activeDays": 180,
     "sessions": 4750
   },
   "days": [
@@ -1526,10 +1526,18 @@
     },
     {
       "date": "2026-10-14",
-      "tokens": 150425866,
-      "cost": 45.34,
+      "tokens": 371879978,
+      "cost": 98,
       "models": {
-        "claude-opus-5-5": 150425866
+        "claude-opus-5-5": 371879978
+      }
+    },
+    {
+      "date": "2026-10-15",
+      "tokens": 4644807,
+      "cost": 1.05,
+      "models": {
+        "claude-opus-5-5": 4644807
       }
     }
   ],
@@ -1541,8 +1549,8 @@
     },
     {
       "name": "claude-opus-5-5",
-      "tokens": 3005764555,
-      "cost": 848.43
+      "tokens": 3231863474,
+      "cost": 902.14
     },
     {
       "name": "cursor-grok-4.6-xhigh-fast",
@@ -1703,8 +1711,8 @@
   "clients": [
     {
       "name": "claude",
-      "tokens": 7012350615,
-      "cost": 3558.49
+      "tokens": 7238449534,
+      "cost": 3612.2
     },
     {
       "name": "cursor",
@@ -1725,14 +1733,14 @@
   "periodDays": [7, 15, 30],
   "periods": {
     "7": {
-      "cost": 425.8,
-      "tokens": 1502407304,
+      "cost": 432.16,
+      "tokens": 1590300123,
       "models": [
         {
           "name": "claude-opus-5-5",
-          "tokens": 1500524754,
-          "cost": 425.28,
-          "shareDelta": 0.0097
+          "tokens": 1588417573,
+          "cost": 431.64,
+          "shareDelta": 0.0086
         },
         {
           "name": "claude-sonnet-5-5",
@@ -1744,167 +1752,167 @@
           "name": "grok-4.7-xhigh-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0065
+          "shareDelta": -0.0058
         },
         {
           "name": "grok-4.7-high-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0045
+          "shareDelta": -0.004
         }
       ],
       "clients": [
         {
           "name": "claude",
-          "tokens": 1502407304,
-          "cost": 425.8,
-          "shareDelta": 0.0109
+          "tokens": 1590300123,
+          "cost": 432.16,
+          "shareDelta": 0.0098
         },
         {
           "name": "cursor",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0109
+          "shareDelta": -0.0098
         }
       ]
     },
     "15": {
-      "cost": 828.47,
-      "tokens": 2957061336,
+      "cost": 882.18,
+      "tokens": 3183160255,
       "models": [
         {
           "name": "claude-opus-5-5",
-          "tokens": 2952508209,
-          "cost": 823.55,
-          "shareDelta": 0.9653
+          "tokens": 3178607128,
+          "cost": 877.26,
+          "shareDelta": 0.9497
         },
         {
           "name": "grok-4.7-xhigh-fast",
           "tokens": 1296500,
           "cost": 2.6,
-          "shareDelta": -0.1478
+          "shareDelta": -0.2316
         },
         {
           "name": "grok-4.7-high-fast",
           "tokens": 1374077,
           "cost": 1.8,
-          "shareDelta": 0.0022
+          "shareDelta": 0.002
         },
         {
           "name": "claude-sonnet-5-5",
           "tokens": 1882550,
           "cost": 0.52,
-          "shareDelta": -0.0089
+          "shareDelta": -0.0142
         },
         {
           "name": "claude-opus-5",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.6857
+          "shareDelta": -0.615
         },
         {
           "name": "cursor-grok-4.6-xhigh-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.125
+          "shareDelta": -0.0909
         }
       ],
       "clients": [
         {
           "name": "claude",
-          "tokens": 2954390759,
-          "cost": 824.07,
-          "shareDelta": 0.2707
+          "tokens": 3180489678,
+          "cost": 877.78,
+          "shareDelta": 0.3205
         },
         {
           "name": "cursor",
           "tokens": 2670577,
           "cost": 4.4,
-          "shareDelta": -0.2707
+          "shareDelta": -0.3205
         }
       ]
     },
     "30": {
-      "cost": 1693.13,
-      "tokens": 4173563616,
+      "cost": 1438.57,
+      "tokens": 3938836136,
       "models": [
         {
           "name": "claude-opus-5-5",
-          "tokens": 3005764555,
-          "cost": 848.43,
-          "shareDelta": 0.5011
+          "tokens": 3231863474,
+          "cost": 902.14,
+          "shareDelta": 0.6271
         },
         {
           "name": "claude-opus-5",
-          "tokens": 950287055,
-          "cost": 592.91,
-          "shareDelta": -0.2944
+          "tokens": 537655455,
+          "cost": 342.18,
+          "shareDelta": -0.4229
         },
         {
           "name": "grok-4.7-xhigh-fast",
           "tokens": 81527518,
           "cost": 133.12,
-          "shareDelta": 0.0786
+          "shareDelta": 0.0925
         },
         {
           "name": "cursor-grok-4.6-xhigh-fast",
-          "tokens": 89338077,
-          "cost": 108.09,
-          "shareDelta": -0.112
+          "tokens": 41143278,
+          "cost": 50.56,
+          "shareDelta": -0.1418
         },
         {
           "name": "claude-sonnet-5-5",
           "tokens": 45272334,
           "cost": 8.77,
-          "shareDelta": 0.0052
+          "shareDelta": 0.0061
         },
         {
           "name": "grok-4.7-high-fast",
           "tokens": 1374077,
           "cost": 1.8,
-          "shareDelta": 0.0011
+          "shareDelta": 0.0013
         },
         {
           "name": "claude-fable-5-1",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0821
+          "shareDelta": -0.0742
         },
         {
           "name": "cursor-grok-4.6-high-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0403
+          "shareDelta": -0.0364
         },
         {
           "name": "claude-fable-5-1-thinking-high",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0378
+          "shareDelta": -0.0341
         },
         {
           "name": "k3",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0159
+          "shareDelta": -0.0143
         },
         {
           "name": "claude-opus-4-8-thinking-high",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0019
+          "shareDelta": -0.0017
         },
         {
           "name": "cursor-grok-4.5-high-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0008
+          "shareDelta": -0.0007
         },
         {
           "name": "default",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0005
+          "shareDelta": -0.0004
         },
         {
           "name": "composer-2.5-fast",
@@ -1928,21 +1936,21 @@
       "clients": [
         {
           "name": "claude",
-          "tokens": 4001323944,
-          "cost": 1450.11,
-          "shareDelta": 0.1298
+          "tokens": 3814791263,
+          "cost": 1253.09,
+          "shareDelta": 0.136
         },
         {
           "name": "cursor",
-          "tokens": 172239672,
-          "cost": 243.01,
-          "shareDelta": -0.1139
+          "tokens": 124044873,
+          "cost": 185.48,
+          "shareDelta": -0.1217
         },
         {
           "name": "kimi",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0159
+          "shareDelta": -0.0143
         }
       ]
     }

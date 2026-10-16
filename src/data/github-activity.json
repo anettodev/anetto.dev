@@ -1,6 +1,6 @@
 {
   "login": "anettodev",
-  "fetchedAt": "2026-10-15",
+  "fetchedAt": "2026-10-16",
   "total": 1024,
   "weeks": [
     [
@@ -1950,6 +1950,11 @@
       },
       {
         "date": "2026-10-15",
+        "count": 0,
+        "level": 0
+      },
+      {
+        "date": "2026-10-16",
         "count": 0,
         "level": 0
       }
