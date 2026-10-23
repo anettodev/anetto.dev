@@ -32,10 +32,10 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.3.5"
+    "astro": "^7.4.1"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.11",
     "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/sdk": "^1.32.0",
     "eslint": "^10.12.0",
