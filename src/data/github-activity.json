@@ -1,7 +1,7 @@
 {
   "login": "anettodev",
-  "fetchedAt": "2026-11-08",
-  "total": 1246,
+  "fetchedAt": "2026-11-09",
+  "total": 1239,
   "weeks": [
     [
       {
@@ -1932,6 +1932,11 @@
         "date": "2026-11-08",
         "count": 0,
         "level": 0
+      },
+      {
+        "date": "2026-11-09",
+        "count": 0,
+        "level": 0
       }
     ]
   ],
@@ -1940,19 +1945,13 @@
       "name": "anetto.dev",
       "owner": "anettodev",
       "url": "https://github.com/anettodev/anetto.dev",
-      "commits": 46
+      "commits": 41
     },
     {
       "name": "github-planner",
       "owner": "anettodev",
       "url": "https://github.com/anettodev/github-planner",
       "commits": 22
-    },
-    {
-      "name": "anettodev",
-      "owner": "anettodev",
-      "url": "https://github.com/anettodev/anettodev",
-      "commits": 2
     },
     {
       "name": "mcs",
