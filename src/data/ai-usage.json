@@ -1,8 +1,8 @@
 {
   "username": "anettodev",
-  "fetchedAt": "2026-11-16",
-  "syncedAt": "2026-11-16T01:00:35.783Z",
-  "rank": 1085,
+  "fetchedAt": "2026-11-17",
+  "syncedAt": "2026-11-17T01:00:35.636Z",
+  "rank": 1093,
   "range": {
     "start": "2025-05-17",
     "end": "2026-11-04"
@@ -1883,58 +1883,58 @@
       "clients": []
     },
     "15": {
-      "cost": 191.6,
-      "tokens": 660937230,
+      "cost": 102.69,
+      "tokens": 343592018,
       "models": [
         {
           "name": "claude-opus-5-5",
-          "tokens": 660937230,
-          "cost": 191.6,
+          "tokens": 343592018,
+          "cost": 102.69,
           "shareDelta": 0
         }
       ],
       "clients": [
         {
           "name": "claude",
-          "tokens": 660937230,
-          "cost": 191.6,
+          "tokens": 343592018,
+          "cost": 102.69,
           "shareDelta": 0
         }
       ]
     },
     "30": {
-      "cost": 997.26,
-      "tokens": 3598039366,
+      "cost": 971.47,
+      "tokens": 3511390107,
       "models": [
         {
           "name": "claude-opus-5-5",
-          "tokens": 3598039366,
-          "cost": 997.26,
-          "shareDelta": 0.2722
+          "tokens": 3511390107,
+          "cost": 971.47,
+          "shareDelta": 0.2653
         },
         {
           "name": "claude-opus-5",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.1732
+          "shareDelta": -0.1674
         },
         {
           "name": "grok-4.7-xhigh-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0803
+          "shareDelta": -0.0793
         },
         {
           "name": "cursor-grok-4.6-xhigh-fast",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0124
+          "shareDelta": -0.0123
         },
         {
           "name": "claude-sonnet-5-5",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0053
+          "shareDelta": -0.0052
         },
         {
           "name": "grok-4.7-high-fast",
@@ -1946,15 +1946,15 @@
       "clients": [
         {
           "name": "claude",
-          "tokens": 3598039366,
-          "cost": 997.26,
-          "shareDelta": 0.0938
+          "tokens": 3511390107,
+          "cost": 971.47,
+          "shareDelta": 0.0927
         },
         {
           "name": "cursor",
           "tokens": 0,
           "cost": 0,
-          "shareDelta": -0.0938
+          "shareDelta": -0.0927
         }
       ]
     }
